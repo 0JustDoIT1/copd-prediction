@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables (절대 git에 올리지 않음 — DB 비밀번호 등 민감정보 포함)
+.env
+.env.*
+!.env.example
+
+# ML 모델 / 데이터 파일 (용량 크고 민감할 수 있음)
+*.pkl
+*.joblib
+*.sas7bdat
+*.csv
+
+# IDE / 에디터
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 마이그레이션 파일은 보통 git에 포함하지만,
+# 팀에서 마이그레이션을 매번 새로 생성하는 방식으로 간다면 아래 주석 해제
+# */migrations/*.py
+# !*/migrations/__init__.py
