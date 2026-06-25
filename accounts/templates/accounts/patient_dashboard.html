@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block page_title %}<h1 class="page-title">환자 홈</h1>{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">최근 검사 권고 점수</div>
+      <div class="stat-value">—</div>
+      <div class="stat-trend">폐활량검사 권고 점수 (진단 아님)</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">최근 검진 제출일</div>
+      <div class="stat-value">—</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">BMI</div>
+      <div class="stat-value">—</div>
+    </div>
+  </div>
+</div>
+
+<p>환자 대시보드 화면 틀입니다. (실제 데이터 연동 전)</p>
+{% endblock %}
