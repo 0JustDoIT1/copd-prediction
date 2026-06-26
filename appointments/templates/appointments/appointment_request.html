@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}검사 예약{% endblock %}
+
+{% block page_title %}<h1 class="page-title">검사 예약</h1>{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 860px;">
+
+  <!-- 달력 -->
+<!-- 달력 -->
+  <div>
+    <p style="font-size:15px; font-weight:700; margin-bottom:14px;">날짜 선택</p>
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <span id="cal-title" style="font-size:15px; font-weight:700;">2026년 6월</span>
+        <div style="display:flex; gap:6px;">
+            <button onclick="changeMonth(-1)" style="width:30px; height:30px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer;">&lt;</button>
+            <button onclick="changeMonth(1)" style="width:30px; height:30px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer;">&gt;</button>      </div>
+      <div id="calendar-grid"></div>
+    </div>
+  </div>
+
+  <!-- 슬롯 -->
+  <div>
+    <p style="font-size:15px; font-weight:700; margin-bottom:14px;">시간 선택</p>
+    <div class="card">
+      <p id="slot-label" style="font-size:13px; color:#62756f; margin-bottom:12px;">날짜를 먼저 선택해주세요</p>
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+        {% for time in slot_times %}
+        <button class="slot-btn" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const DAYS = ['일','월','화','수','목','금','토'];
+let current = new Date();
+
+function renderCalendar() {
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  document.getElementById('cal-title').textContent = `${year}년 ${month+1}월`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+
+  let html = '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px;">';
+  DAYS.forEach(d => {
+    html += `<div style="text-align:center; font-size:11px; color:#62756f; font-weight:600; padding:4px 0;">${d}</div>`;
+  });
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let d = 1; d <= lastDate; d++) {
+    const date = new Date(year, month, d);
+    const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+    let style = "text-align:center; padding:7px 4px; border-radius:8px; font-size:13px; cursor:pointer;";
+    if (isPast) style += "color:#ccc; cursor:not-allowed;";
+    else if (isToday) style += "border:1.5px solid #4a7c72; color:#4a7c72; font-weight:700;";
+    html += `<div style="${style}" ${!isPast ? `onclick="selectDay(${year},${month+1},${d})"` : ''}>${d}</div>`;
+  }
+  html += '</div>';
+  document.getElementById('calendar-grid').innerHTML = html;
+}
+
+function changeMonth(dir) {
+  current.setMonth(current.getMonth() + dir);
+  renderCalendar();
+}
+
+function selectDay(year, month, day) {
+  document.querySelectorAll('#calendar-grid div[onclick]').forEach(el => {
+    el.style.background = '';
+    el.style.color = '';
+  });
+  event.target.style.background = '#4a7c72';
+  event.target.style.color = '#fff';
+  event.target.style.fontWeight = '700';
+  document.getElementById('slot-label').textContent = `${year}년 ${month}월 ${day}일 예약 가능 시간`;
+}
+
+renderCalendar();
+</script>
+{% endblock %}
