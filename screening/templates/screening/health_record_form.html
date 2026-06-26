@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}건강검진 수치 입력 | 미래의료병원{% endblock %}
+{% block page_title %}건강검진 수치 입력{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">건강검진 수치 입력</h5>
+  </div>
+
+  <div class="card-body">
+    <div class="alert-warning-soft mb-4">
+      키와 몸무게를 입력하면 BMI는 서버에서 자동 계산됩니다.
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          저장 및 BMI 계산 확인
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

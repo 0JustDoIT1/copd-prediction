@@ -1,167 +1,234 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}미래의료병원 - 폐쇄성폐질환{% endblock %}</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}미래의료병원 - 폐쇄성폐질환{% endblock %}</title>
 
-  <!-- Bootstrap (CDN) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-  {% block extra_css %}{% endblock %}
-</head>
-<body>
-<div class="app-shell">
+    <!-- Bootstrap (CDN) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- ===================== SIDEBAR ===================== -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark"><i class="bi bi-lungs"></i></div>
+          <div class="brand-text">미래의료병원<br />폐쇄성폐질환</div>
+        </div>
 
-  <!-- ===================== SIDEBAR ===================== -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark"><i class="bi bi-lungs"></i></div>
-      <div class="brand-text">미래의료병원<br>폐쇄성폐질환</div>
-    </div>
+        <nav class="sidebar-nav">
+          {% if user.is_authenticated %} {% if user.role == 'patient' %} {#
+          ============ 환자용 메뉴 ============ #}
 
-    <nav class="sidebar-nav">
-      {% if user.is_authenticated %}
-
-        {% if user.role == 'patient' %}
-          {# ============ 환자용 메뉴 ============ #}
-
-          <a href="{% url 'accounts:dashboard' %}"
-             class="nav-link {% if active_menu == 'home' %}active{% endif %}">
+          <a
+            href="{% url 'accounts:dashboard' %}"
+            class="nav-link {% if active_menu == 'home' %}active{% endif %}"
+          >
             <i class="bi bi-house"></i><span>홈</span>
           </a>
 
           <div class="nav-section">검진/검사</div>
-          <div class="nav-group {% if active_group == 'screening' %}open{% endif %}">
-            <a href="javascript:void(0)" class="nav-link nav-group-toggle"
-               data-target="group-screening"
-               aria-expanded="{% if active_group == 'screening' %}true{% else %}false{% endif %}">
+          <div
+            class="nav-group {% if active_group == 'screening' %}open{% endif %}"
+          >
+            <a
+              href="javascript:void(0)"
+              class="nav-link nav-group-toggle"
+              data-target="group-screening"
+              aria-expanded="{% if active_group == 'screening' %}true{% else %}false{% endif %}"
+            >
               <i class="bi bi-clipboard2-pulse"></i><span>검진/검사</span>
               <i class="bi bi-chevron-down nav-caret"></i>
             </a>
-            <div class="nav-submenu {% if active_group != 'screening' %}d-none{% endif %}" id="group-screening">
-              <a href="{% url 'screening:questionnaire' %}"
-                 class="nav-link nav-sublink {% if active_menu == 'questionnaire' %}active{% endif %}">문진 입력</a>
-              <a href="{% url 'screening:health_record' %}"
-                 class="nav-link nav-sublink {% if active_menu == 'health_record' %}active{% endif %}">검진수치 입력</a>
-              <a href="{% url 'screening:result_list' %}"
-                 class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}">검사 결과/이력</a>
+            <div
+              class="nav-submenu {% if active_group != 'screening' %}d-none{% endif %}"
+              id="group-screening"
+            >
+              <a
+                href="{% url 'screening:questionnaire' %}"
+                class="nav-link nav-sublink {% if active_menu == 'questionnaire' %}active{% endif %}"
+                >문진 입력</a
+              >
+              <a
+                href="{% url 'screening:questionnaire' %}"
+                class="nav-link nav-sublink {% if active_menu == 'health_record' %}active{% endif %}"
+                >검진수치 입력</a
+              >
+              <a
+                href="{% url 'screening:questionnaire' %}"
+                class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}"
+                >검사 결과/이력</a
+              >
             </div>
           </div>
 
           <div class="nav-section">비교 리포트</div>
-          <div class="nav-group {% if active_group == 'benchmarks' %}open{% endif %}">
-            <a href="javascript:void(0)" class="nav-link nav-group-toggle"
-               data-target="group-benchmarks"
-               aria-expanded="{% if active_group == 'benchmarks' %}true{% else %}false{% endif %}">
+          <div
+            class="nav-group {% if active_group == 'benchmarks' %}open{% endif %}"
+          >
+            <a
+              href="javascript:void(0)"
+              class="nav-link nav-group-toggle"
+              data-target="group-benchmarks"
+              aria-expanded="{% if active_group == 'benchmarks' %}true{% else %}false{% endif %}"
+            >
               <i class="bi bi-bar-chart"></i><span>비교 리포트</span>
               <i class="bi bi-chevron-down nav-caret"></i>
             </a>
-            <div class="nav-submenu {% if active_group != 'benchmarks' %}d-none{% endif %}" id="group-benchmarks">
-              <a href="{% url 'benchmarks:report' %}"
-                 class="nav-link nav-sublink {% if active_menu == 'benchmark_report' %}active{% endif %}">위험요인 비교</a>
-              <a href="{% url 'benchmarks:tracking' %}"
-                 class="nav-link nav-sublink {% if active_menu == 'tracking' %}active{% endif %}">추적기록 타임라인</a>
+            <div
+              class="nav-submenu {% if active_group != 'benchmarks' %}d-none{% endif %}"
+              id="group-benchmarks"
+            >
+              <a
+                href="{% url 'benchmarks:report' %}"
+                class="nav-link nav-sublink {% if active_menu == 'benchmark_report' %}active{% endif %}"
+                >위험요인 비교</a
+              >
+              <a
+                href="{% url 'benchmarks:tracking' %}"
+                class="nav-link nav-sublink {% if active_menu == 'tracking' %}active{% endif %}"
+                >추적기록 타임라인</a
+              >
             </div>
           </div>
 
           <div class="nav-section">관리</div>
-          <a href="{% url 'daily_care:daily_log' %}"
-             class="nav-link {% if active_menu == 'daily_log' %}active{% endif %}">
+          <a
+            href="{% url 'daily_care:daily_log' %}"
+            class="nav-link {% if active_menu == 'daily_log' %}active{% endif %}"
+          >
             <i class="bi bi-heart-pulse"></i><span>일상 관리</span>
           </a>
-          <a href="{% url 'appointments:appointment' %}"
-             class="nav-link {% if active_menu == 'appointment' %}active{% endif %}">
+          <a
+            href="{% url 'appointments:appointment' %}"
+            class="nav-link {% if active_menu == 'appointment' %}active{% endif %}"
+          >
             <i class="bi bi-calendar-check"></i><span>검사 예약</span>
           </a>
 
-        {% elif user.role == 'doctor' %}
-          {# ============ 의사용 메뉴 (참고용 placeholder, 별도 설계 예정) ============ #}
-          <a href="{% url 'screening:doctor_dashboard' %}"
-             class="nav-link {% if active_menu == 'doctor_dashboard' %}active{% endif %}">
+          {% elif user.role == 'doctor' %} {# ============ 의사용 메뉴 (참고용
+          placeholder, 별도 설계 예정) ============ #}
+          <a
+            href="{% url 'screening:doctor_dashboard' %}"
+            class="nav-link {% if active_menu == 'doctor_dashboard' %}active{% endif %}"
+          >
             <i class="bi bi-house"></i><span>검사 권고 대상 목록</span>
           </a>
-        {% endif %}
+          {% endif %} {% endif %}
+        </nav>
 
-      {% endif %}
-    </nav>
-
-    <div class="sidebar-footer">
-      <span style="font-size:11px; color:rgba(239,246,243,0.4);">© 미래의료병원</span>
-    </div>
-  </aside>
-
-  <!-- ===================== MAIN AREA ===================== -->
-  <div class="main-area">
-    <header class="topbar">
-      <div style="display:flex; align-items:center; gap:14px;">
-        <button class="icon-btn d-md-none" id="sidebarToggle" aria-label="메뉴 열기">
-          <i class="bi bi-list"></i>
-        </button>
-        <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
-      </div>
-
-      <div class="topbar-right">
-        {% if user.is_authenticated and user.role == 'patient' and not has_checked_in_today %}
-          <a href="{% url 'daily_care:daily_log' %}" class="checkin-banner" id="checkinBanner">
-            <i class="bi bi-pencil-square"></i> 오늘의 호흡 체크인을 작성해주세요
-          </a>
-        {% endif %}
-
-        <button class="icon-btn" aria-label="알림"><i class="bi bi-bell"></i></button>
-
-        {% if user.is_authenticated %}
-        <div class="profile-chip dropdown">
-          <a href="javascript:void(0)" class="dropdown-toggle d-flex align-items-center gap-2"
-             style="text-decoration:none;" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
-            <span class="profile-name">{{ user.username }}</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>내 정보 수정</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
-                {% csrf_token %}
-                <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>로그아웃</button>
-              </form>
-            </li>
-          </ul>
+        <div class="sidebar-footer">
+          <span style="font-size: 11px; color: rgba(239, 246, 243, 0.4)"
+            >© 미래의료병원</span
+          >
         </div>
-        {% endif %}
+      </aside>
+
+      <!-- ===================== MAIN AREA ===================== -->
+      <div class="main-area">
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 14px">
+            <button
+              class="icon-btn d-md-none"
+              id="sidebarToggle"
+              aria-label="메뉴 열기"
+            >
+              <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+          </div>
+
+          <div class="topbar-right">
+            {% if user.is_authenticated and user.role == 'patient' and not
+            has_checked_in_today %}
+            <a
+              href="{% url 'daily_care:daily_log' %}"
+              class="checkin-banner"
+              id="checkinBanner"
+            >
+              <i class="bi bi-pencil-square"></i> 오늘의 호흡 체크인을
+              작성해주세요
+            </a>
+            {% endif %}
+
+            <button class="icon-btn" aria-label="알림">
+              <i class="bi bi-bell"></i>
+            </button>
+
+            {% if user.is_authenticated %}
+            <div class="profile-chip dropdown">
+              <a
+                href="javascript:void(0)"
+                class="dropdown-toggle d-flex align-items-center gap-2"
+                style="text-decoration: none"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+                <span class="profile-name">{{ user.username }}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{% url 'accounts:profile' %}"
+                    ><i class="bi bi-person me-2"></i>내 정보 수정</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    method="post"
+                    action="{% url 'accounts:logout' %}"
+                    class="m-0"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">
+                      <i class="bi bi-box-arrow-right me-2"></i>로그아웃
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </header>
+
+        <main class="content">{% block content %}{% endblock %}</main>
       </div>
-    </header>
+    </div>
 
-    <main class="content">
-      {% block content %}{% endblock %}
-    </main>
-  </div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 사이드바 그룹(드롭다운) 토글
+      document.querySelectorAll(".nav-group-toggle").forEach(function (toggle) {
+        toggle.addEventListener("click", function () {
+          var targetId = toggle.getAttribute("data-target");
+          var submenu = document.getElementById(targetId);
+          var isOpen = !submenu.classList.contains("d-none");
+          submenu.classList.toggle("d-none", isOpen);
+          toggle.setAttribute("aria-expanded", String(!isOpen));
+          toggle.classList.toggle("group-open", !isOpen);
+        });
+      });
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  // 사이드바 그룹(드롭다운) 토글
-  document.querySelectorAll('.nav-group-toggle').forEach(function (toggle) {
-    toggle.addEventListener('click', function () {
-      var targetId = toggle.getAttribute('data-target');
-      var submenu = document.getElementById(targetId);
-      var isOpen = !submenu.classList.contains('d-none');
-      submenu.classList.toggle('d-none', isOpen);
-      toggle.setAttribute('aria-expanded', String(!isOpen));
-      toggle.classList.toggle('group-open', !isOpen);
-    });
-  });
-
-  // 모바일 사이드바 열기/닫기
-  var sidebarToggle = document.getElementById('sidebarToggle');
-  if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', function () {
-      document.getElementById('sidebar').classList.toggle('open');
-    });
-  }
-</script>
-{% block extra_js %}{% endblock %}
-</body>
+      // 모바일 사이드바 열기/닫기
+      var sidebarToggle = document.getElementById("sidebarToggle");
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function () {
+          document.getElementById("sidebar").classList.toggle("open");
+        });
+      }
+    </script>
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>

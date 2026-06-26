@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}문진 입력 | 미래의료병원{% endblock %}
+{% block page_title %}COPD 선별 문진{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">문진 정보 입력</h5>
+  </div>
+
+  <div class="card-body">
+    <p class="text-muted mb-4">
+      폐활량검사 권고 여부 판단을 위한 문진 정보를 입력해주세요.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          다음: 건강검진 수치 입력
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
