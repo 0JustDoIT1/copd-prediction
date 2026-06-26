@@ -12,7 +12,7 @@ from .models import DailyLog
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'daily_care/dashboard.html'
+    template_name = 'daily_care/daily_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +54,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 class CheckinView(LoginRequiredMixin, CreateView):
     model = DailyLog
     form_class = DailyLogForm
-    template_name = 'daily_care/checkin.html'
+    template_name = 'daily_care/daily_checkin.html'
     success_url = reverse_lazy('daily_care:dashboard')
 
     def get_context_data(self, **kwargs):
@@ -81,7 +81,7 @@ class CheckinView(LoginRequiredMixin, CreateView):
 
 class HistoryView(LoginRequiredMixin, ListView):
     model = DailyLog
-    template_name = 'daily_care/history.html'
+    template_name = 'daily_care/daily_history.html'
     context_object_name = 'logs'
 
     def get_queryset(self):
