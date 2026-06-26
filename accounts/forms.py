@@ -10,6 +10,46 @@ from .models import DoctorProfile, PatientProfile
 User = get_user_model()
 
 
+class LoginForm(forms.Form):
+    """
+    로그인 폼. 의도적으로 이메일 형식/비밀번호 패턴 검증을 하지 않는다.
+
+    로그인은 가입과 달리 "형식이 틀렸다"를 구체적으로 알려주면 보안상 좋지 않다 —
+    이미 가입된 계정은 형식 검증을 통과한 값이므로, 형식 에러를 따로 보여주면
+    공격자에게 "이 이메일이 가입된 계정인지" 추측할 단서를 줄 수 있다.
+    그래서 클라이언트 검증은 필수 입력 여부만 확인하고, 실제 인증 성패는
+    view에서 authenticate() 결과로만 판단해 "아이디 또는 비밀번호가 일치하지
+    않습니다"라는 단일 메시지로 응답한다.
+    """
+    username = forms.CharField(
+        label='이메일',
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'email',
+            'autofocus': True,
+            'data-parsley-required': 'true',
+            'data-parsley-required-message': '이메일을 입력해주세요.',
+        }),
+        error_messages={
+            'required': '이메일을 입력해주세요.',
+        },
+    )
+    password = forms.CharField(
+        label='비밀번호',
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'current-password',
+            'data-parsley-required': 'true',
+            'data-parsley-required-message': '비밀번호를 입력해주세요.',
+        }),
+        error_messages={
+            'required': '비밀번호를 입력해주세요.',
+        },
+    )
+
+
 class BaseSignupForm(forms.Form):
     """
     환자/의사 가입 폼이 공통으로 갖는 필드(이메일, 비밀번호).
@@ -21,7 +61,15 @@ class BaseSignupForm(forms.Form):
         label='이메일',
         max_length=150,
         required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'autocomplete': 'email'}),
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'email',
+            'data-parsley-required': 'true',
+            'data-parsley-pattern': EMAIL_REGEX,
+            'data-parsley-required-message': '이메일을 입력해주세요.',
+            'data-parsley-pattern-message': '올바른 이메일 형식이 아닙니다.',
+            'data-parsley-type-message': '올바른 이메일 형식이 아닙니다.',
+        }),
         error_messages={
             'required': '이메일을 입력해주세요.',
             'max_length': '이메일은 150자를 넘을 수 없습니다.',
@@ -30,7 +78,14 @@ class BaseSignupForm(forms.Form):
     password1 = forms.CharField(
         label='비밀번호',
         required=True,
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'new-password',
+            'data-parsley-required': 'true',
+            'data-parsley-pattern': PASSWORD_REGEX,
+            'data-parsley-required-message': '비밀번호를 입력해주세요.',
+            'data-parsley-pattern-message': '영문, 숫자, 특수문자를 포함한 8~16자로 입력해주세요.',
+        }),
         error_messages={
             'required': '비밀번호를 입력해주세요.',
         },
@@ -38,7 +93,14 @@ class BaseSignupForm(forms.Form):
     password2 = forms.CharField(
         label='비밀번호 확인',
         required=True,
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'new-password',
+            'data-parsley-required': 'true',
+            'data-parsley-equalto': '#id_password1',
+            'data-parsley-required-message': '비밀번호를 다시 입력해주세요.',
+            'data-parsley-equalto-message': '비밀번호가 일치하지 않습니다.',
+        }),
         error_messages={
             'required': '비밀번호를 다시 입력해주세요.',
         },
@@ -81,7 +143,13 @@ class PatientSignupForm(BaseSignupForm):
     birth_date = forms.DateField(
         label='생년월일',
         required=True,
-        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+            'data-parsley-required': 'true',
+            'data-parsley-required-message': '생년월일을 입력해주세요.',
+            'data-parsley-type-message': '올바른 날짜 형식이 아닙니다.',
+        }),
         error_messages={
             'required': '생년월일을 입력해주세요.',
             'invalid': '올바른 날짜 형식이 아닙니다.',
@@ -110,7 +178,13 @@ class DoctorSignupForm(BaseSignupForm):
         label='면허번호',
         max_length=50,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'data-parsley-required': 'true',
+            'data-parsley-pattern': DOCTOR_LICENSE_NO_REGEX,
+            'data-parsley-required-message': '면허번호를 입력해주세요.',
+            'data-parsley-pattern-message': '면허번호는 숫자 4~6자리로 입력해주세요.',
+        }),
         error_messages={
             'required': '면허번호를 입력해주세요.',
         },
@@ -135,7 +209,14 @@ class ProfileUpdateForm(forms.ModelForm):
             'username': '이메일',
         }
         widgets = {
-            'username': forms.EmailInput(attrs={'class': 'form-control'}),
+            'username': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'data-parsley-required': 'true',
+                'data-parsley-pattern': EMAIL_REGEX,
+                'data-parsley-required-message': '이메일을 입력해주세요.',
+                'data-parsley-pattern-message': '올바른 이메일 형식이 아닙니다.',
+                'data-parsley-type-message': '올바른 이메일 형식이 아닙니다.',
+            }),
         }
         error_messages = {
             'username': {
@@ -161,7 +242,13 @@ class PatientProfileUpdateForm(forms.ModelForm):
         model = PatientProfile
         fields = ['birth_date', 'sex']
         widgets = {
-            'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'birth_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'data-parsley-required': 'true',
+                'data-parsley-required-message': '생년월일을 입력해주세요.',
+                'data-parsley-type-message': '올바른 날짜 형식이 아닙니다.',
+            }),
             'sex': forms.RadioSelect,
         }
         error_messages = {
@@ -181,7 +268,13 @@ class DoctorProfileUpdateForm(forms.ModelForm):
         model = DoctorProfile
         fields = ['license_no']
         widgets = {
-            'license_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'license_no': forms.TextInput(attrs={
+                'class': 'form-control',
+                'data-parsley-required': 'true',
+                'data-parsley-pattern': DOCTOR_LICENSE_NO_REGEX,
+                'data-parsley-required-message': '면허번호를 입력해주세요.',
+                'data-parsley-pattern-message': '면허번호는 숫자 4~6자리로 입력해주세요.',
+            }),
         }
         error_messages = {
             'license_no': {

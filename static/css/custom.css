@@ -322,7 +322,6 @@ body {
     transform: translateX(0);
   }
 }
-
 /* ===================== SIDEBAR: 드롭다운 그룹 메뉴 (신규 추가) ===================== */
 .nav-group-toggle {
   justify-content: space-between;
@@ -384,4 +383,41 @@ body {
 
 .nav-sublink.active::before {
   background-color: #ffffff;
+}
+
+/* ===================== Parsley 클라이언트 검증 스타일 (신규 추가) ===================== */
+.parsley-errors-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  font-size: 12.5px;
+  color: var(--color-danger);
+}
+
+.parsley-error {
+  border-color: var(--color-danger) !important;
+}
+
+.parsley-error:focus {
+  box-shadow: 0 0 0 3px rgba(216, 90, 48, 0.12) !important;
+}
+
+.parsley-success {
+  border-color: var(--color-main) !important;
+}
+
+/* ===================== 모바일 사이드바: 오버레이 (신규 추가) ===================== */
+/* 사이드바가 .open 상태일 때 뒤에 어두운 배경을 깔고, 그 배경 클릭으로 닫을 수 있게 함 */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+}
+
+@media (max-width: 900px) {
+  .sidebar-overlay.show {
+    display: block;
+  }
 }

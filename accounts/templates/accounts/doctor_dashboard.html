@@ -1,20 +1,11 @@
 {% extends "base.html" %}
-
-{% block page_title %}<h1 class="page-title">의사 대시보드</h1>{% endblock %}
+{% block title %}홈 - 미래의료병원{% endblock %}
+{% block page_title %}검사 권고 대상 목록{% endblock %}
 
 {% block content %}
-<p class="mb-3">검사 권고 점수가 높은 순으로 정렬됩니다. (실제 데이터 연동 전 화면 틀)</p>
-
-<div class="card p-3 priority-high mb-2">
-  <div class="d-flex justify-content-between align-items-center">
-    <strong>샘플 환자 A</strong>
-    <span class="fw-bold">82.4%</span>
-  </div>
-</div>
-<div class="card p-3 priority-normal mb-2">
-  <div class="d-flex justify-content-between align-items-center">
-    <strong>샘플 환자 B</strong>
-    <span class="fw-bold">23.1%</span>
-  </div>
+<div class="stat-card mb-3">
+  <div class="stat-label">환영합니다</div>
+  <div class="stat-value">{{ request.user.username }}님</div>
+  <div class="stat-trend">권고 점수 기준 환자 목록은 곧 제공됩니다.</div>
 </div>
 {% endblock %}
