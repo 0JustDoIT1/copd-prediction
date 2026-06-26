@@ -1,48 +1,178 @@
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
+from .forms import (
+    DoctorProfileUpdateForm,
+    DoctorSignupForm,
+    LoginForm,
+    PatientProfileUpdateForm,
+    PatientSignupForm,
+    ProfileUpdateForm,
+)
+from .models import DoctorProfile, PatientProfile
 
-def home(request):
+User = get_user_model()
+
+
+def _redirect_to_dashboard(request):
+    """로그인 상태에 따른 분기 리다이렉트. role별 대시보드로 보낸다."""
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+    if request.user.role == 'doctor':
+        return redirect('accounts:doctor_dashboard')
+    return redirect('accounts:patient_dashboard')
+
+
+def root_view(request):
     """
-    GET /
-    지금은 로그인 구분 없이 그냥 환자 대시보드로 보냄.
-    TODO: 로그인 로직 붙으면 role 보고 patient/doctor 대시보드로 분기.
+    '/' 경로 — 화면을 직접 그리지 않고 redirect만 담당.
+    비로그인: 로그인 페이지로. 로그인: role별 대시보드로.
     """
-    return redirect("accounts:patient_dashboard")
+    return _redirect_to_dashboard(request)
 
 
-def patient_dashboard(request):
-    """
-    GET /dashboard
-    환자 홈. 지금은 화면 틀만 보여줌.
-    TODO: HealthRecord/PredictionResult 연동 (screening.models 사용)
-    """
-    return render(request, "accounts/patient_dashboard.html")
-
-
-def doctor_dashboard(request):
-    """
-    GET /doctor/dashboard
-    의사 대시보드. 지금은 화면 틀만 보여줌.
-    TODO: screening.models.PredictionResult를 risk_probability 내림차순으로 조회
-    """
-    return render(request, "accounts/doctor_dashboard.html")
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def signup(request):
-    return JsonResponse({"detail": "TODO: signup not implemented"}, status=501)
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
 def login_view(request):
-    return JsonResponse({"detail": "TODO: login not implemented"}, status=501)
+    """공통 로그인 페이지. 역할 구분 없이 하나의 폼으로 처리하고, 로그인 후 role에 따라 분기."""
+    if request.user.is_authenticated:
+        return _redirect_to_dashboard(request)
+
+    error = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                request,
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password'],
+            )
+            if user is not None:
+                login(request, user)
+                return _redirect_to_dashboard(request)
+
+            # 보안상 아이디/비밀번호 중 어느 쪽이 틀렸는지 구분하지 않는다.
+            error = '아이디 또는 비밀번호가 일치하지 않습니다.'
+    else:
+        form = LoginForm()
+
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'error': error,
+    })
 
 
-@require_http_methods(["POST"])
+def signup_role_select_view(request):
+    """회원가입 1단계: 환자/의사 역할 선택 페이지."""
+    if request.user.is_authenticated:
+        return _redirect_to_dashboard(request)
+    return render(request, 'accounts/signup_role_select.html')
+
+
+def signup_patient_view(request):
+    """환자 전용 가입 폼."""
+    if request.user.is_authenticated:
+        return _redirect_to_dashboard(request)
+
+    if request.method == 'POST':
+        form = PatientSignupForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=form.cleaned_data['email'],
+                    password=form.cleaned_data['password1'],
+                    role='patient',
+                )
+                PatientProfile.objects.create(
+                    user=user,
+                    birth_date=form.cleaned_data['birth_date'],
+                    sex=form.cleaned_data['sex'],
+                )
+            messages.success(request, '회원가입이 완료되었습니다. 로그인해주세요.')
+            return redirect('accounts:login')
+    else:
+        form = PatientSignupForm()
+
+    return render(request, 'accounts/signup_patient.html', {'form': form})
+
+
+def signup_doctor_view(request):
+    """의사 전용 가입 폼."""
+    if request.user.is_authenticated:
+        return _redirect_to_dashboard(request)
+
+    if request.method == 'POST':
+        form = DoctorSignupForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=form.cleaned_data['email'],
+                    password=form.cleaned_data['password1'],
+                    role='doctor',
+                )
+                DoctorProfile.objects.create(
+                    user=user,
+                    license_no=form.cleaned_data.get('license_no', ''),
+                )
+            messages.success(request, '회원가입이 완료되었습니다. 로그인해주세요.')
+            return redirect('accounts:login')
+    else:
+        form = DoctorSignupForm()
+
+    return render(request, 'accounts/signup_doctor.html', {'form': form})
+
+
+@require_http_methods(['POST'])
 def logout_view(request):
-    return JsonResponse({"detail": "TODO: logout not implemented"}, status=501)
+    logout(request)
+    return redirect('accounts:login')
+
+
+@login_required
+def patient_dashboard_view(request):
+    return render(request, 'accounts/patient_dashboard.html', {
+        'active_menu': 'home',
+    })
+
+
+@login_required
+def doctor_dashboard_view(request):
+    return render(request, 'accounts/doctor_dashboard.html', {
+        'active_menu': 'home',
+    })
+
+
+@login_required
+def profile_view(request):
+    """topbar 프로필 드롭다운 → 내 정보 수정. User 기본정보 + role별 프로필 정보를 같이 처리."""
+    user = request.user
+
+    if request.method == 'POST':
+        user_form = ProfileUpdateForm(request.POST, instance=user)
+
+        if user.role == 'patient':
+            profile = user.patientprofile
+            profile_form = PatientProfileUpdateForm(request.POST, instance=profile)
+        else:
+            profile = user.doctorprofile
+            profile_form = DoctorProfileUpdateForm(request.POST, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            with transaction.atomic():
+                user_form.save()
+                profile_form.save()
+            messages.success(request, '내 정보가 수정되었습니다.')
+            return redirect('accounts:profile')
+    else:
+        user_form = ProfileUpdateForm(instance=user)
+        if user.role == 'patient':
+            profile_form = PatientProfileUpdateForm(instance=user.patientprofile)
+        else:
+            profile_form = DoctorProfileUpdateForm(instance=user.doctorprofile)
+
+    return render(request, 'accounts/profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })

@@ -41,16 +41,22 @@ class PredictionResult(models.Model):
     questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE)
     health_record = models.ForeignKey(HealthRecord, on_delete=models.CASCADE)
     risk_probability = models.FloatField()  # 의미: 폐활량검사 권고 점수
+
+
+
     top_factors = models.JSONField(default=dict)
     year = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ClinicalDecision(models.Model):
-    DECISION_CHOICES = [('recommend', '검사 권고'), ('hold', '보류')]
-
+    DECISION_CHOICES = [
+    ('recommend', '폐활량검사 권고'),
+    ('normal', '정상'), # ❗❗❗
+]
     prediction = models.OneToOneField(PredictionResult, on_delete=models.CASCADE, related_name='decision')
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True)
     decision = models.CharField(max_length=10, choices=DECISION_CHOICES)
     memo = models.TextField(blank=True)
     decided_at = models.DateTimeField(auto_now_add=True)
+

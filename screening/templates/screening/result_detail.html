@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}예측 결과{% endblock %}
+{% block page_title %}예측 결과{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+        <h5>PredictionResult 생성 확인</h5>
+    </div>
+
+    <div class="card-body">
+
+        <p><strong>ID</strong> : {{ prediction.id }}</p>
+
+        <p><strong>권고 점수</strong> : {{ prediction.risk_probability }}</p>
+
+        <p><strong>생성일</strong> : {{ prediction.created_at }}</p>
+
+    </div>
+
+</div>
+
+{% endblock %}
