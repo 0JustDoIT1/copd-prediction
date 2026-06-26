@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}기록 및 추세 히스토리 | COPD 시스템{% endblock %}
+
+{% block page_title %}
+<h1 class="page-title">📊 기록 및 추세 히스토리</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-12 col-sm-auto">
+                <span class="fw-medium text-secondary"><i class="ti ti-filter me-1"></i> 조회 기간 선택</span>
+            </div>
+            <div class="col-6 col-sm-auto">
+                <input type="date" name="start" class="form-control bg-light border-0" value="{{ request.GET.get 'start'|default:'' }}">
+            </div>
+            <div class="col-auto px-0 text-center">~</div>
+            <div class="col-6 col-sm-auto">
+                <input type="date" name="end" class="form-control bg-light border-0" value="{{ request.GET.get 'end'|default:'' }}">
+            </div>
+            <div class="col-12 col-sm-auto ms-sm-auto d-flex gap-2">
+                <a href="{% url 'daily_care:history' %}" class="btn btn-light w-100 shadow-sm" style="border-radius: 8px;">초기화</a>
+                <button type="submit" class="btn btn-primary w-100 shadow-sm" style="border-radius: 8px; background-color: #0d6efd;">조회하기</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <h5 class="fw-bold mb-4" style="color: #333;"><i class="ti ti-chart-line text-primary me-2"></i>건강 지표 추세 분석</h5>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="healthTrendChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+        <h5 class="fw-bold mb-3" style="color: #333;"><i class="ti ti-list text-primary me-2"></i>날짜별 상세 기록 목록</h5>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="min-width: 700px;">
+                <thead class="table-light text-secondary small fw-bold">
+                    <tr>
+                        <th style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;">날짜</th>
+                        <th>흡연량</th>
+                        <th>호흡 곤란 등급</th>
+                        <th>산소포화도</th>
+                        <th>기침/가래</th>
+                        <th>호흡운동</th>
+                        <th style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; width: 30%;">컨디션 메모</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark fs-7">
+                    {% for log in logs %}
+                    <tr>
+                        <td class="fw-bold text-secondary">{{ log.log_date|date:"Y-m-d" }}</td>
+                        <td>
+                            <span class="badge {% if log.smoking_count == 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} px-2 py-1">
+                                {{ log.smoking_count }} 개비
+                            </span>
+                        </td>
+                        <td><span class="fw-medium">{{ log.dyspnea_grade }} 단계</span></td>
+                        <td>
+                            {% if log.spo2 %}
+                                <span class="text-primary fw-medium">{{ log.spo2 }} %</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.has_cough or log.has_sputum %}
+                                <div class="d-flex gap-1">
+                                    {% if log.has_cough %}<span class="badge bg-warning-subtle text-warning-emphasis">기침</span>{% endif %}
+                                    {% if log.has_sputum %}<span class="badge bg-warning-subtle text-warning-emphasis">가래</span>{% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-success small"><i class="ti ti-circle-check-filled"></i> 무증상</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.exercised %}
+                                <span class="badge bg-success text-white px-2 py-1" style="border-radius: 6px;">완료</span>
+                            {% else %}
+                                <span class="badge bg-light text-muted px-2 py-1" style="border-radius: 6px;">미수행</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-truncate text-muted small" style="max-width: 200px;" title="{{ log.memo }}">
+                            {{ log.memo|default:"-" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="ti ti-database-off fs-2 d-block mb-2"></i>
+                            선택한 기간 내에 등록된 일상 관리 기록이 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('healthTrendChart').getContext('2d');
+        
+        // 장고 템플릿 루프를 활용해 안전하게 자바스크립트 배열 데이터 추출 (역순 정렬하여 그래프는 과거->최신 흐름)
+        const rawLabels = [];
+        const rawSmokingData = [];
+        const rawSpo2Data = [];
+        
+        {% for log in logs reversed %}
+            rawLabels.push('{{ log.log_date|date:"m-dd" }}');
+            rawSmokingData.push({{ log.smoking_count }});
+            rawSpo2Data.push({% if log.spo2 %}{{ log.spo2 }}{% else %}null{% endif %});
+        {% endfor %}
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: rawLabels,
+                datasets: [
+                    {
+                        label: '흡연량 (개비)',
+                        data: rawSmokingData,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '산소포화도 (%)',
+                        data: rawSpo2Data,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        yAxisID: 'y1',
+                        spanGaps: true // 데이터가 없는 날(null)은 선을 이어서 표시
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: '흡연량 (개비)' },
+                        min: 0,
+                        grid: { borderDash: [5, 5] }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: '산소포화도 (%)' },
+                        min: 80,
+                        max: 100,
+                        grid: { drawOnChartArea: false } // 우측 축의 그리드선은 겹치지 않게 숨김
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

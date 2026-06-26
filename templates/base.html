@@ -168,8 +168,8 @@
           </div>
 
           <div class="topbar-right">
-            {% if user.is_authenticated and user.role == 'patient' and not
-            has_checked_in_today %} {# TODO: daily_care 앱 구현 후 href="{% url
+            {% if user.is_authenticated and user.role == 'patient' and not has_checked_in_today %}
+            {# TODO: daily_care 앱 구현 후 href="{% url
             'daily_care:daily_log' %}"로 복원 #}
             <a href="#" class="checkin-banner" id="checkinBanner">
               <i class="bi bi-pencil-square"></i> 오늘의 호흡 체크인을

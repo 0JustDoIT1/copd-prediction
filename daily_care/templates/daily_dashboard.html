@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}일상 관리 대시보드 | COPD 시스템{% endblock %}
+
+{% block page_title %}
+<h1 class="page-title">🫁 일상 관리 대시보드</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    {% if checked_in_today %}
+    <div class="alert alert-success d-flex align-items-center mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background-color: #e8f5e9; color: #2e7d32;">
+        <i class="ti ti-circle-check fs-3 me-2"></i>
+        <div>
+            <strong>오늘의 흡연·호흡 체크인이 완료되었습니다!</strong> 꾸준한 기록은 건강 변화를 추적하는 데 큰 도움이 됩니다.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── 지표 카드 4개 ── -->
+    <div class="row g-4">
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted fw-medium" style="font-size: 0.9rem;">오늘의 흡연량</span>
+                    <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #ffebee; color: #c62828;">Smoking</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <h3 class="display-6 fw-bold mb-0" style="color: #1a1a1a;">
+                        {% if checked_in_today %}{{ today_log.smoking_count }}{% else %}-{% endif %}
+                    </h3>
+                    <span class="text-muted ms-2" style="font-size: 0.9rem;">개비</span>
+                </div>
+                <p class="text-muted small mt-2 mb-0">
+                    {% if checked_in_today and today_log.smoking_count == 0 %}
+                        🎉 오늘은 금연 성공 중입니다!
+                    {% elif checked_in_today %}
+                        어제보다 줄여나가 볼까요?
+                    {% else %}
+                        우측 상단 배너를 눌러 기록해 주세요.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted fw-medium" style="font-size: 0.9rem;">호흡 곤란 등급</span>
+                    <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #e3f2fd; color: #1565c0;">mMRC</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <h3 class="display-6 fw-bold mb-0" style="color: #1a1a1a;">
+                        {% if checked_in_today %}{{ today_log.dyspnea_grade }}{% else %}-{% endif %}
+                    </h3>
+                    <span class="text-muted ms-2" style="font-size: 0.9rem;">단계</span>
+                </div>
+                <p class="text-muted small mt-2 mb-0">0(정상) ~ 4(심함) 단계 기준</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted fw-medium" style="font-size: 0.9rem;">산소포화도</span>
+                    <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #e0f7fa; color: #00838f;">SpO₂</span>
+                </div>
+                <div class="d-flex align-items-baseline">
+                    <h3 class="display-6 fw-bold mb-0" style="color: #1a1a1a;">
+                        {% if checked_in_today and today_log.spo2 %}{{ today_log.spo2 }}{% else %}-{% endif %}
+                    </h3>
+                    <span class="text-muted ms-2" style="font-size: 0.9rem;">%</span>
+                </div>
+                <p class="text-muted small mt-2 mb-0">정상 범위: 95% ~ 100%</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted fw-medium" style="font-size: 0.9rem;">오늘의 증상 여부</span>
+                    <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #fff3e0; color: #ef6c00;">Status</span>
+                </div>
+                <div class="mt-1">
+                    {% if checked_in_today %}
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge px-2 py-1" style="border-radius: 6px; {% if today_log.has_cough %}background-color: #ffe082; color: #6d4c41;{% else %}background-color: #f5f5f5; color: #9e9e9e;{% endif %}">기침</span>
+                            <span class="badge px-2 py-1" style="border-radius: 6px; {% if today_log.has_sputum %}background-color: #ffe082; color: #6d4c41;{% else %}background-color: #f5f5f5; color: #9e9e9e;{% endif %}">가래</span>
+                            <span class="badge px-2 py-1" style="border-radius: 6px; {% if today_log.exercised %}background-color: #c8e6c9; color: #1b5e20;{% else %}background-color: #f5f5f5; color: #9e9e9e;{% endif %}">호흡운동</span>
+                        </div>
+                    {% else %}
+                        <span class="text-muted small">기록이 없습니다.</span>
+                    {% endif %}
+                </div>
+                <p class="text-muted small mt-3 mb-0">주요 일상 증상 요약</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── 컨디션 메모 ── -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                    <i class="ti ti-notes text-muted me-1"></i> 오늘 나의 컨디션 노트
+                </h5>
+                <p class="mb-0" style="color: #555; line-height: 1.6;">
+                    {% if checked_in_today and today_log.memo %}
+                        {{ today_log.memo }}
+                    {% elif checked_in_today %}
+                        <span class="text-muted fst-italic">기록된 컨디션 메모가 없습니다.</span>
+                    {% else %}
+                        <span class="text-muted">오늘 체크인을 완료하면 여기에 메모가 표시됩니다.</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 차트 2개 ── -->
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                    <i class="ti ti-chart-line text-muted me-1"></i> 흡연량 추세 (최근 30일)
+                </h5>
+                <canvas id="smokingChart" height="160"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                    <i class="ti ti-chart-bar text-muted me-1"></i> 호흡 곤란 등급 (최근 30일)
+                </h5>
+                <canvas id="gradeChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 주간 달성률 ── -->
+    <div class="row mt-4 mb-4">
+        <div class="col-12">
+            <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem; color: #333;">
+                        <i class="ti ti-calendar-check text-muted me-1"></i> 주간 체크인 달성률
+                    </h5>
+                    <span class="fw-bold fs-5" style="color: #0D9488;">{{ weekly_rate }}%</span>
+                </div>
+                <div class="d-flex justify-content-around">
+                    {% for day in weekly %}
+                    <div class="text-center">
+                        <div class="rounded-circle mx-auto mb-1"
+                             style="width: 32px; height: 32px;
+                             background: {% if day.checked %}#0D9488{% else %}#E2E8F0{% endif %};">
+                        </div>
+                        <div class="small text-muted">{{ day.day }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels  = {{ chart_labels|safe }};
+const smoking = {{ chart_smoking|safe }};
+const grade   = {{ chart_grade|safe }};
+
+new Chart(document.getElementById('smokingChart'), {
+    type: 'line',
+    data: {
+        labels,
+        datasets: [{
+            data: smoking,
+            borderColor: '#EF4444',
+            backgroundColor: 'rgba(239,68,68,.1)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+new Chart(document.getElementById('gradeChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+            data: grade,
+            backgroundColor: '#F59E0B',
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } }
+    }
+});
+</script>
+{% endblock %}
