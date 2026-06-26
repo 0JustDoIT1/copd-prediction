@@ -163,17 +163,7 @@
           </div>
 
           <div class="topbar-right">
-            {% if user.is_authenticated and user.role == 'patient' and not has_checked_in_today %}
-            <!-- TODO: daily_care 앱 구현 후 href="url name='daily_care:daily_log'"로 복원 -->
-            <a href="#" class="checkin-banner" id="checkinBanner">
-              <i class="bi bi-pencil-square"></i> 오늘의 호흡 체크인을
-              작성해주세요
-            </a>
-            {% endif %}
-
-            <button class="icon-btn" aria-label="알림">
-              <i class="bi bi-bell"></i>
-            </button>
+            <div class="topbar-date" id="topbarDate"></div>
 
             {% if user.is_authenticated %}
             <div class="profile-chip dropdown">
@@ -216,12 +206,30 @@
       </div>
     </div>
 
+    {% if user.is_authenticated and user.role == 'patient' %}
+    <!-- TODO: daily_care 앱 구현 후 href="url name='daily_care:daily_log'"로 복원 -->
+    <a href="#" class="checkin-toast" id="checkinToast">
+      <i class="bi bi-pencil-square checkin-toast-icon"></i>
+      <div class="checkin-toast-body">
+        <div class="checkin-toast-title">오늘의 체크인을 작성해주세요</div>
+        <div class="checkin-toast-desc">흡연·호흡 상태를 1분이면 기록할 수 있어요</div>
+      </div>
+      <i
+        class="bi bi-x checkin-toast-close"
+        id="checkinToastClose"
+        aria-label="닫기"
+      ></i>
+    </a>
+    {% endif %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/parsley.min.js"></script>
     <script src="{% static 'js/parsley_config.js' %}"></script>
+    <script src="{% static 'js/topbar_date.js' %}"></script>
+    <script src="{% static 'js/checkin_toast.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
