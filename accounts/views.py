@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
@@ -19,7 +18,14 @@ User = get_user_model()
 
 
 def _redirect_to_dashboard(request):
-    """로그인 상태에 따른 분기 리다이렉트. role별 대시보드로 보낸다."""
+    """
+    로그인 상태에 따른 분기 리다이렉트. role별 대시보드로 보낸다.
+
+    미들웨어(common.middleware.LoginRequiredMiddleware)가 일반적인 접근 제어를
+    전담하지만, 이 함수는 "막 로그인에 성공한 바로 그 순간"처럼 미들웨어가
+    개입하기 전에 이번 요청 안에서 바로 분기해야 하는 경우에 쓰인다.
+    root_view도 동일한 이유로 이 함수를 그대로 사용한다.
+    """
     if not request.user.is_authenticated:
         return redirect('accounts:login')
     if request.user.role == 'doctor':
@@ -36,10 +42,12 @@ def root_view(request):
 
 
 def login_view(request):
-    """공통 로그인 페이지. 역할 구분 없이 하나의 폼으로 처리하고, 로그인 후 role에 따라 분기."""
-    if request.user.is_authenticated:
-        return _redirect_to_dashboard(request)
+    """
+    공통 로그인 페이지. 역할 구분 없이 하나의 폼으로 처리하고, 로그인 후 role에 따라 분기.
 
+    로그인한 사용자가 이 페이지에 접근하는 경우는 미들웨어가 이미 대시보드로
+    돌려보내므로, 이 함수 내부에서는 별도로 체크하지 않는다.
+    """
     error = None
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -66,16 +74,11 @@ def login_view(request):
 
 def signup_role_select_view(request):
     """회원가입 1단계: 환자/의사 역할 선택 페이지."""
-    if request.user.is_authenticated:
-        return _redirect_to_dashboard(request)
     return render(request, 'accounts/signup_role_select.html')
 
 
 def signup_patient_view(request):
     """환자 전용 가입 폼."""
-    if request.user.is_authenticated:
-        return _redirect_to_dashboard(request)
-
     if request.method == 'POST':
         form = PatientSignupForm(request.POST)
         if form.is_valid():
@@ -100,9 +103,6 @@ def signup_patient_view(request):
 
 def signup_doctor_view(request):
     """의사 전용 가입 폼."""
-    if request.user.is_authenticated:
-        return _redirect_to_dashboard(request)
-
     if request.method == 'POST':
         form = DoctorSignupForm(request.POST)
         if form.is_valid():
@@ -130,21 +130,18 @@ def logout_view(request):
     return redirect('accounts:login')
 
 
-@login_required
 def patient_dashboard_view(request):
     return render(request, 'accounts/patient_dashboard.html', {
         'active_menu': 'home',
     })
 
 
-@login_required
 def doctor_dashboard_view(request):
     return render(request, 'accounts/doctor_dashboard.html', {
         'active_menu': 'home',
     })
 
 
-@login_required
 def profile_view(request):
     """topbar 프로필 드롭다운 → 내 정보 수정. User 기본정보 + role별 프로필 정보를 같이 처리."""
     user = request.user

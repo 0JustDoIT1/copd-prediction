@@ -136,3 +136,46 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+# 1. LOGIN_URL, LOGIN_REDIRECT_URL 수정
+#    (기존 Django 기본값 '/accounts/login/'은 우리 프로젝트의 실제 로그인 경로와 다름 —
+#     accounts 앱이 루트(/)에 매핑되어 있으므로 로그인 경로는 /login/)
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:root'
+ 
+# 2. 미로그인 사용자도 접근 가능한 URL 이름 목록
+#    LoginRequiredMiddleware가 이 목록 외의 모든 페이지를 로그인 필수로 막는다.
+LOGIN_EXEMPT_URL_NAMES = [
+    'accounts:root',
+    'accounts:login',
+    'accounts:signup',
+    'accounts:signup_patient',
+    'accounts:signup_doctor',
+]
+ 
+# 3. 로그인한 사용자는 접근하면 안 되는("비로그인 전용") URL 이름 목록
+#    이미 로그인한 사용자가 로그인/가입 페이지에 들어오면 각자의 대시보드로 돌려보낸다.
+#    보통 LOGIN_EXEMPT_URL_NAMES와 거의 같은 목록이지만 'accounts:root'는
+#    제외한다 — root는 로그인 여부와 무관하게 항상 통과시켜 그 안에서 분기하므로
+#    여기서 다시 걸러내면 무한 리다이렉트 위험이 있다.
+GUEST_ONLY_URL_NAMES = [
+    'accounts:login',
+    'accounts:signup',
+    'accounts:signup_patient',
+    'accounts:signup_doctor',
+]
+ 
+# 4. MIDDLEWARE 리스트에 추가
+#    AuthenticationMiddleware보다 반드시 아래(뒤)에 위치해야 한다 —
+#    request.user가 채워진 다음에 검사해야 하기 때문.
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'common.middleware.LoginRequiredMiddleware',  # ← 이 줄 추가 (반드시 AuthenticationMiddleware 다음)
+]
