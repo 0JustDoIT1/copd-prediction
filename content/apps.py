@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class ContentConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'content'
+    verbose_name = '콘텐츠 (COPD 상식·호흡 가이드·FAQ)'

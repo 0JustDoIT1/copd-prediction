@@ -1,0 +1,842 @@
+[
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 1,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 25.09
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 2,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 118.12
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 3,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 73.06
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 4,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 91.48
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 5,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 181.93
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 6,
+    "fields": {
+      "age_group": "20s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 5.91
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 7,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 22.18
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 8,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 106.08
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 9,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 67.93
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 10,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 88.49
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 11,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 183.28
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 12,
+    "fields": {
+      "age_group": "20s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 2.03
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 13,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 25.62
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 14,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 119.12
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 15,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 77.26
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 16,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 98.99
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 17,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 200.82
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 18,
+    "fields": {
+      "age_group": "30s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 5.63
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 19,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.26
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 20,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 107.51
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 21,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 70.44
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 22,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 91.67
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 23,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 194.99
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 24,
+    "fields": {
+      "age_group": "30s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 2.0
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 25,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 26.19
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 26,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 120.62
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 27,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 80.6
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 28,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 103.49
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 29,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 204.89
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 30,
+    "fields": {
+      "age_group": "40s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 6.2
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 31,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.33
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 32,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 112.19
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 33,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 73.97
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 34,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 95.2
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 35,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 199.65
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 36,
+    "fields": {
+      "age_group": "40s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 3.75
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 37,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 24.9
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 38,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 121.72
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 39,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 80.56
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 40,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 106.84
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 41,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 193.72
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 42,
+    "fields": {
+      "age_group": "50s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 6.33
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 43,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.57
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 44,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 117.23
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 45,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 75.33
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 46,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 100.83
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 47,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 201.11
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 48,
+    "fields": {
+      "age_group": "50s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 5.28
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 49,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 24.63
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 50,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 125.82
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 51,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 79.01
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 52,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 112.48
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 53,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 172.76
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 54,
+    "fields": {
+      "age_group": "60s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 4.7
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 55,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.95
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 56,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 123.94
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 57,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 75.62
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 58,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 102.95
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 59,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 186.8
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 60,
+    "fields": {
+      "age_group": "60s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 5.28
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 61,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 24.03
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 62,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 127.61
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 63,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 75.2
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 64,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 110.38
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 65,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 163.99
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 66,
+    "fields": {
+      "age_group": "70s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 2.48
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 67,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 24.53
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 68,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 129.69
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 69,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 74.12
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 70,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 106.48
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 71,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 174.34
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 72,
+    "fields": {
+      "age_group": "70s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 4.0
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 73,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.07
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 74,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "HE_sbp",
+      "mean_value": 130.66
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 75,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "HE_dbp",
+      "mean_value": 72.04
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 76,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "HE_glu",
+      "mean_value": 108.54
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 77,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "HE_chol",
+      "mean_value": 165.65
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 78,
+    "fields": {
+      "age_group": "80s",
+      "sex": "M",
+      "variable_name": "smoking_amount",
+      "mean_value": 0.79
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 79,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "HE_BMI",
+      "mean_value": 23.58
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 80,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "HE_sbp",
+      "mean_value": 134.69
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 81,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "HE_dbp",
+      "mean_value": 72.73
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 82,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "HE_glu",
+      "mean_value": 103.34
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 83,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "HE_chol",
+      "mean_value": 172.69
+    }
+  },
+  {
+    "model": "benchmarks.benchmark",
+    "pk": 84,
+    "fields": {
+      "age_group": "80s",
+      "sex": "F",
+      "variable_name": "smoking_amount",
+      "mean_value": 1.73
+    }
+  }
+]

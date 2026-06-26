@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}COPD 상식 - 미래의료병원{% endblock %}
+{% block page_title %}COPD 상식{% endblock %}
+
+{% block content %}
+<div class="content-list">
+  {% for tip in tips %}
+  <div class="content-card">
+    <div class="content-card-title">{{ tip.title }}</div>
+    <p class="content-card-body">{{ tip.body }}</p>
+    {% if tip.source %}
+    <div class="content-card-source">출처: {{ tip.source }}</div>
+    {% endif %}
+  </div>
+  {% empty %}
+  <p class="text-muted">등록된 콘텐츠가 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}

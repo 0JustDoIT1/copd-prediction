@@ -131,9 +131,40 @@ def logout_view(request):
 
 
 def patient_dashboard_view(request):
-    return render(request, 'accounts/patient_dashboard.html', {
+    """
+    환자 홈 대시보드.
+
+    구성: 히어로 섹션 / 카드 4개(검진입력·예약·COPD상식·호흡운동) /
+    What-if 시뮬레이션(메인 콘텐츠) / FAQ 아코디언
+
+    카드 4개는 모두 고정 안내 문구이며, COPD 상식·호흡 운동 가이드의 실제
+    콘텐츠는 각 카드를 클릭해 들어가는 content 앱의 목록 페이지에서 확인한다.
+    FAQ만 content.models.FAQ에서 상위 4개를 가져와 미리보기로 보여준다.
+
+    TODO: 아래는 여전히 더미 데이터인 부분. 각 항목이 실제로 연동될 자리:
+    - has_health_record: screening.HealthRecord 존재 여부로 분기 (What-if 빈 상태 처리)
+    - whatif_current_smoking/amount: 가장 최근 Questionnaire/HealthRecord에서 가져옴
+    - whatif_compute_url: screening 팀이 /predict/what-if/ 를 만들면 그 경로로 교체.
+      입력: {smoking_status, smoking_amount, weight_delta}, 출력: {risk_probability}
+    """
+    from content.models import FAQ
+
+    faqs = FAQ.objects.all()[:4]
+
+    # TODO: screening.HealthRecord.objects.filter(patient=request.user.patientprofile).exists() 로 교체
+    has_health_record = False
+
+    context = {
         'active_menu': 'home',
-    })
+
+        'faqs': faqs,
+
+        'has_health_record': has_health_record,
+        # TODO: 아래 두 값은 screening.PredictionResult / Questionnaire에서 가장 최근 값으로 교체
+        'whatif_current_smoking': 2,
+        'whatif_current_amount': 20,
+    }
+    return render(request, 'accounts/patient_dashboard.html', context)
 
 
 def doctor_dashboard_view(request):

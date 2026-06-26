@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}호흡 운동 가이드 - 미래의료병원{% endblock %}
+{% block page_title %}호흡 운동 가이드{% endblock %}
+
+{% block content %}
+<div class="content-list">
+  {% for exercise in exercises %}
+  <div class="content-card">
+    <div class="content-card-title">{{ exercise.title }}</div>
+    <p class="content-card-body">{{ exercise.steps }}</p>
+  </div>
+  {% empty %}
+  <p class="text-muted">등록된 콘텐츠가 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}

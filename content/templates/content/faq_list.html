@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}자주 묻는 질문 - 미래의료병원{% endblock %}
+{% block page_title %}자주 묻는 질문{% endblock %}
+
+{% block content %}
+<div class="dashboard-panel">
+  <div class="accordion" id="faqAccordion">
+    {% for faq in faqs %}
+    <div class="accordion-item faq-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                data-bs-toggle="collapse" data-bs-target="#faq{{ forloop.counter }}">
+          {{ faq.question }}
+        </button>
+      </h2>
+      <div id="faq{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+           data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          {{ faq.answer }}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">등록된 질문이 없습니다.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

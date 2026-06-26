@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'daily_care',
     'appointments',
     'benchmarks',
+    'content',
 ]
 
 # Auth User

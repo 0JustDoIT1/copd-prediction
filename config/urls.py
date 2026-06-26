@@ -26,5 +26,6 @@ urlpatterns = [
     path("screening/", include("screening.urls")),
     # path("daily/", include("daily_care.urls")),
     path("appoint/", include("appointments.urls")),
-    # path("bench/", include("benchmarks.urls"))
+    # path("bench/", include("benchmarks.urls")),
+    path('content/', include('content.urls')),
 ]
