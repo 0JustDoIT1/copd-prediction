@@ -11,19 +11,17 @@ class User(AbstractUser):
 
 
 class PatientProfile(models.Model):
-    SEX_CHOICES = [('M', '남성'), ('F', '여성')]
+    SEX_CHOICES = [
+        ('M', '남성'),
+        ('F', '여성'),
+    ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='patient_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_date = models.DateField()
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
-
-    def __str__(self):
-        return f"{self.user.username} (Patient)"
+    # 주소 필드 없음 — 검진기관찾기 기능 삭제로 불필요
 
 
 class DoctorProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor_profile')
-    license_no = models.CharField(max_length=50, blank=True)
-
-    def __str__(self):
-        return f"{self.user.username} (Doctor)"
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    license_no = models.CharField(max_length=50, blank=False)

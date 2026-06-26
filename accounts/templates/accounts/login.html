@@ -1,0 +1,28 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}로그인 - 미래의료병원{% endblock %}
+
+{% block auth_content %}
+<div class="auth-form-title">로그인</div>
+<div class="auth-form-subtitle">계정으로 로그인해주세요</div>
+
+{% if error %}
+  <div class="alert-danger-soft mb-3">{{ error }}</div>
+{% endif %}
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">이메일</label>
+    <input type="email" name="username" class="form-control" autocomplete="email" required autofocus>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">비밀번호</label>
+    <input type="password" name="password" class="form-control" autocomplete="current-password" required>
+  </div>
+  <button type="submit" class="btn btn-primary w-100 mt-2">로그인</button>
+</form>
+
+<p class="text-center mt-4 mb-0" style="font-size: 13.5px;">
+  계정이 없으신가요? <a href="{% url 'accounts:signup' %}">회원가입</a>
+</p>
+{% endblock %}

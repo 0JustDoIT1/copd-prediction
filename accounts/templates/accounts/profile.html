@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}내 정보 수정 - 미래의료병원{% endblock %}
+{% block page_title %}내 정보 수정{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert-warning-soft mb-3">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">{{ user_form.username.label }}</label>
+            {{ user_form.username }}
+            {% if user_form.username.errors %}<div class="text-danger small mt-1">{{ user_form.username.errors }}</div>{% endif %}
+          </div>
+
+          <hr>
+
+          {% if request.user.role == 'patient' %}
+            <div class="mb-3">
+              <label class="form-label">{{ profile_form.birth_date.label }}</label>
+              {{ profile_form.birth_date }}
+              {% if profile_form.birth_date.errors %}<div class="text-danger small mt-1">{{ profile_form.birth_date.errors }}</div>{% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label d-block">{{ profile_form.sex.label }}</label>
+              {% for radio in profile_form.sex %}
+                <div class="form-check form-check-inline">
+                  {{ radio.tag }}
+                  <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="mb-3">
+              <label class="form-label">{{ profile_form.license_no.label }}</label>
+              {{ profile_form.license_no }}
+              <div class="text-muted" style="font-size:11.5px; margin-top:4px;">숫자 4~6자리</div>
+              {% if profile_form.license_no.errors %}<div class="text-danger small mt-1">{{ profile_form.license_no.errors }}</div>{% endif %}
+            </div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-primary w-100 mt-2">저장</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

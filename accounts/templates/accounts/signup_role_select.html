@@ -1,0 +1,41 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}회원가입 - 미래의료병원{% endblock %}
+
+{% block auth_content %}
+<div class="auth-form-title">회원가입</div>
+<div class="auth-form-subtitle">가입 유형을 선택해주세요</div>
+
+<a href="{% url 'accounts:signup_patient' %}" class="text-decoration-none d-block mb-3">
+  <div class="card p-3" style="cursor:pointer; border-color: var(--color-border);">
+    <div class="d-flex align-items-center gap-3">
+      <div class="auth-brand-mark" style="background-color: var(--color-accent); color: var(--color-dark); position:static;">
+        <i class="bi bi-person"></i>
+      </div>
+      <div>
+        <div style="font-weight:600; color: var(--color-dark); font-size:14.5px;">환자로 가입</div>
+        <div style="font-size:12.5px; color: var(--color-muted);">검진 데이터를 입력하고 결과를 받아보세요</div>
+      </div>
+      <i class="bi bi-chevron-right ms-auto" style="color: var(--color-muted);"></i>
+    </div>
+  </div>
+</a>
+
+<a href="{% url 'accounts:signup_doctor' %}" class="text-decoration-none d-block">
+  <div class="card p-3" style="cursor:pointer; border-color: var(--color-border);">
+    <div class="d-flex align-items-center gap-3">
+      <div class="auth-brand-mark" style="background-color: var(--color-accent); color: var(--color-dark); position:static;">
+        <i class="bi bi-clipboard2-pulse"></i>
+      </div>
+      <div>
+        <div style="font-weight:600; color: var(--color-dark); font-size:14.5px;">의사로 가입</div>
+        <div style="font-size:12.5px; color: var(--color-muted);">권고 점수를 확인하고 환자를 진료하세요</div>
+      </div>
+      <i class="bi bi-chevron-right ms-auto" style="color: var(--color-muted);"></i>
+    </div>
+  </div>
+</a>
+
+<p class="text-center mt-4 mb-0" style="font-size: 13.5px;">
+  이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a>
+</p>
+{% endblock %}

@@ -1,0 +1,140 @@
+:root {
+  --auth-panel-w: 440px;
+}
+
+body.auth-body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Pretendard", -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #ffffff;
+}
+
+.auth-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== 좌측 브랜드 패널 ===== */
+.auth-brand-panel {
+  width: var(--auth-panel-w);
+  flex-shrink: 0;
+  background-color: var(--color-dark);
+  color: #eff6f3;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 40px;
+  overflow: hidden;
+}
+
+.auth-brand-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+.auth-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background-color: var(--color-accent);
+  color: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.auth-brand-copy {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-brand-copy h2 {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 14px;
+  letter-spacing: -0.3px;
+}
+
+.auth-brand-copy p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(239, 246, 243, 0.75);
+  margin: 0;
+}
+
+.auth-brand-foot {
+  font-size: 12px;
+  color: rgba(239, 246, 243, 0.4);
+  position: relative;
+  z-index: 2;
+}
+
+/* 호흡 곡선 시그니처 — 화면 하단에 흐르는 사인파, 장식이 아니라 '폐활량 곡선'의 변형 */
+.breath-curve {
+  position: absolute;
+  left: -10%;
+  bottom: -40px;
+  width: 120%;
+  height: auto;
+  opacity: 0.9;
+  z-index: 1;
+}
+
+/* ===== 우측 폼 영역 ===== */
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background-color: var(--color-bg);
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-form-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-darker);
+  margin-bottom: 6px;
+}
+
+.auth-form-subtitle {
+  font-size: 13.5px;
+  color: var(--color-muted);
+  margin-bottom: 28px;
+}
+
+.auth-form-card .form-control {
+  border-color: var(--color-border);
+  padding: 10px 14px;
+}
+
+.auth-form-card .form-control:focus {
+  border-color: var(--color-main);
+  box-shadow: 0 0 0 3px rgba(74, 124, 114, 0.12);
+}
+
+.auth-form-card label.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-darker);
+}
+
+@media (max-width: 860px) {
+  .auth-brand-panel {
+    display: none;
+  }
+}

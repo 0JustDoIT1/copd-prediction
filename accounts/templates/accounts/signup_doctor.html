@@ -1,0 +1,53 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}의사 회원가입 - 미래의료병원{% endblock %}
+
+{% block auth_content %}
+<a href="{% url 'accounts:signup' %}" class="text-decoration-none" style="font-size: 13px; color: var(--color-muted);">
+  <i class="bi bi-arrow-left"></i> 가입 유형 다시 선택
+</a>
+
+<div class="auth-form-title mt-2">의사로 가입</div>
+<div class="auth-form-subtitle">권고 점수를 확인하고 환자를 진료하세요</div>
+
+{% if form.non_field_errors %}
+  <div class="alert-danger-soft mb-3">{{ form.non_field_errors }}</div>
+{% endif %}
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label class="form-label">{{ form.email.label }}</label>
+    {{ form.email }}
+    {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">{{ form.password1.label }}</label>
+    {{ form.password1 }}
+    <div class="text-muted" style="font-size:11.5px; margin-top:4px;">영문, 숫자, 특수문자를 포함한 8~16자</div>
+    {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors }}</div>{% endif %}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">{{ form.password2.label }}</label>
+    {{ form.password2 }}
+    {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors }}</div>{% endif %}
+  </div>
+
+  <hr>
+
+  <div class="mb-3">
+    <label class="form-label">{{ form.license_no.label }}</label>
+    {{ form.license_no }}
+    <div class="text-muted" style="font-size:11.5px; margin-top:4px;">숫자 4~6자리</div>
+    {% if form.license_no.errors %}<div class="text-danger small mt-1">{{ form.license_no.errors }}</div>{% endif %}
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100 mt-2">의사로 가입하기</button>
+</form>
+
+<p class="text-center mt-4 mb-0" style="font-size: 13.5px;">
+  이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a>
+</p>
+{% endblock %}
