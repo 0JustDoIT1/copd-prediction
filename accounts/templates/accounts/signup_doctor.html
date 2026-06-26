@@ -10,29 +10,27 @@
 <div class="auth-form-subtitle">권고 점수를 확인하고 환자를 진료하세요</div>
 
 {% if form.non_field_errors %}
-  <div class="alert-danger-soft mb-3">{{ form.non_field_errors }}</div>
+  <div class="alert-danger-soft mb-3 js-server-error" data-watch="id_password1,id_password2">{{ form.non_field_errors }}</div>
 {% endif %}
 
-<form method="post" novalidate>
+<form method="post" novalidate data-parsley-validate>
   {% csrf_token %}
 
   <div class="mb-3">
     <label class="form-label">{{ form.email.label }}</label>
     {{ form.email }}
-    {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+    {% if form.email.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_email" style="font-size:13px; padding:8px 12px;">{{ form.email.errors }}</div>{% endif %}
   </div>
 
   <div class="mb-3">
     <label class="form-label">{{ form.password1.label }}</label>
     {{ form.password1 }}
     <div class="text-muted" style="font-size:11.5px; margin-top:4px;">영문, 숫자, 특수문자를 포함한 8~16자</div>
-    {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors }}</div>{% endif %}
   </div>
 
   <div class="mb-3">
     <label class="form-label">{{ form.password2.label }}</label>
     {{ form.password2 }}
-    {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors }}</div>{% endif %}
   </div>
 
   <hr>
@@ -41,7 +39,6 @@
     <label class="form-label">{{ form.license_no.label }}</label>
     {{ form.license_no }}
     <div class="text-muted" style="font-size:11.5px; margin-top:4px;">숫자 4~6자리</div>
-    {% if form.license_no.errors %}<div class="text-danger small mt-1">{{ form.license_no.errors }}</div>{% endif %}
   </div>
 
   <button type="submit" class="btn btn-primary w-100 mt-2">의사로 가입하기</button>

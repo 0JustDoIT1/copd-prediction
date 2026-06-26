@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from .forms import (
     DoctorProfileUpdateForm,
     DoctorSignupForm,
+    LoginForm,
     PatientProfileUpdateForm,
     PatientSignupForm,
     ProfileUpdateForm,
@@ -22,7 +23,7 @@ def _redirect_to_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
     if request.user.role == 'doctor':
-        return redirect('screening:doctor_dashboard')
+        return redirect('accounts:doctor_dashboard')
     return redirect('accounts:patient_dashboard')
 
 
@@ -41,18 +42,26 @@ def login_view(request):
 
     error = None
     if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        user = authenticate(request, username=username, password=password)
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                request,
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password'],
+            )
+            if user is not None:
+                login(request, user)
+                return _redirect_to_dashboard(request)
 
-        if user is not None:
-            login(request, user)
-            return _redirect_to_dashboard(request)
+            # 보안상 아이디/비밀번호 중 어느 쪽이 틀렸는지 구분하지 않는다.
+            error = '아이디 또는 비밀번호가 일치하지 않습니다.'
+    else:
+        form = LoginForm()
 
-        # 보안상 아이디/비밀번호 중 어느 쪽이 틀렸는지 구분하지 않는다.
-        error = '아이디 또는 비밀번호가 일치하지 않습니다.'
-
-    return render(request, 'accounts/login.html', {'error': error})
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'error': error,
+    })
 
 
 def signup_role_select_view(request):
@@ -81,8 +90,8 @@ def signup_patient_view(request):
                     birth_date=form.cleaned_data['birth_date'],
                     sex=form.cleaned_data['sex'],
                 )
-            login(request, user)
-            return redirect('accounts:patient_dashboard')
+            messages.success(request, '회원가입이 완료되었습니다. 로그인해주세요.')
+            return redirect('accounts:login')
     else:
         form = PatientSignupForm()
 
@@ -107,8 +116,8 @@ def signup_doctor_view(request):
                     user=user,
                     license_no=form.cleaned_data.get('license_no', ''),
                 )
-            login(request, user)
-            return redirect('screening:doctor_dashboard')
+            messages.success(request, '회원가입이 완료되었습니다. 로그인해주세요.')
+            return redirect('accounts:login')
     else:
         form = DoctorSignupForm()
 
@@ -124,6 +133,13 @@ def logout_view(request):
 @login_required
 def patient_dashboard_view(request):
     return render(request, 'accounts/patient_dashboard.html', {
+        'active_menu': 'home',
+    })
+
+
+@login_required
+def doctor_dashboard_view(request):
+    return render(request, 'accounts/doctor_dashboard.html', {
         'active_menu': 'home',
     })
 
