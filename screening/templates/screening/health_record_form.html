@@ -4,27 +4,195 @@
 {% block page_title %}건강검진 수치 입력{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h5 class="mb-0">건강검진 수치 입력</h5>
-  </div>
 
-  <div class="card-body">
-    <div class="alert-warning-soft mb-4">
-      키와 몸무게를 입력하면 BMI는 서버에서 자동 계산됩니다.
+<div class="card">
+
+    <div class="card-header">
+        <h5 class="mb-0">건강검진 수치 입력</h5>
     </div>
 
-    <form method="post">
-      {% csrf_token %}
+    <div class="card-body">
 
-      {{ form.as_p }}
+        <div class="alert-warning-soft mb-4">
+            <strong>입력 안내 / Input Guide</strong><br>
 
-      <div class="mt-4">
-        <button type="submit" class="btn btn-primary">
-          저장 및 BMI 계산 확인
-        </button>
-      </div>
-    </form>
-  </div>
+            Height : cm<br>
+            Weight : kg<br>
+
+            BMI는 키와 몸무게를 이용하여 자동 계산됩니다.
+        </div>
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6 class="mb-0">기본 정보</h6>
+          </div>
+
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="stat-label">성별 / Sex</div>
+                <div class="stat-value" style="font-size:18px;">
+                  {{ patient.get_sex_display }}
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="stat-label">생년월일 / Birth date</div>
+                <div class="stat-value" style="font-size:18px;">
+                  {{ patient.birth_date }}
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="stat-label">나이 / Age</div>
+                <div class="stat-value" style="font-size:18px;">
+                  {{ age }}세
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- ================= 신체계측 ================= -->
+
+            <h5 class="mb-3">📏 신체계측</h5>
+
+            <div class="row mb-4">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ form.height.label }}</label>
+                    {{ form.height }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ form.weight.label }}</label>
+                    {{ form.weight }}
+                </div>
+
+            </div>
+
+
+            <!-- ================= 혈압 ================= -->
+
+            <h5 class="mb-3">🩺 혈압</h5>
+
+            <div class="row mb-4">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.sbp.label }}</label>
+                    {{ form.sbp }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.dbp.label }}</label>
+                    {{ form.dbp }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.hp_stage.label }}</label>
+                    {{ form.hp_stage }}
+                </div>
+
+            </div>
+
+
+            <!-- ================= 혈액검사 ================= -->
+
+            <h5 class="mb-3">🩸 혈액검사</h5>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.glucose.label }}</label>
+                    {{ form.glucose }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.hba1c.label }}</label>
+                    {{ form.hba1c }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.cholesterol.label }}</label>
+                    {{ form.cholesterol }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.hdl.label }}</label>
+                    {{ form.hdl }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.triglyceride.label }}</label>
+                    {{ form.triglyceride }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.ast.label }}</label>
+                    {{ form.ast }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.alt.label }}</label>
+                    {{ form.alt }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.hemoglobin.label }}</label>
+                    {{ form.hemoglobin }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.wbc.label }}</label>
+                    {{ form.wbc }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>{{ form.rbc.label }}</label>
+                    {{ form.rbc }}
+                </div>
+
+            </div>
+
+            <!-- ================= 기왕력 및 염증 수치 ================= -->
+
+            <h5 class="mb-3 mt-4">📋 기왕력 및 염증 수치</h5>
+
+            <div class="row mb-4">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.hscrp.label }}</label>
+                    {{ form.hscrp }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.asthma_history.label }}</label>
+                    {{ form.asthma_history }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ form.rhinitis_history.label }}</label>
+                    {{ form.rhinitis_history }}
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="text-end">
+
+                <button class="btn btn-primary" type="submit">
+                    AI 예측 실행
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
 </div>
+
 {% endblock %}

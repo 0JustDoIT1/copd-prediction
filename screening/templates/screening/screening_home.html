@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}검진/검사 | 미래의료병원{% endblock %}
+{% block page_title %}검진/검사{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">COPD 폐활량검사 권고 선별</h5>
+  </div>
+
+  <div class="card-body">
+    <p class="text-muted">
+      문진과 건강검진 수치를 입력하면 의사가 폐활량검사 권고 여부를 검토합니다.
+    </p>
+
+    <a href="{% url 'screening:questionnaire' %}" class="btn btn-primary">
+      문진 시작하기
+    </a>
+  </div>
+</div>
+{% endblock %}

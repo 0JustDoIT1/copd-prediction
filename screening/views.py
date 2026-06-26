@@ -4,11 +4,23 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Questionnaire, HealthRecord, PredictionResult, ClinicalDecision
 from .forms import QuestionnaireForm, HealthRecordForm, ClinicalDecisionForm
-from .services.prediction_service import create_prediction_result
+from .services.prediction_service import create_prediction_result, calculate_age
+
+
+@login_required
+def screening_home(request): # 로그인한 사용자만 문진입력 가능
+    return render(
+        request,
+        "screening/screening_home.html",
+        {
+            "active_group": "screening",
+            "active_menu": "screening_home",
+        }
+    )
 
 
 # 문진 입력 ✏️
-@login_required # 로그인한 사용자만 문진입력 가능
+@login_required 
 def questionnaire_create(request): 
     if request.method == "POST":
         form = QuestionnaireForm(request.POST) # 환자가 제출한 문진 데이터 받음
@@ -65,10 +77,18 @@ def health_record_create(request, questionnaire_id):
                 health_record
             )
 
-            return redirect(
-                "screening:result_detail",
-                prediction_id=prediction.id
-            )
+            patient = request.user.patientprofile
+
+            return render(
+            request,
+            "screening/health_record_form.html",
+            {
+                "form": form,
+                "questionnaire": questionnaire,
+                "patient": patient,
+                "age": calculate_age(patient.birth_date),
+            }
+        )
 
     else:
         form = HealthRecordForm()
@@ -104,6 +124,7 @@ def result_detail(request, prediction_id):
 권고 점수 높은 순으로 정렬
 의사 대시보드 템플릿으로 전달
 '''
+
 @login_required
 def doctor_dashboard(request):
     pending_predictions = PredictionResult.objects.filter(
