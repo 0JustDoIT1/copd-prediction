@@ -1,12 +1,31 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}자주 묻는 질문 - 미래의료병원{% endblock %}
 {% block page_title %}자주 묻는 질문{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'content/css/faq_list.css' %}" />
+{% endblock %}
+
 {% block content %}
+
+<div class="content-page-intro">
+  <div class="content-page-intro-icon"><i class="bi bi-question-circle"></i></div>
+  <div>
+    <div class="content-page-intro-text-title">자주 묻는 질문을 모아봤어요</div>
+    <div class="content-page-intro-text-desc">궁금한 내용을 검색하거나, 아래에서 직접 찾아보세요</div>
+  </div>
+</div>
+
+<div class="faq-search">
+  <i class="bi bi-search faq-search-icon"></i>
+  <input type="text" id="faqSearchInput" class="faq-search-input" placeholder="궁금한 내용을 검색해보세요">
+</div>
+
 <div class="dashboard-panel">
   <div class="accordion" id="faqAccordion">
     {% for faq in faqs %}
-    <div class="accordion-item faq-item">
+    <div class="accordion-item faq-item" data-faq-question="{{ faq.question }}">
       <h2 class="accordion-header">
         <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
                 data-bs-toggle="collapse" data-bs-target="#faq{{ forloop.counter }}">
@@ -21,8 +40,13 @@
       </div>
     </div>
     {% empty %}
-    <p class="text-muted">등록된 질문이 없습니다.</p>
+    <p class="content-empty">등록된 질문이 없습니다.</p>
     {% endfor %}
   </div>
+  <p class="content-empty faq-no-result d-none">검색 결과가 없어요. 다른 단어로 찾아보세요.</p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'content/js/faq_search.js' %}"></script>
 {% endblock %}
