@@ -5,23 +5,52 @@
 {% block page_title %} 기록 및 추세 히스토리{% endblock %}
 
 {% block content %}
+<style>
+.dc-card { transition: transform .15s ease, box-shadow .15s ease; }
+.dc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.08) !important; }
+.dc-quick-btn {
+    border-radius: 20px;
+    font-size: 0.82rem;
+    padding: 4px 14px;
+    border: 1px solid #d0e8e5;
+    background: #f0f9f8;
+    color: #00695c;
+    transition: background .15s ease;
+}
+.dc-quick-btn:hover { background: #d8efec; color: #00695c; }
+.dc-quick-btn.active { background: #0D9488; color: white; border-color: #0D9488; }
+.table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.dc-risk-text { color: #c62828; font-weight: 700; }
+</style>
+
 <div class="container-fluid p-0">
 
-    <div class="card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="card dc-card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
         <form method="get" class="row g-3 align-items-center">
             <div class="col-12 col-sm-auto">
                 <span class="fw-medium text-secondary"><i class="bi bi-funnel me-1"></i> 조회 기간 선택</span>
             </div>
             <div class="col-6 col-sm-auto">
-                <input type="date" name="start" class="form-control bg-light border-0" value="{{ request.GET.start|default:'' }}">
+                <input type="date" id="startInput" name="start" class="form-control bg-light border-0" value="{{ request.GET.start|default:'' }}">
             </div>
             <div class="col-auto px-0 text-center">~</div>
             <div class="col-6 col-sm-auto">
-                <input type="date" name="end" class="form-control bg-light border-0" value="{{ request.GET.end|default:'' }}">
+                <input type="date" id="endInput" name="end" class="form-control bg-light border-0" value="{{ request.GET.end|default:'' }}">
             </div>
             <div class="col-12 col-sm-auto ms-sm-auto d-flex gap-2">
                 <a href="{% url 'daily_care:history' %}" class="btn btn-light w-100 shadow-sm" style="border-radius: 8px;">초기화</a>
-                <button type="submit" class="btn btn-primary w-100 shadow-sm" style="border-radius: 8px; background-color: #0d6efd;">조회하기</button>
+                <button type="submit" class="btn w-100 shadow-sm fw-bold" style="border-radius: 8px; background-color: #0D9488; color: white; border: none;">조회하기</button>
+            </div>
+
+            <!-- ── 빠른 기간 선택 ── -->
+            <div class="col-12 d-flex gap-2 mt-1">
+                <button type="button" class="dc-quick-btn" onclick="setQuickRange(7)">최근 7일</button>
+                <button type="button" class="dc-quick-btn" onclick="setQuickRange(30)">최근 30일</button>
+                <button type="button" class="dc-quick-btn" onclick="setQuickRange(90)">최근 90일</button>
             </div>
         </form>
     </div>
@@ -31,8 +60,8 @@
 
         <!-- 차트 -->
         <div class="col-12 col-xl-8">
-            <div class="card p-4 bg-white border-0 shadow-sm h-100" style="border-radius: 12px;">
-                <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-graph-up text-primary me-2"></i>건강 지표 추세 분석</h5>
+            <div class="card dc-card p-4 bg-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-graph-up me-2" style="color: #0D9488;"></i>건강 지표 추세 분석</h5>
                 <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="healthTrendChart"></canvas>
                 </div>
@@ -43,7 +72,7 @@
         <div class="col-12 col-xl-4">
             <div class="d-flex flex-column gap-3 h-100">
 
-                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                <div class="card dc-card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-muted small mb-1">평균 흡연량</div>
@@ -53,7 +82,7 @@
                     </div>
                 </div>
 
-                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                <div class="card dc-card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-muted small mb-1">평균 호흡 곤란 등급</div>
@@ -63,7 +92,7 @@
                     </div>
                 </div>
 
-                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                <div class="card dc-card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-muted small mb-1">체크인 달성률</div>
@@ -78,11 +107,14 @@
 
     </div>
 
-    <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
-        <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-list-ul text-primary me-2"></i>날짜별 상세 기록 목록</h5>
+    <div class="card dc-card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0" style="color: #333;"><i class="bi bi-list-ul me-2" style="color: #0D9488;"></i>날짜별 상세 기록 목록</h5>
+            <span class="text-muted small">총 {{ logs|length }}건</span>
+        </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="min-width: 700px;">
+        <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 table-sticky" style="min-width: 700px;">
                 <thead class="table-light text-secondary small fw-bold">
                     <tr>
                         <th style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;">날짜</th>
@@ -103,10 +135,18 @@
                                 {{ log.smoking_count }} 개비
                             </span>
                         </td>
-                        <td><span class="fw-medium">{{ log.dyspnea_grade }} 단계</span></td>
+                        <td>
+                            <span class="fw-medium {% if log.dyspnea_grade >= 3 %}dc-risk-text{% endif %}">
+                                {{ log.dyspnea_grade }} 단계
+                                {% if log.dyspnea_grade >= 3 %}<i class="bi bi-exclamation-triangle-fill ms-1" style="font-size: 0.75rem;"></i>{% endif %}
+                            </span>
+                        </td>
                         <td>
                             {% if log.spo2 %}
-                                <span class="text-primary fw-medium">{{ log.spo2 }} %</span>
+                                <span class="fw-medium {% if log.spo2 < 95 %}dc-risk-text{% else %}text-primary{% endif %}">
+                                    {{ log.spo2 }} %
+                                    {% if log.spo2 < 95 %}<i class="bi bi-exclamation-triangle-fill ms-1" style="font-size: 0.75rem;"></i>{% endif %}
+                                </span>
                             {% else %}
                                 <span class="text-muted">-</span>
                             {% endif %}
@@ -123,7 +163,7 @@
                         </td>
                         <td>
                             {% if log.exercised %}
-                                <span class="badge bg-success text-white px-2 py-1" style="border-radius: 6px;">완료</span>
+                                <span class="badge text-white px-2 py-1" style="border-radius: 6px; background-color: #0D9488;">완료</span>
                             {% else %}
                                 <span class="badge bg-light text-muted px-2 py-1" style="border-radius: 6px;">미수행</span>
                             {% endif %}
@@ -136,7 +176,12 @@
                     <tr>
                         <td colspan="7" class="text-center py-5 text-muted">
                             <i class="bi bi-database-x fs-2 d-block mb-2"></i>
-                            선택한 기간 내에 등록된 일상 관리 기록이 없습니다.
+                            {% if request.GET.start or request.GET.end %}
+                                선택한 기간({{ request.GET.start|default:"전체" }} ~ {{ request.GET.end|default:"전체" }}) 내에 등록된 기록이 없습니다.<br>
+                                <a href="{% url 'daily_care:history' %}" class="small" style="color: #0D9488;">전체 기록 보기</a>
+                            {% else %}
+                                아직 등록된 일상 관리 기록이 없습니다. 체크인을 시작해 보세요!
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -151,6 +196,19 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // ── 빠른 기간 선택 ──
+    function setQuickRange(days) {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - (days - 1));
+
+        const fmt = (d) => d.toISOString().split('T')[0];
+        document.getElementById('startInput').value = fmt(start);
+        document.getElementById('endInput').value = fmt(end);
+
+        document.querySelector('form').submit();
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('healthTrendChart').getContext('2d');
 
@@ -158,11 +216,13 @@
         const rawLabels = [];
         const rawSmokingData = [];
         const rawSpo2Data = [];
+        const rawGradeData = [];
 
         {% for log in logs reversed %}
             rawLabels.push('{{ log.log_date|date:"m-d" }}');
             rawSmokingData.push({{ log.smoking_count }});
             rawSpo2Data.push({% if log.spo2 %}{{ log.spo2 }}{% else %}null{% endif %});
+            rawGradeData.push({{ log.dyspnea_grade }});
         {% endfor %}
 
         new Chart(ctx, {
@@ -178,6 +238,17 @@
                         borderWidth: 2,
                         tension: 0.2,
                         yAxisID: 'y'
+                    },
+                    {
+                        label: '호흡곤란 등급',
+                        data: rawGradeData,
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                        borderWidth: 2,
+                        borderDash: [4, 3],
+                        tension: 0.2,
+                        yAxisID: 'y2',
+                        pointRadius: 2
                     },
                     {
                         label: '산소포화도 (%)',
@@ -215,6 +286,12 @@
                         min: 80,
                         max: 100,
                         grid: { drawOnChartArea: false }
+                    },
+                    y2: {
+                        type: 'linear',
+                        display: false,
+                        min: 0,
+                        max: 4
                     }
                 }
             }

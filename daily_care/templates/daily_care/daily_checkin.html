@@ -5,16 +5,86 @@
 {% block page_title %}📝 오늘의 일상 체크인{% endblock %}
 
 {% block content %}
+<style>
+.dc-card { border-radius: 12px; }
+.dc-icon { color: #0D9488; }
+.dc-stepper-btn {
+    width: 44px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0D9488;
+    background: #f0f9f8;
+    border-color: #d0e8e5 !important;
+}
+.dc-stepper-btn:hover { background: #d8efec; }
+.dc-spo2-low { color: #c62828 !important; font-weight: 600; }
+
+/* ── mMRC 라디오 카드 ── */
+.dc-grade-radio { position: absolute; opacity: 0; pointer-events: none; }
+.dc-grade-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+    margin-bottom: 0.6rem;
+}
+.dc-grade-card:hover { border-color: #99d8d1; }
+.dc-grade-radio:checked + .dc-grade-card {
+    border-color: #0D9488;
+    background: #f0f9f8;
+}
+.dc-grade-badge {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: background .15s ease, color .15s ease;
+}
+.dc-grade-radio:checked + .dc-grade-card .dc-grade-badge {
+    background: #0D9488;
+    color: white;
+}
+.dc-grade-text { font-size: 0.92rem; color: #444; line-height: 1.4; }
+
+/* ── 스위치 항목 ── */
+.dc-switch-row { transition: background .15s ease; border-radius: 8px; padding: 0.5rem 0.25rem; }
+
+/* ── 하단 sticky 저장 바 ── */
+.dc-save-bar {
+    position: sticky;
+    bottom: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(6px);
+    padding: 0.9rem 0;
+    margin: 0 -0.25rem;
+    border-top: 1px solid #eee;
+}
+</style>
+
 <div class="container-fluid p-0" style="max-width: 800px; margin: 0 auto;">
-    
+
     <div class="mb-4">
-        <p class="text-muted mb-1">오늘 하루 동안의 호흡기 상태와 일상 습관을 기록해 주세요.</p>
+        <p class="text-muted mb-1">
+            오늘 하루 동안의 호흡기 상태와 일상 습관을 기록해 주세요.
+            <span class="text-secondary fw-medium">· {% now "Y년 n월 j일" %}</span>
+        </p>
         <small class="text-danger">* 정확한 데이터 축적은 의료진의 대시보드 모니터링 및 COPD 선별 예측에 중요하게 활용됩니다.</small>
     </div>
 
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
-        
+
         {% if form.non_field_errors %}
         <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px;">
             {% for error in form.non_field_errors %}
@@ -23,17 +93,18 @@
         </div>
         {% endif %}
 
-        <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-calculator text-primary me-2"></i>건강 수치 입력</h5>
-            
+        <div class="card dc-card p-4 bg-white border-0 shadow-sm mb-4">
+            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-calculator dc-icon me-2"></i>건강 수치 입력</h5>
+
             <div class="row g-4">
                 <div class="col-12 col-md-6">
                     <label for="{{ form.smoking_count.id_for_label }}" class="form-label fw-medium text-secondary">오늘의 흡연량 (개비)</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-smoke"></i></span>
-                        <input type="number" name="smoking_count" id="{{ form.smoking_count.id_for_label }}" 
-                               class="form-control bg-light border-start-0 {% if form.smoking_count.errors %}is-invalid{% endif %}" 
+                        <button type="button" class="btn dc-stepper-btn border" onclick="adjustSmoking(-1)">−</button>
+                        <input type="number" name="smoking_count" id="{{ form.smoking_count.id_for_label }}"
+                               class="form-control bg-light text-center {% if form.smoking_count.errors %}is-invalid{% endif %}"
                                value="{{ form.smoking_count.value|default:0 }}" min="0" required>
+                        <button type="button" class="btn dc-stepper-btn border" onclick="adjustSmoking(1)">+</button>
                     </div>
                     <div class="form-text">금연하셨다면 0을 입력해 주세요.</div>
                     {% if form.smoking_count.errors %}
@@ -45,11 +116,12 @@
                     <label for="{{ form.spo2.id_for_label }}" class="form-label fw-medium text-secondary">산소포화도 (SpO₂ %)</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-heart-pulse"></i></span>
-                        <input type="number" step="0.1" name="spo2" id="{{ form.spo2.id_for_label }}" 
-                               class="form-control bg-light border-start-0 {% if form.spo2.errors %}is-invalid{% endif %}" 
-                               value="{{ form.spo2.value|default:'' }}" placeholder="예: 98.5">
+                        <input type="number" step="0.1" name="spo2" id="{{ form.spo2.id_for_label }}"
+                               class="form-control bg-light border-start-0 {% if form.spo2.errors %}is-invalid{% endif %}"
+                               value="{{ form.spo2.value|default:'' }}" placeholder="예: 98.5"
+                               oninput="checkSpo2(this.value)">
                     </div>
-                    <div class="form-text">측정 장비가 있는 경우 소수점 첫째 자리까지 입력 (선택)</div>
+                    <div class="form-text" id="spo2Hint">측정 장비가 있는 경우 소수점 첫째 자리까지 입력 (선택)</div>
                     {% if form.spo2.errors %}
                         <div class="text-danger small mt-1">{{ form.spo2.errors.0 }}</div>
                     {% endif %}
@@ -57,64 +129,134 @@
             </div>
         </div>
 
-        <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-lungs text-primary me-2"></i>mMRC 호흡 곤란 등급</h5>
+        <div class="card dc-card p-4 bg-white border-0 shadow-sm mb-4">
+            <h5 class="fw-bold mb-1" style="color: #333;"><i class="bi bi-lungs dc-icon me-2"></i>mMRC 호흡 곤란 등급</h5>
             <p class="text-muted small mb-3">현재 나의 호흡 상태와 가장 유사한 단계를 선택해 주세요.</p>
-            
-            <div class="mb-3">
-                <select name="dyspnea_grade" id="{{ form.dyspnea_grade.id_for_label }}" class="form-select bg-light {% if form.dyspnea_grade.errors %}is-invalid{% endif %}" required>
-                    <option value="0" {% if form.dyspnea_grade.value == 0 %}selected{% endif %}>0단계: 심한 운동을 할 때만 숨이 차다.</option>
-                    <option value="1" {% if form.dyspnea_grade.value == 1 %}selected{% endif %}>1단계: 평지를 빨리 걷거나 약간 언덕을 오를 때 숨이 차다.</option>
-                    <option value="2" {% if form.dyspnea_grade.value == 2 %}selected{% endif %}>2단계: 숨이 차서 평지를 동년배보다 천천히 걷거나, 이내 멈추어 쉬어야 한다.</option>
-                    <option value="3" {% if form.dyspnea_grade.value == 3 %}selected{% endif %}>3단계: 평지를 약 100m 걷거나 몇 분 동안 걸으면 숨이 차서 멈추어야 한다.</option>
-                    <option value="4" {% if form.dyspnea_grade.value == 4 %}selected{% endif %}>4단계: 숨이 차서 집을 나설 수 없거나, 옷을 입고 벗을 때도 숨이 차다.</option>
-                </select>
-                {% if form.dyspnea_grade.errors %}
-                    <div class="text-danger small mt-1">{{ form.dyspnea_grade.errors.0 }}</div>
-                {% endif %}
+
+            <div>
+                <input type="radio" name="dyspnea_grade" id="grade_0" value="0" class="dc-grade-radio"
+                       {% if form.dyspnea_grade.value == 0 or not form.dyspnea_grade.value %}checked{% endif %} required>
+                <label for="grade_0" class="dc-grade-card">
+                    <span class="dc-grade-badge">0</span>
+                    <span class="dc-grade-text">심한 운동을 할 때만 숨이 차다.</span>
+                </label>
+
+                <input type="radio" name="dyspnea_grade" id="grade_1" value="1" class="dc-grade-radio"
+                       {% if form.dyspnea_grade.value == 1 %}checked{% endif %} required>
+                <label for="grade_1" class="dc-grade-card">
+                    <span class="dc-grade-badge">1</span>
+                    <span class="dc-grade-text">평지를 빨리 걷거나 약간 언덕을 오를 때 숨이 차다.</span>
+                </label>
+
+                <input type="radio" name="dyspnea_grade" id="grade_2" value="2" class="dc-grade-radio"
+                       {% if form.dyspnea_grade.value == 2 %}checked{% endif %} required>
+                <label for="grade_2" class="dc-grade-card">
+                    <span class="dc-grade-badge">2</span>
+                    <span class="dc-grade-text">숨이 차서 평지를 동년배보다 천천히 걷거나, 이내 멈추어 쉬어야 한다.</span>
+                </label>
+
+                <input type="radio" name="dyspnea_grade" id="grade_3" value="3" class="dc-grade-radio"
+                       {% if form.dyspnea_grade.value == 3 %}checked{% endif %} required>
+                <label for="grade_3" class="dc-grade-card">
+                    <span class="dc-grade-badge">3</span>
+                    <span class="dc-grade-text">평지를 약 100m 걷거나 몇 분 동안 걸으면 숨이 차서 멈추어야 한다.</span>
+                </label>
+
+                <input type="radio" name="dyspnea_grade" id="grade_4" value="4" class="dc-grade-radio"
+                       {% if form.dyspnea_grade.value == 4 %}checked{% endif %} required>
+                <label for="grade_4" class="dc-grade-card" style="margin-bottom: 0;">
+                    <span class="dc-grade-badge">4</span>
+                    <span class="dc-grade-text">숨이 차서 집을 나설 수 없거나, 옷을 입고 벗을 때도 숨이 차다.</span>
+                </label>
             </div>
+            {% if form.dyspnea_grade.errors %}
+                <div class="text-danger small mt-2">{{ form.dyspnea_grade.errors.0 }}</div>
+            {% endif %}
         </div>
 
-        <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-check2-square text-primary me-2"></i>오늘의 증상 및 활동</h5>
-            
-            <div class="d-flex flex-column gap-3">
-                <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
-                    <label class="form-check-label fw-medium text-secondary" for="{{ form.has_cough.id_for_label }}">오늘 기침 증상이 있었나요?</label>
+        <div class="card dc-card p-4 bg-white border-0 shadow-sm mb-4">
+            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-check2-square dc-icon me-2"></i>오늘의 증상 및 활동</h5>
+
+            <div class="d-flex flex-column gap-1">
+                <div class="dc-switch-row form-check form-switch p-0 d-flex justify-content-between align-items-center">
+                    <label class="form-check-label fw-medium text-secondary" for="{{ form.has_cough.id_for_label }}">
+                        <i class="bi bi-wind text-muted me-2"></i>오늘 기침 증상이 있었나요?
+                    </label>
                     <input class="form-check-input ms-0" type="checkbox" role="switch" name="has_cough" id="{{ form.has_cough.id_for_label }}" style="width: 2.5em; height: 1.25em;" {% if form.has_cough.value %}checked{% endif %}>
                 </div>
                 <hr class="text-muted my-1 opacity-25">
 
-                <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
-                    <label class="form-check-label fw-medium text-secondary" for="{{ form.has_sputum.id_for_label }}">오늘 가래 증상이 있었나요?</label>
+                <div class="dc-switch-row form-check form-switch p-0 d-flex justify-content-between align-items-center">
+                    <label class="form-check-label fw-medium text-secondary" for="{{ form.has_sputum.id_for_label }}">
+                        <i class="bi bi-droplet text-muted me-2"></i>오늘 가래 증상이 있었나요?
+                    </label>
                     <input class="form-check-input ms-0" type="checkbox" role="switch" name="has_sputum" id="{{ form.has_sputum.id_for_label }}" style="width: 2.5em; height: 1.25em;" {% if form.has_sputum.value %}checked{% endif %}>
                 </div>
                 <hr class="text-muted my-1 opacity-25">
 
-                <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
-                    <label class="form-check-label fw-medium text-secondary" for="{{ form.exercised.id_for_label }}">오늘 호흡 재활/지정된 운동을 수행하셨나요?</label>
+                <div class="dc-switch-row form-check form-switch p-0 d-flex justify-content-between align-items-center">
+                    <label class="form-check-label fw-medium text-secondary" for="{{ form.exercised.id_for_label }}">
+                        <i class="bi bi-person-walking text-muted me-2"></i>오늘 호흡 재활/지정된 운동을 수행하셨나요?
+                    </label>
                     <input class="form-check-input ms-0" type="checkbox" role="switch" name="exercised" id="{{ form.exercised.id_for_label }}" style="width: 2.5em; height: 1.25em;" {% if form.exercised.value %}checked{% endif %}>
                 </div>
             </div>
         </div>
 
-        <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-journal-text text-primary me-2"></i>오늘의 컨디션 노트</h5>
+        <div class="card dc-card p-4 bg-white border-0 shadow-sm mb-4">
+            <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-journal-text dc-icon me-2"></i>오늘의 컨디션 노트</h5>
             <div>
-                <textarea name="memo" id="{{ form.memo.id_for_label }}" class="form-control bg-light {% if form.memo.errors %}is-invalid{% endif %}" 
-                          rows="4" placeholder="특이사항이나 의료진에게 공유하고 싶은 호흡기 컨디션을 자유롭게 작성해 주세요. (최대 500자)">{{ form.memo.value|default:'' }}</textarea>
-                <div class="form-text text-end">최대 500자까지 작성 가능합니다.</div>
+                <textarea name="memo" id="{{ form.memo.id_for_label }}" class="form-control bg-light {% if form.memo.errors %}is-invalid{% endif %}"
+                          rows="4" maxlength="500" oninput="updateMemoCount(this.value)"
+                          placeholder="특이사항이나 의료진에게 공유하고 싶은 호흡기 컨디션을 자유롭게 작성해 주세요. (최대 500자)">{{ form.memo.value|default:'' }}</textarea>
+                <div class="form-text text-end"><span id="memoCount">0</span> / 500자</div>
                 {% if form.memo.errors %}
                     <div class="text-danger small mt-1">{{ form.memo.errors.0 }}</div>
                 {% endif %}
             </div>
         </div>
 
-        <div class="d-flex gap-3 justify-content-end mb-5">
+        <div class="dc-save-bar d-flex gap-3 justify-content-end">
             <a href="{% url 'daily_care:dashboard' %}" class="btn btn-light px-4 py-2 fw-medium shadow-sm" style="border-radius: 8px;">취소</a>
-            <button type="submit" class="btn btn-primary px-5 py-2 fw-medium shadow-sm" style="border-radius: 8px; background-color: #0d6efd;">기록 저장하기</button>
+            <button type="submit" class="btn px-5 py-2 fw-medium shadow-sm" style="border-radius: 8px; background-color: #0D9488; color: white; border: none;">기록 저장하기</button>
         </div>
 
     </form>
 </div>
+
+<script>
+function adjustSmoking(delta) {
+    const input = document.getElementById('{{ form.smoking_count.id_for_label }}');
+    const next = Math.max(0, (parseInt(input.value) || 0) + delta);
+    input.value = next;
+}
+
+function checkSpo2(value) {
+    const hint = document.getElementById('spo2Hint');
+    const num = parseFloat(value);
+    if (!value) {
+        hint.textContent = '측정 장비가 있는 경우 소수점 첫째 자리까지 입력 (선택)';
+        hint.classList.remove('dc-spo2-low');
+    } else if (num < 95) {
+        hint.textContent = '⚠️ 95% 미만은 정상 범위보다 낮아요. 증상이 있다면 의료진과 상담해 주세요.';
+        hint.classList.add('dc-spo2-low');
+    } else {
+        hint.textContent = '정상 범위예요.';
+        hint.classList.remove('dc-spo2-low');
+    }
+}
+
+function updateMemoCount(value) {
+    document.getElementById('memoCount').textContent = value.length;
+}
+
+// 페이지 로드 시 기존 값 기준으로 초기 상태 반영 (수정/재방문 케이스 대비)
+document.addEventListener('DOMContentLoaded', function () {
+    const spo2Input = document.getElementById('{{ form.spo2.id_for_label }}');
+    if (spo2Input && spo2Input.value) checkSpo2(spo2Input.value);
+
+    const memoInput = document.getElementById('{{ form.memo.id_for_label }}');
+    if (memoInput) updateMemoCount(memoInput.value);
+});
+</script>
 {% endblock %}
