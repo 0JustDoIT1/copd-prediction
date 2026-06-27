@@ -5,36 +5,55 @@
 {% block page_title %}<h1 class="page-title">검사 예약</h1>{% endblock %}
 
 {% block content %}
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 860px;">
+<div style="max-width: 700px; margin: 0 auto;">
 
   <!-- 달력 -->
-  <div>
-    <p style="font-size:15px; font-weight:700; margin-bottom:14px;">날짜 선택</p>
-    <div class="card">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-        <span id="cal-title" style="font-size:15px; font-weight:700;"></span>
-        <div style="display:flex; gap:6px;">
-          <button onclick="changeMonth(-1)" style="width:30px; height:30px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer;">&lt;</button>
-          <button onclick="changeMonth(1)" style="width:30px; height:30px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer;">&gt;</button>
-        </div>
-      </div>
+  <div style="margin-bottom: 32px;">
+    <p style="font-size:25px; font-weight:700; margin-bottom:16px;">날짜 선택</p>
+    <div class="card" style="padding: 28px;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:20px;">
+        <button onclick="changeMonth(-1)" style="width:34px; height:34px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer; font-size:16px;">&lt;</button>
+        <span id="cal-title" style="font-size:25px; font-weight:700;"></span>
+        <button onclick="changeMonth(1)" style="width:34px; height:34px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer; font-size:16px;">&gt;</button>
+      </div>      
       <div id="calendar-grid"></div>
     </div>
   </div>
 
-  <!-- 슬롯 -->
-  <div>
-    <p style="font-size:15px; font-weight:700; margin-bottom:14px;">시간 선택</p>
-    <div class="card">
-      <p id="slot-label" style="font-size:13px; color:#62756f; margin-bottom:12px;">날짜를 먼저 선택해주세요</p>
-      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-        {% for time in slot_times %}
-        <button style="padding:10px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:13px;" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
-        {% endfor %}
-      </div>
-    </div>
+<!-- 슬롯 -->
+<div>
+  <p style="font-size:25px; font-weight:700; margin-bottom:16px;">시간 선택</p>
+  <div class="card" style="padding: 28px;">
+    <p id="slot-label" style="font-size:17px; color:#62756f; margin-bottom:20px;">날짜를 먼저 선택해주세요</p>
+    
+<!-- 오전 -->
+<div id="am-section">
+  <p style="font-size:14px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오전</p>
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px;">
+    {% for time in slot_times_am %}
+    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500;" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
+    {% endfor %}
   </div>
+</div>
 
+<!-- 오후 -->
+<div id="pm-section">
+  <p style="font-size:14px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오후</p>
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px;">
+    {% for time in slot_times_pm %}
+    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500;" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+  </div>
+</div>
+<!-- 선택 정보 + 다음 버튼 -->
+<p style="font-size:25px; font-weight:700; margin-bottom:16px; margin-top:32px;">선택한 예약 일시</p>
+<div id="selected-info" style="display:block; padding:16px 20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;">
+  <p id="selected-info-text" style="font-size:16px; font-weight:700; margin-bottom:16px;"></p>
+  <button onclick="goToConfirm()" style="width:100%; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; fo nt-weight:600; cursor:pointer;">다음 →</button>
+</div>
 </div>
 {% endblock %}
 
@@ -50,20 +69,45 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1).getDay();
   const lastDate = new Date(year, month+1, 0).getDate();
   const today = new Date();
-  let html = '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px;">';
-  DAYS.forEach(d => {
-    html += `<div style="text-align:center; font-size:11px; color:#62756f; font-weight:600; padding:4px 0;">${d}</div>`;
+  
+  let html = '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px;">';
+  
+  DAYS.forEach((d, i) => {
+    let color = '#62756f';
+    if (i === 0) color = '#e53e3e';
+    if (i === 6) color = '#3182ce';
+    html += `<div style="text-align:center; font-size:13px; color:${color}; font-weight:600; padding:6px 0;">${d}</div>`;
   });
+  
   for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  
   for (let d = 1; d <= lastDate; d++) {
     const date = new Date(year, month, d);
+    const dayOfWeek = date.getDay();
     const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-    let style = "text-align:center; padding:7px 4px; border-radius:8px; font-size:13px; cursor:pointer;";
-    if (isPast) style += "color:#ccc; cursor:not-allowed;";
-    else if (isToday) style += "border:1.5px solid #4a7c72; color:#4a7c72; font-weight:700;";
-    html += `<div style="${style}" ${!isPast ? `onclick="selectDay(${year},${month+1},${d})"` : ''}>${d}</div>`;
+    const isSunday = dayOfWeek === 0;
+    const isSaturday = dayOfWeek === 6;
+    
+    let color = '#1a2e2a';
+    if (isSunday) color = '#e53e3e';
+    if (isSaturday) color = '#3182ce';
+    
+    let style = `text-align:center; padding:10px 4px; border-radius:8px; font-size:15px; color:${color};`;
+    
+    if (isPast || isSunday) {
+      style += "color:#ccc; cursor:not-allowed;";
+    } else if (isToday) {
+      style += "border:1.5px solid #4a7c72; font-weight:700; cursor:pointer;";
+    } else {
+      style += "cursor:pointer;";
+    }
+    
+    const clickable = !isPast && !isSunday;
+    const isSat = isSaturday ? 'true' : 'false';
+    html += `<div style="${style}" ${clickable ? `onclick="selectDay(${year},${month+1},${d},${isSat})"` : ''}>${d}</div>`;
   }
+  
   html += '</div>';
   document.getElementById('calendar-grid').innerHTML = html;
 }
@@ -73,16 +117,35 @@ function changeMonth(dir) {
   renderCalendar();
 }
 
-function selectDay(year, month, day) {
+function selectDay(year, month, day, isSat) {
   document.querySelectorAll('#calendar-grid div[onclick]').forEach(el => {
     el.style.background = '';
     el.style.color = '';
+    el.style.fontWeight = '';
   });
   event.target.style.background = '#4a7c72';
   event.target.style.color = '#fff';
   event.target.style.fontWeight = '700';
-  document.getElementById('slot-label').textContent = `${year}년 ${month}월 ${day}일 예약 가능 시간`;
+  document.getElementById('slot-label').textContent = `${year}년 ${month}월 ${day}일`;
+  
+  // 시간 선택 초기화
+selectedTime = '';
+document.getElementById('selected-info').style.display = 'block';
+document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
+document.querySelectorAll('.slot-btn-item').forEach(b => {
+  b.style.background = '#fff';
+  b.style.color = '#1a2e2a';
+  b.style.borderColor = '#d7e6e2';
+});
+  
+  if (isSat === true || isSat === 'true') {
+    document.getElementById('pm-section').style.display = 'none';
+  } else {
+    document.getElementById('pm-section').style.display = 'block';
+  }
 }
+
+let selectedTime = '';
 
 function selectSlot(btn, time) {
   const selectedDate = document.getElementById('slot-label').textContent;
@@ -90,7 +153,41 @@ function selectSlot(btn, time) {
     alert('날짜를 먼저 선택해주세요!');
     return;
   }
-  window.location.href = `/appoint/confirm/?time=${time}&date=${selectedDate}`;
+  
+  // 이미 선택된 슬롯 다시 클릭하면 취소
+  if (selectedTime === time) {
+      btn.style.background = '#fff';
+      btn.style.color = '#1a2e2a';
+      btn.style.borderColor = '#d7e6e2';
+      selectedTime = '';
+      const selectedDate = document.getElementById('slot-label').textContent;
+      document.getElementById('selected-info-text').textContent = selectedDate;
+      return;
+  }
+  
+  // 기존 선택 초기화
+  document.querySelectorAll('.slot-btn-item').forEach(b => {
+    b.style.background = '#fff';
+    b.style.color = '#1a2e2a';
+    b.style.borderColor = '#d7e6e2';
+  });
+  
+  btn.style.background = '#4a7c72';
+  btn.style.color = '#fff';
+  btn.style.borderColor = '#4a7c72';
+  
+  selectedTime = time;
+  document.getElementById('selected-info').style.display = 'block';
+  document.getElementById('selected-info-text').textContent = `${selectedDate} ${time}`;
+}
+
+function goToConfirm() {
+  const selectedDate = document.getElementById('slot-label').textContent;
+  if (!selectedTime) {
+    alert('시간을 선택해주세요!');
+    return;
+  }
+  window.location.href = `/appoint/confirm/?time=${selectedTime}&date=${selectedDate}`;
 }
 
 renderCalendar();

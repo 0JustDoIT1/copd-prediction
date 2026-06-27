@@ -4,10 +4,17 @@ from screening.models import ClinicalDecision
 
 
 class AppointmentRequest(models.Model):
-    STATUS_CHOICES = [('requested', '요청됨'), ('confirmed', '확정'), ('cancelled', '취소')]
+    STATUS_CHOICES = [
+        ('confirmed', '확정'),
+        ('cancelled', '취소'),
+    ]
 
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='appointments')
-    decision = models.ForeignKey(ClinicalDecision, on_delete=models.CASCADE, related_name='appointments')
-    preferred_datetime = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='requested')
+    decision = models.ForeignKey(ClinicalDecision, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
+    slot_datetime = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='confirmed')
+    note = models.TextField(blank=True)
     requested_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (('slot_datetime',),)

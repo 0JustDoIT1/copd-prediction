@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("preferred_datetime", models.DateTimeField(blank=True, null=True)),
+                ("preferred_datetime", models.DateTimeField(blank=True, null=True)), 
                 (
                     "status",
                     models.CharField(
