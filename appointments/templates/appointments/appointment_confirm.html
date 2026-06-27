@@ -5,15 +5,14 @@
 {% block page_title %}<h1 class="page-title">예약 확인</h1>{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px;  margin: 0 auto;">
+<div style="max-width: 800px;  margin: 0 auto;">
 
-  <div class="card" style="margin-bottom: 16px; padding: 32px;">
+  <div class="card" style="margin-bottom: 16px; padding: 32px;box-shadow: 0 4px 16px rgba(0,0,0,0.08)">
     <!-- 예약 내용 확인 -->
     <p style="font-size:20px; font-weight:700; margin-bottom:14px;">예약 내용 확인</p>
     <div style="border:1.5px solid #d7e6e2; border-radius:12px; padding:18px 20px; margin-bottom:24px;">
       <p style="font-size:18px; font-weight:700; margin-bottom:8px;">COPD 폐기능검사</p>
-      <p style="font-size:16px; color:#62756f; margin-bottom:4px;">예약 일정 &nbsp; {{ selected_date }} &nbsp; {{ selected_time }}</p>
-    </div>
+      <p style="font-size:15px; color:#62756f; margin-bottom:4px;">예약 일시 &nbsp; {{ selected_date }} &nbsp;·&nbsp; {{ ampm }} {{ selected_time }}</p>    </div>
 
     <hr style="border:none; border-top:1px solid #d7e6e2; margin:20px 0;">
 
@@ -30,8 +29,17 @@
       </div>
     </div>
 
+    <!-- 안내사항 -->
     <hr style="border:none; border-top:1px solid #d7e6e2; margin:20px 0;">
-
+    <p style="font-size:15px; font-weight:700; margin-bottom:12px;">검사 전 주의사항</p>
+    <div style="background:#fff8f0; border:1.5px solid #f6ad55; border-radius:12px; padding:16px 20px; margin-bottom:20px;">
+        <ul style="margin:0; padding-left:18px; font-size:13px; color:#7a4f00; line-height:2;">
+        <li>검사 1주일 전부터 기침약, 콧물약, 감기약 등의 복용을 중단해 주세요.</li>
+        <li>세레타이드 등 흡입기는 검사 2일 전부터, 벤토린은 검사 당일 중단해 주세요.</li>
+        <li>검사 전 음주, 흡연, 과식, 과격한 운동, 불편한 복장은 검사 결과에 영향을 줄 수 있으니 삼가 주세요.</li>
+        <li>복용 중인 약물이 있으시면 사전에 의료진에게 문의해 주세요.</li>
+      </ul>
+    </div>
     <!-- 요청사항 -->
     <form method="post" action="{% url 'appointments:appointment_done' %}">
       {% csrf_token %}
@@ -43,10 +51,9 @@
   </div>
 
   <!-- 버튼 카드 밖 -->
-  <div style="display:flex; gap:10px; margin-top:16px;">
+  <div style="display:flex; gap:10px; margin-top:16px; padding:36px 32px;">
     <a href="{% url 'appointments:appointment_request' %}" style="flex:1; padding:13px; background:#fff; border:1.5px solid #d7e6e2; border-radius:12px; font-size:14px; font-weight:600; color:#62756f; text-align:center; text-decoration:none;">← 이전</a>
-    <button type="submit" style="flex:2; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer;">예약 확정하기</button>
-  </div>
+    <button type="submit" style="flex:2; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; box-shadow: 0 4px 12px rgba(74,124,114,0.4);">예약 확정하기</button>  </div>
   </form>
 
 </div>

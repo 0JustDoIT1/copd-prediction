@@ -31,11 +31,15 @@ def appointment_confirm(request):
         patient = request.user.patient_profile
     except:
         patient = None
+        
+    hour = int(selected_time.split(':')[0]) if selected_time else 0
+    ampm = '오전' if hour < 12 else '오후'
     
     return render(request, 'appointments/appointment_confirm.html', {
         'selected_date': selected_date,
         'selected_time': selected_time,
         'patient': patient,
+        'ampm': ampm,
     })
 
 def appointment_done(request):
@@ -64,8 +68,11 @@ def appointment_done(request):
     
     date_str = request.session.get('appointment_date', '')
     time_str = request.session.get('appointment_time', '')
+    hour = int(time_str.split(':')[0]) if time_str else 0
+    ampm = '오전' if hour < 12 else '오후'
     
     return render(request, 'appointments/appointment_done.html', {
         'date': date_str,
         'time': time_str,
+        'ampm': ampm,
     })

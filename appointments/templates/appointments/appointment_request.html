@@ -5,12 +5,12 @@
 {% block page_title %}<h1 class="page-title">검사 예약</h1>{% endblock %}
 
 {% block content %}
-<div style="max-width: 700px; margin: 0 auto;">
+<div style="max-width: 800px; margin: 0 auto;">
 
   <!-- 달력 -->
   <div style="margin-bottom: 32px;">
-    <p style="font-size:25px; font-weight:700; margin-bottom:16px;">날짜 선택</p>
-    <div class="card" style="padding: 28px;">
+    <p style="font-size:25px; font-weight:700; margin-bottom:16px;">예약 날짜 선택</p>
+    <div class="card" style="padding: 28px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);">
       <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:20px;">
         <button onclick="changeMonth(-1)" style="width:34px; height:34px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer; font-size:16px;">&lt;</button>
         <span id="cal-title" style="font-size:25px; font-weight:700;"></span>
@@ -22,27 +22,31 @@
 
 <!-- 슬롯 -->
 <div>
-  <p style="font-size:25px; font-weight:700; margin-bottom:16px;">시간 선택</p>
-  <div class="card" style="padding: 28px;">
+  <p style="font-size:25px; font-weight:700; margin-bottom:16px;">예약 시간 선택</p>
+  <div class="card" style="padding: 28px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);">
     <p id="slot-label" style="font-size:17px; color:#62756f; margin-bottom:20px;">날짜를 먼저 선택해주세요</p>
     
 <!-- 오전 -->
 <div id="am-section">
-  <p style="font-size:14px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오전</p>
+  <p style="font-size:15px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오전</p>
   <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px;">
     {% for time in slot_times_am %}
-    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500;" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
-    {% endfor %}
+    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: all 0.15s ease;" 
+    onmouseover="if(!this.style.background || this.style.background=='rgb(255, 255, 255)'){this.style.background='#f0f7f5'; this.style.borderColor='#4a7c72'; this.style.color='#4a7c72';}" 
+    onmouseout="if(this.style.background=='rgb(240, 247, 245)'){this.style.background='#fff'; this.style.borderColor='#d7e6e2'; this.style.color='#1a2e2a';}"
+    onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>    {% endfor %}
   </div>
 </div>
 
 <!-- 오후 -->
 <div id="pm-section">
-  <p style="font-size:14px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오후</p>
+  <p style="font-size:15px; font-weight:600; color:#2c4a44; margin-bottom:10px;">오후</p>
   <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px;">
     {% for time in slot_times_pm %}
-    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500;" onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>
-    {% endfor %}
+    <button class="slot-btn-item" style="padding:14px 6px; border:1px solid #d7e6e2; border-radius:10px; background:#fff; cursor:pointer; font-size:15px; font-weight:500; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: all 0.15s ease;" 
+    onmouseover="if(!this.style.background || this.style.background=='rgb(255, 255, 255)'){this.style.background='#f0f7f5'; this.style.borderColor='#4a7c72'; this.style.color='#4a7c72';}" 
+    onmouseout="if(this.style.background=='rgb(240, 247, 245)'){this.style.background='#fff'; this.style.borderColor='#d7e6e2'; this.style.color='#1a2e2a';}"
+    onclick="selectSlot(this, '{{ time }}')">{{ time }}</button>    {% endfor %}
   </div>
 </div>
 
@@ -50,10 +54,11 @@
 </div>
 <!-- 선택 정보 + 다음 버튼 -->
 <p style="font-size:25px; font-weight:700; margin-bottom:16px; margin-top:32px;">선택한 예약 일시</p>
-<div id="selected-info" style="display:block; padding:16px 20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;">
-  <p id="selected-info-text" style="font-size:16px; font-weight:700; margin-bottom:16px;"></p>
-  <button onclick="goToConfirm()" style="width:100%; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; fo nt-weight:600; cursor:pointer;">다음 →</button>
-</div>
+<div id="selected-info" style="display:block; padding:16px 20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);">
+  <p id="selected-info-text" style="font-size:18px; font-weight:700; margin-bottom:18px;"></p>
+  </div>
+  <button onclick="goToConfirm()" style="width:100%; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; fo nt-weight:600; cursor:pointer; margin-top:10px; box-shadow: 0 4px 12px rgba(74,124,114,0.15);">다음 →</button>
+
 </div>
 {% endblock %}
 
@@ -76,7 +81,7 @@ function renderCalendar() {
     let color = '#62756f';
     if (i === 0) color = '#e53e3e';
     if (i === 6) color = '#3182ce';
-    html += `<div style="text-align:center; font-size:13px; color:${color}; font-weight:600; padding:6px 0;">${d}</div>`;
+    html += `<div style="text-align:center; font-size:16px; color:${color}; font-weight:600; padding:6px 0;">${d}</div>`;
   });
   
   for (let i = 0; i < firstDay; i++) html += '<div></div>';
@@ -105,7 +110,10 @@ function renderCalendar() {
     
     const clickable = !isPast && !isSunday;
     const isSat = isSaturday ? 'true' : 'false';
-    html += `<div style="${style}" ${clickable ? `onclick="selectDay(${year},${month+1},${d},${isSat})"` : ''}>${d}</div>`;
+    html += `<div style="${style}" 
+      ${clickable ? `onclick="selectDay(${year},${month+1},${d},${isSat})"
+      onmouseover="if(this.style.background!='rgb(74, 124, 114)'){this.style.background='#f0f7f5'; this.style.color='#4a7c72';}"
+      onmouseout="if(this.style.background!='rgb(74, 124, 114)'){this.style.background=''; this.style.color='';}"` : ''}>${d}</div>`;
   }
   
   html += '</div>';
@@ -137,7 +145,40 @@ document.querySelectorAll('.slot-btn-item').forEach(b => {
   b.style.color = '#1a2e2a';
   b.style.borderColor = '#d7e6e2';
 });
-  
+// 오늘이면 지난 시간 비활성화
+const now = new Date();
+const isToday = year === now.getFullYear() && month === now.getMonth()+1 && day === now.getDate();
+
+if (isToday) {
+  document.querySelectorAll('.slot-btn-item').forEach(btn => {
+    const btnHour = parseInt(btn.textContent.split(':')[0]);
+    const btnMin = parseInt(btn.textContent.split(':')[1]);
+    const btnTime = btnHour * 60 + btnMin;
+    const nowTime = now.getHours() * 60 + now.getMinutes();
+    
+    if (btnTime <= nowTime) {
+      btn.disabled = true;
+      btn.style.background = '#f5f5f5';
+      btn.style.color = '#bbb';
+      btn.style.borderColor = '#e0e0e0';
+      btn.style.cursor = 'not-allowed';
+    } else {
+      btn.disabled = false;
+      btn.style.background = '#fff';
+      btn.style.color = '#1a2e2a';
+      btn.style.borderColor = '#d7e6e2';
+      btn.style.cursor = 'pointer';
+    }
+  });
+} else {
+  document.querySelectorAll('.slot-btn-item').forEach(btn => {
+    btn.disabled = false;
+    btn.style.background = '#fff';
+    btn.style.color = '#1a2e2a';
+    btn.style.borderColor = '#d7e6e2';
+    btn.style.cursor = 'pointer';
+  });
+} 
   if (isSat === true || isSat === 'true') {
     document.getElementById('pm-section').style.display = 'none';
   } else {
@@ -178,7 +219,9 @@ function selectSlot(btn, time) {
   
   selectedTime = time;
   document.getElementById('selected-info').style.display = 'block';
-  document.getElementById('selected-info-text').textContent = `${selectedDate} ${time}`;
+  const hour = parseInt(time.split(':')[0]);
+  const ampm = hour < 12 ? '오전' : '오후';
+  document.getElementById('selected-info-text').textContent = `${selectedDate} · ${ampm} ${time}`;
 }
 
 function goToConfirm() {
