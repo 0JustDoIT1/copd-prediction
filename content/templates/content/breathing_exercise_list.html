@@ -20,10 +20,26 @@
 <div class="breathing-list">
   {% for exercise in exercises %}
   <div class="breathing-card">
-    <div class="breathing-card-number">{{ forloop.counter }}</div>
+    <div class="breathing-card-icon">
+      {% if exercise.pk == 1 %}
+      <i class="bi bi-flower2"></i>
+      {% elif exercise.pk == 2 %}
+      <i class="bi bi-arrow-down-up"></i>
+      {% elif exercise.pk == 3 %}
+      <i class="bi bi-hourglass-split"></i>
+      {% elif exercise.pk == 4 %}
+      <i class="bi bi-person-arms-up"></i>
+      {% elif exercise.pk == 5 %}
+      <i class="bi bi-activity"></i>
+      {% elif exercise.pk == 6 %}
+      <i class="bi bi-arrow-repeat"></i>
+      {% else %}
+      <i class="bi bi-lungs"></i>
+      {% endif %}
+    </div>
     <div class="breathing-card-body">
       <div class="breathing-card-title">{{ exercise.title }}</div>
-      <p class="breathing-card-steps">{{ exercise.steps }}</p>
+      <div class="breathing-card-steps">{{ exercise.steps|linebreaks }}</div>
     </div>
   </div>
   {% empty %}

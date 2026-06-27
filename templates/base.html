@@ -94,15 +94,18 @@
               class="nav-submenu collapse {% if active_group == 'benchmarks' %}show{% endif %}"
               id="group-benchmarks"
             >
-              <!-- TODO: benchmarks 앱 구현 후 href="url name='benchmarks:report'"로 복원 -->
               <a
-                href="#"
-                class="nav-link nav-sublink {% if active_menu == 'benchmark_report' %}active{% endif %}"
-                >위험요인 비교</a
+                href="{% url 'benchmarks:age_compare' %}"
+                class="nav-link nav-sublink {% if active_menu == 'age_compare' %}active{% endif %}"
+                >동연령대 비교</a
               >
-              <!-- TODO: benchmarks 앱 구현 후 href="url name='benchmarks:tracking'"로 복원 -->
               <a
-                href="#"
+                href="{% url 'benchmarks:risk_factors' %}"
+                class="nav-link nav-sublink {% if active_menu == 'risk_factors' %}active{% endif %}"
+                >위험요인 시각화</a
+              >
+              <a
+                href="{% url 'benchmarks:timeline' %}"
                 class="nav-link nav-sublink {% if active_menu == 'tracking' %}active{% endif %}"
                 >추적기록 타임라인</a
               >

@@ -6,6 +6,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   // 사이드바 그룹(드롭다운) — Bootstrap Collapse 이벤트에 맞춰 caret 회전만 처리
+  // shown/hidden(애니메이션 완료 후) 대신 show/hide(애니메이션 시작 시점)를 사용해
+  // 화살표 회전이 메뉴 펼침과 동시에 시작되도록 함 (체감 지연 제거)
   document
     .querySelectorAll(".nav-submenu.collapse")
     .forEach(function (submenu) {
@@ -21,12 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
         toggle.classList.add("group-open");
       }
 
-      submenu.addEventListener("shown.bs.collapse", function () {
+      submenu.addEventListener("show.bs.collapse", function () {
         toggle.classList.add("group-open");
         toggle.setAttribute("aria-expanded", "true");
       });
 
-      submenu.addEventListener("hidden.bs.collapse", function () {
+      submenu.addEventListener("hide.bs.collapse", function () {
         toggle.classList.remove("group-open");
         toggle.setAttribute("aria-expanded", "false");
       });

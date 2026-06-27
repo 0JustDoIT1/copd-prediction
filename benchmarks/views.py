@@ -2,7 +2,7 @@ import json
 
 from django.shortcuts import render
 
-from .services import get_age_compare_context, get_timeline_context
+from .services import get_age_compare_context, get_timeline_context, get_risk_factors_context
 
 
 def age_compare_view(request):
@@ -17,6 +17,8 @@ def age_compare_view(request):
     return render(request, 'benchmarks/age_compare.html', {
         'has_data': context is not None,
         'data': context,
+        'active_group': 'benchmarks',
+        'active_menu': 'age_compare',
     })
 
 
@@ -39,4 +41,24 @@ def timeline_view(request):
     return render(request, 'benchmarks/timeline.html', {
         'has_data': context is not None,
         'data': context,
+        'active_group': 'benchmarks',
+        'active_menu': 'tracking',
+    })
+
+
+def risk_factors_view(request):
+    """
+    환자 본인의 최근 검사에서 권고 점수에 영향을 준 주요 요인(top_factors)을
+    시각화하는 화면. screening 앱이 저장한 값을 그대로 사용한다.
+    PredictionResult가 없으면 empty-state를 표시한다.
+    """
+    patient = request.user.patientprofile
+
+    context = get_risk_factors_context(patient)
+
+    return render(request, 'benchmarks/risk_factors.html', {
+        'has_data': context is not None,
+        'data': context,
+        'active_group': 'benchmarks',
+        'active_menu': 'risk_factors',
     })

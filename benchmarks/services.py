@@ -1,7 +1,7 @@
 from common.utils.age_group import calculate_age_group
 from screening.models import PredictionResult
 from .models import Benchmark
-from .variable_info import get_variable_explanation
+from .variable_info import get_variable_explanation, get_variable_label_info
 
 # 화면에 표시할 6개 벤치마크 변수와, HealthRecord/Questionnaire 필드 매핑
 # label: 화면 표시명, unit: 단위 표시
@@ -191,4 +191,72 @@ def get_timeline_context(patient):
         'variable_timelines': variable_timelines,
         'first_date': first_result.created_at,
         'latest_date': latest_result.created_at,
+    }
+
+
+def get_risk_factors_context(patient):
+    """
+    환자 본인의 최근 검사 결과(PredictionResult.top_factors)를 기반으로
+    위험요인 시각화 화면에 필요한 컨텍스트를 만들어 반환한다.
+
+    top_factors는 screening 앱이 모델 추론 시점에 이미 계산해 저장해둔 값을
+    그대로 사용한다 (별도로 계수를 다시 계산하지 않음 — 결과 페이지와 수치가
+    항상 일치해야 하기 때문).
+
+    Args:
+        patient: PatientProfile 인스턴스
+
+    Returns:
+        dict | None: PredictionResult가 없으면 None (템플릿에서 empty-state 처리)
+    """
+    latest_result = (
+        PredictionResult.objects
+        .filter(questionnaire__patient=patient)
+        .order_by('-created_at')
+        .first()
+    )
+
+    if latest_result is None:
+        return None
+
+    factors = []
+    raw_items = latest_result.top_factors or []
+
+    # 막대 길이 계산 기준 — 절댓값이 가장 큰 contribution을 100%로 두고 나머지를 비율로 환산
+    max_abs_contribution = max(
+        (abs(item.get('contribution', 0)) for item in raw_items if item.get('contribution') is not None),
+        default=0,
+    )
+
+    for item in raw_items:
+        var_name = item.get('feature')
+        contribution = item.get('contribution')
+
+        if var_name is None or contribution is None:
+            continue  # 형식이 어긋난 항목은 건너뜀 (방어적 처리)
+
+        label_info = get_variable_label_info(var_name)
+        explanation = get_variable_explanation(var_name)
+        increases_risk = contribution > 0
+
+        bar_percent = round(abs(contribution) / max_abs_contribution * 100, 1) if max_abs_contribution > 0 else 0
+
+        factors.append({
+            'variable_name': var_name,
+            'label': label_info['label'],
+            'contribution': round(contribution, 3),
+            'bar_percent': bar_percent,
+            'increases_risk': increases_risk,
+            'description': explanation['description'] if explanation else '',
+            'interpretation': (
+                explanation.get('increases_risk') if increases_risk
+                else explanation.get('decreases_risk')
+            ) if explanation else '',
+            'copd_relation': explanation['copd_relation'] if explanation else '',
+        })
+
+    return {
+        'score': round(latest_result.risk_probability * 100, 1),
+        'factors': factors,
+        'result_created_at': latest_result.created_at,
     }

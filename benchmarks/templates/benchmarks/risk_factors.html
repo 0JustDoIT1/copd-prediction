@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}위험요인 시각화{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'benchmarks/css/risk_factors.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="risk-factors-page">
+
+    <div class="page-header">
+        <h1 class="page-title">위험요인 시각화</h1>
+        <p class="page-subtitle">최근 검사에서 권고 점수에 가장 크게 영향을 준 요인들을 확인해보세요</p>
+    </div>
+
+    {% if not has_data %}
+    <div class="empty-state-card">
+        <i class="bi bi-search-heart"></i>
+        <p>아직 분석할 검사 결과가 없습니다.</p>
+        <p class="empty-state-sub">문진과 검진수치를 먼저 제출해주세요.</p>
+    </div>
+    {% else %}
+
+    <div class="compare-meta">
+        <span class="meta-badge">
+            <i class="bi bi-clipboard2-pulse"></i>
+            최근 검사일: {{ data.result_created_at|date:"Y.m.d" }}
+        </span>
+    </div>
+
+    {% if data.factors %}
+    <div class="factor-list">
+        {% for factor in data.factors %}
+        <div class="factor-card">
+            <div class="factor-rank">{{ forloop.counter }}</div>
+
+            <div class="factor-body">
+                <div class="factor-header">
+                    <span class="factor-label">{{ factor.label }}</span>
+                    <span class="factor-direction {% if factor.increases_risk %}direction-up{% else %}direction-down{% endif %}">
+                        {% if factor.increases_risk %}
+                            <i class="bi bi-arrow-up-circle-fill"></i> 위험 높임
+                        {% else %}
+                            <i class="bi bi-arrow-down-circle-fill"></i> 위험 낮춤
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="factor-bar-track">
+                    <div
+                        class="factor-bar-fill {% if factor.increases_risk %}fill-up{% else %}fill-down{% endif %}"
+                        style="width: {{ factor.bar_percent }}%;">
+                    </div>
+                </div>
+
+                <div class="factor-explanation">
+                    <p class="factor-description">{{ factor.description }}</p>
+                    <p class="factor-interpretation">{{ factor.interpretation }}</p>
+                    <div class="factor-copd">
+                        <i class="bi bi-lungs"></i>
+                        <span>{{ factor.copd_relation }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-card">
+        <i class="bi bi-hourglass-split"></i>
+        <p>이번 검사는 위험요인 분석이 준비되지 않았습니다.</p>
+        <p class="empty-state-sub">다음 검사부터 위험요인을 확인할 수 있어요.</p>
+    </div>
+    {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}
