@@ -1,6 +1,11 @@
-{% extends "base.html" %} {% block title %}의사 판정 | 미래의료병원{% endblock
-%} {% block page_title %}의사 판정{% endblock %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}검사 권고 검토 | 미래의료병원{% endblock %}
+{% block page_title %}검사 권고 검토{% endblock %}
+
+{% block content %}
 <div class="row g-4">
+
   <div class="col-lg-8">
     <div class="card mb-4">
       <div class="card-header">
@@ -9,6 +14,7 @@
 
       <div class="card-body">
         <h6 class="mb-3">문진 정보</h6>
+
         <table class="table table-sm">
           <tr>
             <th>환자명</th>
@@ -23,16 +29,17 @@
             <td>{{ prediction.questionnaire.smoking_amount }}</td>
           </tr>
           <tr>
-            <th>기침 여부</th>
+            <th>기침</th>
             <td>{{ prediction.questionnaire.cough|yesno:"있음,없음" }}</td>
           </tr>
           <tr>
-            <th>가래 여부</th>
+            <th>가래</th>
             <td>{{ prediction.questionnaire.sputum|yesno:"있음,없음" }}</td>
           </tr>
         </table>
 
-        <h6 class="mt-4 mb-3">건강검진 정보</h6>
+        <h6 class="mt-4 mb-3">건강검진 수치</h6>
+
         <table class="table table-sm">
           <tr>
             <th>키</th>
@@ -47,24 +54,61 @@
             <td>{{ prediction.health_record.bmi }}</td>
           </tr>
           <tr>
-            <th>수축기 혈압</th>
-            <td>{{ prediction.health_record.sbp }}</td>
-          </tr>
-          <tr>
-            <th>이완기 혈압</th>
-            <td>{{ prediction.health_record.dbp }}</td>
+            <th>혈압</th>
+            <td>
+              {{ prediction.health_record.sbp }} /
+              {{ prediction.health_record.dbp }} mmHg
+            </td>
           </tr>
           <tr>
             <th>공복혈당</th>
             <td>{{ prediction.health_record.glucose }}</td>
           </tr>
           <tr>
-            <th>총콜레스테롤</th>
+            <th>당화혈색소</th>
+            <td>{{ prediction.health_record.hba1c }}</td>
+          </tr>
+          <tr>
+            <th>총 콜레스테롤</th>
             <td>{{ prediction.health_record.cholesterol }}</td>
+          </tr>
+          <tr>
+            <th>HDL</th>
+            <td>{{ prediction.health_record.hdl }}</td>
+          </tr>
+          <tr>
+            <th>중성지방</th>
+            <td>{{ prediction.health_record.triglyceride }}</td>
+          </tr>
+          <tr>
+            <th>AST / ALT</th>
+            <td>
+              {{ prediction.health_record.ast }} /
+              {{ prediction.health_record.alt }}
+            </td>
           </tr>
           <tr>
             <th>헤모글로빈</th>
             <td>{{ prediction.health_record.hemoglobin }}</td>
+          </tr>
+          <tr>
+            <th>백혈구 / 적혈구</th>
+            <td>
+              {{ prediction.health_record.wbc }} /
+              {{ prediction.health_record.rbc }}
+            </td>
+          </tr>
+          <tr>
+            <th>hsCRP</th>
+            <td>{{ prediction.health_record.hscrp }}</td>
+          </tr>
+          <tr>
+            <th>천식 진단 이력</th>
+            <td>{{ prediction.health_record.asthma_history|yesno:"있음,없음" }}</td>
+          </tr>
+          <tr>
+            <th>비염 진단 이력</th>
+            <td>{{ prediction.health_record.rhinitis_history|yesno:"있음,없음" }}</td>
           </tr>
         </table>
       </div>
@@ -79,14 +123,17 @@
 
       <div class="card-body">
         <div class="stat-card mb-3">
-          <div class="stat-label">검사 권고 점수</div>
-          <div class="stat-value">{{ prediction.risk_probability }}</div>
-          <div class="stat-trend">진단값이 아닌 의사 참고용 점수입니다</div>
+          <div class="stat-label">폐활량검사 권고 점수</div>
+          <div class="stat-value">
+            {{ prediction.risk_probability|floatformat:3 }}
+          </div>
+          <div class="stat-trend">
+            진단값이 아닌 의사 참고용 점수입니다.
+          </div>
         </div>
 
         <div class="alert-warning-soft">
-          이 점수는 COPD 확정 진단이 아니며, 최종 판단은 의사 검토를 통해
-          결정됩니다.
+          이 점수는 COPD 확정 진단이 아니며, 최종 판단은 의사 검토를 통해 결정됩니다.
         </div>
       </div>
     </div>
@@ -98,12 +145,17 @@
 
       <div class="card-body">
         <form method="post">
-          {% csrf_token %} {{ form.as_p }}
+          {% csrf_token %}
 
-          <button type="submit" class="btn btn-primary w-100">판정 저장</button>
+          {{ form.as_p }}
+
+          <button type="submit" class="btn btn-primary w-100">
+            판정 저장
+          </button>
         </form>
       </div>
     </div>
   </div>
+
 </div>
 {% endblock %}

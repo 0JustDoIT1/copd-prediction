@@ -77,21 +77,18 @@ def health_record_create(request, questionnaire_id):
                 health_record
             )
 
-            patient = request.user.patientprofile
-
             return render(
-            request,
-            "screening/health_record_form.html",
-            {
-                "form": form,
-                "questionnaire": questionnaire,
-                "patient": patient,
-                "age": calculate_age(patient.birth_date),
-            }
-        )
+                request,
+                "screening/submit_complete.html",
+                {
+                    "prediction_id": prediction.id,
+                }
+            )
 
     else:
         form = HealthRecordForm()
+
+    patient = request.user.patientprofile
 
     return render(
         request,
@@ -99,6 +96,8 @@ def health_record_create(request, questionnaire_id):
         {
             "form": form,
             "questionnaire": questionnaire,
+            "patient": patient,
+            "age": calculate_age(patient.birth_date),
         }
     )
 

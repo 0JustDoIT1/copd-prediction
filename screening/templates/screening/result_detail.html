@@ -1,26 +1,51 @@
 {% extends "base.html" %}
 
-{% block title %}예측 결과{% endblock %}
-{% block page_title %}예측 결과{% endblock %}
+{% block title %}검사 권고 결과 | 미래의료병원{% endblock %}
+{% block page_title %}검사 권고 결과{% endblock %}
 
 {% block content %}
-
 <div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">폐활량검사 권고 검토 상태</h5>
+  </div>
 
-    <div class="card-header">
-        <h5>PredictionResult 생성 확인</h5>
-    </div>
+  <div class="card-body">
 
-    <div class="card-body">
+    {% if prediction.decision %}
 
-        <p><strong>ID</strong> : {{ prediction.id }}</p>
+      {% if prediction.decision.decision == "recommend" %}
+        <div class="alert-danger-soft mb-4">
+          <strong>폐활량검사 권고</strong><br>
+          담당 의사 검토 결과, 폐활량검사를 받아보실 것을 권고합니다.
+        </div>
+      {% elif prediction.decision.decision == "normal" %}
+        <div class="alert-warning-soft mb-4">
+          <strong>정상</strong><br>
+          담당 의사 검토 결과, 현재 추가적인 폐활량검사 권고 사항은 없습니다.
+        </div>
+      {% endif %}
 
-        <p><strong>권고 점수</strong> : {{ prediction.risk_probability }}</p>
+      {% if prediction.decision.memo %}
+        <div class="mt-4">
+          <h6>의사 메모</h6>
+          <p>{{ prediction.decision.memo }}</p>
+        </div>
+      {% endif %}
 
-        <p><strong>생성일</strong> : {{ prediction.created_at }}</p>
+    {% else %}
+      <div class="alert-warning-soft mb-4">
+        <strong>의사 검토 대기</strong><br>
+        입력하신 문진 및 건강검진 정보가 정상적으로 제출되었습니다.
+        담당 의사의 검토 후 결과가 표시됩니다.
+      </div>
+    {% endif %}
 
-    </div>
+    <hr>
 
+    <p class="text-muted mb-0">
+      이 결과는 COPD 확정 진단이 아니며, 정확한 판단은 의료진 상담 및 필요한 검사를 통해 이루어집니다.
+    </p>
+
+  </div>
 </div>
-
 {% endblock %}

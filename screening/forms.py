@@ -12,6 +12,15 @@ class QuestionnaireForm(forms.ModelForm):
             "sputum",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs["class"] = "form-control"
+
 
 class HealthRecordForm(forms.ModelForm):
     class Meta:
@@ -21,7 +30,9 @@ class HealthRecordForm(forms.ModelForm):
             "sbp", "dbp", "hp_stage",
             "glucose", "hba1c", "cholesterol", "hdl", "triglyceride",
             "ast", "alt", "hemoglobin", "wbc", "rbc",
+            "hscrp", "asthma_history", "rhinitis_history",
         ]
+
         labels = {
             "height": "Height (키, cm)",
             "weight": "Weight (몸무게, kg)",
@@ -38,15 +49,38 @@ class HealthRecordForm(forms.ModelForm):
             "hemoglobin": "Hemoglobin (헤모글로빈, g/dL)",
             "wbc": "WBC (백혈구, ×10³/μL)",
             "rbc": "RBC (적혈구, ×10⁶/μL)",
+            "hscrp": "hsCRP (고감도 C-반응단백, mg/L)",
+            "asthma_history": "Asthma History (천식 진단 이력)",
+            "rhinitis_history": "Rhinitis History (비염 진단 이력)",
+        }
+
+        widgets = {
+            "asthma_history": forms.RadioSelect(
+                choices=[
+                    (True, "예"),
+                    (False, "아니오"),
+                ]
+            ),
+            "rhinitis_history": forms.RadioSelect(
+                choices=[
+                    (True, "예"),
+                    (False, "아니오"),
+                ]
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field in self.fields.values():
-            field.widget.attrs.update({
-                "class": "form-control",
-            })
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.RadioSelect):
+                field.widget.attrs["class"] = "form-check-input"
+            elif isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs["class"] = "form-control"
+
+
 
 class ClinicalDecisionForm(forms.ModelForm):
     class Meta:

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card text-center">
+    <div class="card-body p-5">
+
+        <h3 class="mb-4">
+            ✓ 건강검진 정보가 제출되었습니다.
+        </h3>
+
+        <p class="text-muted mb-4">
+            폐활량검사 권고 여부를 분석하였습니다.
+        </p>
+
+        <a
+            href="{% url 'screening:result_detail' prediction_id %}"
+            class="btn btn-primary"
+        >
+            결과 확인하기
+        </a>
+
+    </div>
+</div>
+{% endblock %}

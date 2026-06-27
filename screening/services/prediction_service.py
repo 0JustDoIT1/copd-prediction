@@ -5,6 +5,7 @@ COPD 폐활량검사 권고 예측 서비스
 from datetime import date
 
 from screening.models import PredictionResult
+from screening.ml_model import predict_risk_probability
 
 
 def calculate_age(birth_date):
@@ -18,15 +19,6 @@ def calculate_age(birth_date):
 
 
 def convert_sex_to_model_value(sex):
-    """
-    PatientProfile.sex 값을 ML 모델 입력값으로 변환
-
-    임시 기준:
-    M -> 1
-    F -> 2
-
-    KNHANES 코드북 기준 확인 후 필요 시 수정
-    """
     if sex == "M":
         return 1
     if sex == "F":
@@ -46,13 +38,9 @@ def build_feature_dict(questionnaire, health_record):
         "HE_wt": health_record.weight,
         "HE_BMI": health_record.bmi,
 
-        # 흡연
-        "smoking_status": questionnaire.smoking_status,
-        "smoking_amount": questionnaire.smoking_amount,
-
         # 증상
         "HE_cough1": int(questionnaire.cough),
-        "HE_qput1": int(questionnaire.sputum),
+        "HE_sput1": int(questionnaire.sputum),
 
         # 혈압
         "HE_sbp": health_record.sbp,
@@ -70,29 +58,33 @@ def build_feature_dict(questionnaire, health_record):
         "HE_HB": health_record.hemoglobin,
         "HE_WBC": health_record.wbc,
         "HE_RBC": health_record.rbc,
+        "HE_hsCRP": health_record.hscrp,
+
+        # 기왕력
+        "DJ4_dg": int(health_record.asthma_history or False),
+        "DJ8_dg": int(health_record.rhinitis_history or False),
+
+        # 흡연
+        "smoking_status": questionnaire.smoking_status,
+        "smoking_amount": questionnaire.smoking_amount,
+
+        # hsCRP 결측 여부
+        "hsCRP_missing": 1 if health_record.hscrp is None else 0,
     }
 
     return features
 
 
 def create_prediction_result(questionnaire, health_record):
-    """
-    임시 예측 함수
-
-    실제 ML 모델 연결 전까지는 가짜 점수로 PredictionResult를 생성합니다.
-    나중에 copd_screening_model.pkl 연결 시 이 부분을 교체합니다.
-    """
-
     features = build_feature_dict(questionnaire, health_record)
 
-    # TODO: 실제 모델 연결 후 교체
-    risk_probability = 0.0
+    risk_probability, top_factors = predict_risk_probability(features)
 
     prediction = PredictionResult.objects.create(
         questionnaire=questionnaire,
         health_record=health_record,
         risk_probability=risk_probability,
-        top_factors={},
+        top_factors=top_factors,
         year=date.today().year,
     )
 

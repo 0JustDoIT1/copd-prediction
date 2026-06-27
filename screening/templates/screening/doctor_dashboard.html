@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}검사 권고 대상 목록 | 미래의료병원{% endblock %}
-{% block page_title %}검사 권고 대상 목록{% endblock %}
+{% block title %}검사 권고 검토 목록 | 미래의료병원{% endblock %}
+{% block page_title %}검사 권고 검토 목록{% endblock %}
 
 {% block content %}
 <div class="row g-3 mb-4">
@@ -9,7 +9,7 @@
     <div class="stat-card">
       <div class="stat-label">검토 대기 건수</div>
       <div class="stat-value">{{ pending_predictions|length }}</div>
-      <div class="stat-trend">의사 판정이 필요한 목록입니다</div>
+      <div class="stat-trend">의사 판정이 필요한 검사 결과입니다.</div>
     </div>
   </div>
 </div>
@@ -21,42 +21,57 @@
 
   <div class="card-body">
     {% if pending_predictions %}
-      <div class="list-group">
-        {% for prediction in pending_predictions %}
-          <div class="list-group-item mb-2 rounded
-            {% if prediction.risk_probability >= 0.7 %}
-              priority-high
-            {% else %}
-              priority-normal
-            {% endif %}
-          ">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-bold">
-                  {{ prediction.questionnaire.patient.user.username }}
-                </div>
-                <div class="text-muted small">
-                  검진 연도: {{ prediction.year }} |
-                  생성일: {{ prediction.created_at|date:"Y-m-d H:i" }}
-                </div>
-                <div class="mt-2">
-                  <span class="badge badge-danger">
-                    권고 점수 {{ prediction.risk_probability }}
-                  </span>
-                </div>
-              </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>환자</th>
+              <th>제출일</th>
+              <th>권고 점수</th>
+              <th>우선순위</th>
+              <th class="text-end">검토</th>
+            </tr>
+          </thead>
 
-              <a href="{% url 'screening:doctor_decision' prediction.id %}"
-                 class="btn btn-primary">
-                검토하기
-              </a>
-            </div>
-          </div>
-        {% endfor %}
+          <tbody>
+            {% for prediction in pending_predictions %}
+              <tr>
+                <td class="fw-semibold">
+                  {{ prediction.questionnaire.patient.user.username }}
+                </td>
+
+                <td>
+                  {{ prediction.created_at|date:"Y-m-d H:i" }}
+                </td>
+
+                <td>
+                  {{ prediction.risk_probability|floatformat:3 }}
+                </td>
+
+                <td>
+                  {% if prediction.risk_probability >= 0.4 %}
+                    <span class="badge badge-danger">우선 검토</span>
+                  {% else %}
+                    <span class="badge badge-warning">일반 검토</span>
+                  {% endif %}
+                </td>
+
+                <td class="text-end">
+                  <a
+                    href="{% url 'screening:doctor_decision' prediction.id %}"
+                    class="btn btn-primary btn-sm"
+                  >
+                    검토하기
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     {% else %}
       <div class="alert-warning-soft">
-        현재 의사 검토가 필요한 예측 결과가 없습니다.
+        현재 검토가 필요한 검사 결과가 없습니다.
       </div>
     {% endif %}
   </div>

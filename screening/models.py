@@ -51,12 +51,20 @@ class PredictionResult(models.Model):
 
 class ClinicalDecision(models.Model):
     DECISION_CHOICES = [
-    ('recommend', '폐활량검사 권고'),
-    ('normal', '정상'), # ❗❗❗
-]
-    prediction = models.OneToOneField(PredictionResult, on_delete=models.CASCADE, related_name='decision')
-    doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True)
+        ('recommend', '폐활량검사 권고'),
+        ('normal', '정상'),
+    ]
+
+    prediction = models.OneToOneField(
+        PredictionResult,
+        on_delete=models.CASCADE,
+        related_name='decision'
+    )
+    doctor = models.ForeignKey(
+        DoctorProfile,
+        on_delete=models.SET_NULL,
+        null=True
+    )
     decision = models.CharField(max_length=10, choices=DECISION_CHOICES)
     memo = models.TextField(blank=True)
     decided_at = models.DateTimeField(auto_now_add=True)
-
