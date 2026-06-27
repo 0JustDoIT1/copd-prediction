@@ -76,4 +76,62 @@
     {% endif %}
   </div>
 </div>
+
+<div class="card mt-4">
+  <div class="card-header">
+    <h5 class="mb-0">검토 완료 목록</h5>
+  </div>
+
+  <div class="card-body">
+    {% if completed_predictions %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>환자</th>
+              <th>제출일</th>
+              <th>권고 점수</th>
+              <th>의사 판정</th>
+              <th>판정일</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for prediction in completed_predictions %}
+              <tr>
+                <td class="fw-semibold">
+                  {{ prediction.questionnaire.patient.user.username }}
+                </td>
+
+                <td>
+                  {{ prediction.created_at|date:"Y-m-d H:i" }}
+                </td>
+
+                <td>
+                  {{ prediction.risk_probability|floatformat:3 }}
+                </td>
+
+                <td>
+                  {% if prediction.decision.decision == "recommend" %}
+                    <span class="badge badge-danger">폐활량검사 권고</span>
+                  {% elif prediction.decision.decision == "normal" %}
+                    <span class="badge badge-warning">정상</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {{ prediction.decision.decided_at|date:"Y-m-d H:i" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert-warning-soft">
+        아직 검토 완료된 결과가 없습니다.
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

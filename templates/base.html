@@ -61,22 +61,20 @@
             >
               <!-- TODO: screening 앱 구현 후 href="url name='screening:questionnaire'"로 복원 -->
               <a
-                href="#"
+                href="{% url 'screening:home' %}"
                 class="nav-link nav-sublink {% if active_menu == 'questionnaire' %}active{% endif %}"
-                >문진 입력</a
               >
-              <!-- TODO: screening 앱 구현 후 href="url name='screening:health_record'"로 복원 -->
-              <a
-                href="#"
-                class="nav-link nav-sublink {% if active_menu == 'health_record' %}active{% endif %}"
-                >검진수치 입력</a
-              >
+                문진 입력
+              </a>
+             
               <!-- TODO: screening 앱 구현 후 href="url name='screening:result_list'"로 복원 -->
-              <a
-                href="#"
-                class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}"
-                >검사 결과/이력</a
-              >
+             <a
+              href="{% url 'screening:result_list' %}"
+              class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}"
+            >
+              검사 결과/이력
+            </a>
+
             </div>
           </div>
 
@@ -133,7 +131,7 @@
             href="{% url 'accounts:doctor_dashboard' %}"
             class="nav-link {% if active_menu == 'doctor_dashboard' %}active{% endif %}"
           >
-            <i class="bi bi-house"></i><span>검사 권고 대상 목록</span>
+            <i class="bi bi-clipboard2-check"></i><span>검사 권고 검토</span>
           </a>
           {% endif %}
           {% endif %}

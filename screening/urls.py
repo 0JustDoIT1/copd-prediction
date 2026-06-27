@@ -30,4 +30,10 @@ urlpatterns = [
         views.doctor_decision,
         name="doctor_decision",
     ),
+    
+    path(
+    "results/",
+    views.result_list,
+    name="result_list",
+),
 ]

@@ -110,12 +110,14 @@ def result_detail(request, prediction_id):
     )
 
     return render(
-        request,
-        "screening/result_detail.html",
-        {
-            "prediction": prediction,
-        }
-    )
+    request,
+    "screening/result_detail.html",
+    {
+        "prediction": prediction,
+        "active_menu": "result_list",
+        "active_group": "screening",
+    }
+)
 
 # 의사 대시보드 💻
 '''
@@ -126,19 +128,31 @@ def result_detail(request, prediction_id):
 
 @login_required
 def doctor_dashboard(request):
-    pending_predictions = PredictionResult.objects.filter(
-        decision__isnull=True
-    ).select_related(
-        "questionnaire__patient__user",
-        "health_record__patient__user",
-    ).order_by("-risk_probability")
+    pending_predictions = (
+        PredictionResult.objects
+        .filter(decision__isnull=True)
+        .select_related(
+            "questionnaire__patient__user"
+        )
+        .order_by("-risk_probability")
+    )
+
+    completed_predictions = (
+        PredictionResult.objects
+        .filter(decision__isnull=False)
+        .select_related(
+            "questionnaire__patient__user",
+            "decision"
+        )
+        .order_by("-decision__decided_at")
+    )
 
     return render(
         request,
         "screening/doctor_dashboard.html",
         {
             "pending_predictions": pending_predictions,
-            "active_menu": "doctor_dashboard",
+            "completed_predictions": completed_predictions,
         }
     )
 
@@ -174,3 +188,112 @@ def doctor_decision(request, prediction_id):
             "active_menu": "doctor_dashboard",
         }
     )
+
+# 결과페이지 📋
+def result_detail(request, prediction_id): 
+
+    prediction = get_object_or_404(
+        PredictionResult,
+        id=prediction_id
+    )
+
+    return render(
+        request,
+        "screening/result_detail.html",
+        {
+            "prediction": prediction,
+        }
+    )
+
+# 의사 대시보드 💻
+'''
+아직 의사가 판정하지 않은 PredictionResult만 가져옴
+권고 점수 높은 순으로 정렬
+의사 대시보드 템플릿으로 전달
+'''
+
+@login_required
+def doctor_dashboard(request):
+    pending_predictions = (
+        PredictionResult.objects
+        .filter(decision__isnull=True)
+        .select_related(
+            "questionnaire__patient__user"
+        )
+        .order_by("-risk_probability")
+    )
+
+    completed_predictions = (
+        PredictionResult.objects
+        .filter(decision__isnull=False)
+        .select_related(
+            "questionnaire__patient__user",
+            "decision"
+        )
+        .order_by("-decision__decided_at")
+    )
+
+    return render(
+        request,
+        "screening/doctor_dashboard.html",
+        {
+            "pending_predictions": pending_predictions,
+            "completed_predictions": completed_predictions,
+        }
+    )
+
+
+# 의사 판정 🔨
+@login_required
+def doctor_decision(request, prediction_id):
+    prediction = get_object_or_404(
+        PredictionResult,
+        id=prediction_id
+    )
+
+    if request.method == "POST":
+        form = ClinicalDecisionForm(request.POST)
+
+        if form.is_valid():
+            decision = form.save(commit=False)
+            decision.prediction = prediction
+            decision.doctor = request.user.doctorprofile
+            decision.save()
+
+            return redirect("screening:doctor_dashboard")
+
+    else:
+        form = ClinicalDecisionForm()
+
+    return render(
+        request,
+        "screening/doctor_decision.html",
+        {
+            "form": form,
+            "prediction": prediction,
+            "active_menu": "doctor_dashboard",
+        }
+    )
+
+
+# 환자가 결과 확인페이지
+@login_required
+def result_list(request):
+    predictions = (
+        PredictionResult.objects
+        .filter(
+            questionnaire__patient=request.user.patientprofile
+        )
+        .select_related("decision")
+        .order_by("-created_at")
+    )
+
+    return render(
+    request,
+    "screening/result_list.html",
+    {
+        "predictions": predictions,
+        "active_menu": "result_list",
+        "active_group": "screening",
+    }
+)
