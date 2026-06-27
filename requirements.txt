@@ -2,7 +2,6 @@ asgiref==3.11.1
 Django==6.0.6
 django-extensions==4.1
 joblib==1.5.3
-joLib==0.0.1
 mysqlclient==2.2.8
 narwhals==2.22.1
 numpy==2.5.0

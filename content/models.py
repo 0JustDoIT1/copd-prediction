@@ -5,8 +5,17 @@ class HealthTip(models.Model):
     """오늘의 COPD 상식. 대시보드에서는 날짜 기준으로 하나씩 로테이션해서 보여주고,
     전체 목록 페이지에서는 등록된 전부를 보여준다."""
 
+    CATEGORY_CHOICES = [
+        ('disease', '질환/검사 이해'),
+        ('lifestyle', '생활관리 팁'),
+        ('factor', '관련 요인 살펴보기'),
+    ]
+
     title = models.CharField('제목', max_length=100)
     body = models.TextField('본문')
+    category = models.CharField(
+        '카테고리', max_length=20, choices=CATEGORY_CHOICES, default='disease',
+    )
     source = models.CharField(
         '출처/근거', max_length=200, blank=True,
         help_text='참고문헌이나 근거를 짧게 표기 (선택)',

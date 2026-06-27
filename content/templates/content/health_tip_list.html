@@ -1,19 +1,57 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}COPD 상식 - 미래의료병원{% endblock %}
 {% block page_title %}COPD 상식{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'content/css/content_list.css' %}" />
+{% endblock %}
+
 {% block content %}
-<div class="content-list">
-  {% for tip in tips %}
-  <div class="content-card">
+
+<div class="content-page-intro">
+  <div class="content-page-intro-icon"><i class="bi bi-lungs"></i></div>
+  <div>
+    <div class="content-page-intro-text-title">COPD를 이해하는 데 도움이 되는 정보예요</div>
+    <div class="content-page-intro-text-desc">개념부터 검사 방법, 생활관리 팁까지 쉽게 풀어드려요</div>
+  </div>
+</div>
+
+<div class="content-tabs" id="contentTabs">
+  {% for group in grouped_tips %}
+  <button
+    type="button"
+    class="content-tab {% if forloop.first %}active{% endif %}"
+    data-target="panel-{{ group.key }}"
+  >
+    <i class="bi {{ group.icon }}"></i>{{ group.label }}
+    <span class="content-tab-count">{{ group.tips|length }}</span>
+  </button>
+  {% endfor %}
+</div>
+
+{% for group in grouped_tips %}
+<div
+  class="content-list content-list-{{ group.key }} {% if not forloop.first %}d-none{% endif %}"
+  id="panel-{{ group.key }}"
+>
+  {% for tip in group.tips %}
+  <div class="content-card content-card-{{ group.key }}">
+    <div class="content-card-index">TIP {{ forloop.counter|stringformat:"02d" }}</div>
     <div class="content-card-title">{{ tip.title }}</div>
     <p class="content-card-body">{{ tip.body }}</p>
     {% if tip.source %}
-    <div class="content-card-source">출처: {{ tip.source }}</div>
+    <div class="content-card-source"><i class="bi bi-bookmark"></i>출처: {{ tip.source }}</div>
     {% endif %}
   </div>
   {% empty %}
-  <p class="text-muted">등록된 콘텐츠가 없습니다.</p>
+  <p class="content-empty">등록된 콘텐츠가 없습니다.</p>
   {% endfor %}
 </div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'content/js/content_tabs.js' %}"></script>
 {% endblock %}
