@@ -182,18 +182,18 @@
 
 {% block checkin_toast %}
 {% if show_checkin_toast %}
-<a href="#" class="checkin-toast" id="checkinToast">
-  <i class="bi bi-pencil-square checkin-toast-icon"></i>
+<div class="checkin-toast" id="checkinToast">
+  <div class="checkin-toast-icon"><i class="bi bi-pencil-square"></i></div>
   <div class="checkin-toast-body">
     <div class="checkin-toast-title">오늘의 체크인을 작성해주세요</div>
     <div class="checkin-toast-desc">흡연·호흡 상태를 1분이면 기록할 수 있어요</div>
+    <div class="checkin-toast-actions">
+      <a href="#" class="checkin-toast-link">기록하기</a>
+      <button type="button" class="checkin-toast-dismiss" id="checkinToastDismiss">오늘 하루 안 보기</button>
+    </div>
   </div>
-  <i
-    class="bi bi-x checkin-toast-close"
-    id="checkinToastClose"
-    aria-label="닫기"
-  ></i>
-</a>
+  <i class="bi bi-x checkin-toast-close" id="checkinToastClose" aria-label="닫기"></i>
+</div>
 {% endif %}
 {% endblock %}
 

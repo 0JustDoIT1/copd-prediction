@@ -4,6 +4,8 @@ from django.db import transaction
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
+from daily_care.utils import has_checked_in_today
+
 from .forms import (
     DoctorProfileUpdateForm,
     DoctorSignupForm,
@@ -145,9 +147,10 @@ def patient_dashboard_view(request):
     콘텐츠는 각 카드를 클릭해 들어가는 content 앱의 목록 페이지에서 확인한다.
     FAQ만 content.models.FAQ에서 상위 4개를 가져와 미리보기로 보여준다.
 
-    체크인 토스트는 Django session 플래그(checkin_toast_shown)로 노출 여부를
-    결정한다 — 로그인 세션당 1회만 노출되고, 로그아웃 시 Django가 세션을
-    새로 발급하므로 플래그도 자동으로 초기화되어 다음 로그인 때 다시 노출된다.
+    체크인 토스트는 daily_care.utils.has_checked_in_today()로 노출 여부를
+    결정한다 — 오늘 daily_log를 실제로 기록했는지 여부로 판단하므로, 세션이나
+    로그인 여부와 무관하게 정확하게 동작한다. (이전에는 임시로 Django session
+    플래그를 썼으나, daily_care 앱 구현 완료로 실제 체크인 여부 기반으로 교체함)
 
     TODO: 아래는 여전히 더미 데이터인 부분. 각 항목이 실제로 연동될 자리:
     - has_health_record: screening.HealthRecord 존재 여부로 분기 (What-if 빈 상태 처리)
@@ -162,9 +165,7 @@ def patient_dashboard_view(request):
     # TODO: screening.HealthRecord.objects.filter(patient=request.user.patientprofile).exists() 로 교체
     has_health_record = False
 
-    show_checkin_toast = not request.session.get('checkin_toast_shown', False)
-    if show_checkin_toast:
-        request.session['checkin_toast_shown'] = True
+    show_checkin_toast = not has_checked_in_today(request.user)
 
     context = {
         'active_menu': 'home',

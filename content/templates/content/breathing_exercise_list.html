@@ -1,16 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}호흡 운동 가이드 - 미래의료병원{% endblock %}
 {% block page_title %}호흡 운동 가이드{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'content/css/breathing_list.css' %}" />
+{% endblock %}
+
 {% block content %}
-<div class="content-list">
+
+<div class="content-page-intro">
+  <div class="content-page-intro-icon"><i class="bi bi-wind"></i></div>
+  <div>
+    <div class="content-page-intro-text-title">집에서 따라할 수 있는 호흡 운동이에요</div>
+    <div class="content-page-intro-text-desc">무리하지 않는 선에서, 편안한 자세로 시작해보세요</div>
+  </div>
+</div>
+
+<div class="breathing-list">
   {% for exercise in exercises %}
-  <div class="content-card">
-    <div class="content-card-title">{{ exercise.title }}</div>
-    <p class="content-card-body">{{ exercise.steps }}</p>
+  <div class="breathing-card">
+    <div class="breathing-card-number">{{ forloop.counter }}</div>
+    <div class="breathing-card-body">
+      <div class="breathing-card-title">{{ exercise.title }}</div>
+      <p class="breathing-card-steps">{{ exercise.steps }}</p>
+    </div>
   </div>
   {% empty %}
-  <p class="text-muted">등록된 콘텐츠가 없습니다.</p>
+  <p class="content-empty">등록된 콘텐츠가 없습니다.</p>
   {% endfor %}
 </div>
 {% endblock %}
