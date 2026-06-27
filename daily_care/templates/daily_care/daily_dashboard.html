@@ -14,6 +14,38 @@
             <strong>오늘의 흡연·호흡 체크인이 완료되었습니다!</strong> 꾸준한 기록은 건강 변화를 추적하는 데 큰 도움이 됩니다.
         </div>
     </div>
+    {% else %}
+    <!-- ── 빈 상태 CTA 배너 ── -->
+    <div class="alert d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background-color: #e0f2f1; color: #00695c;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-pencil-square fs-3 me-2"></i>
+            <div>
+                <strong>아직 오늘 체크인을 하지 않았어요.</strong> 1분이면 충분해요, 지금 기록해 볼까요?
+            </div>
+        </div>
+        <!-- TODO: 실제 체크인 페이지 url name으로 교체하세요 (예시: 'checkin') -->
+        <a href="{% url 'daily_care:checkin' %}" class="btn btn-sm fw-bold px-3 py-2 flex-shrink-0 ms-3" style="border-radius: 8px; background-color: #0D9488; color: white; border: none;">
+            오늘 체크인 하기
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ── 위험 신호 경고 배너 ── -->
+    {% if checked_in_today and today_log.spo2 and today_log.spo2 < 95 or checked_in_today and today_log.dyspnea_grade >= 3 %}
+    <div class="alert d-flex align-items-start mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background-color: #ffebee; color: #c62828;">
+        <i class="bi bi-exclamation-triangle fs-3 me-2 flex-shrink-0"></i>
+        <div>
+            <strong>오늘 컨디션에 주의가 필요해요.</strong>
+            <ul class="mb-0 mt-1 ps-3" style="font-size: 0.92rem;">
+                {% if today_log.spo2 and today_log.spo2 < 95 %}
+                <li>산소포화도가 {{ today_log.spo2 }}%로 정상 범위(95~100%)보다 낮아요. 휴식을 취하고 증상이 지속되면 의료진과 상담해 주세요.</li>
+                {% endif %}
+                {% if today_log.dyspnea_grade >= 3 %}
+                <li>호흡곤란 등급이 {{ today_log.dyspnea_grade }}단계로 높게 기록됐어요. 무리한 활동을 피하고 필요 시 병원 방문을 고려해 주세요.</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
     {% endif %}
 
     <!-- ── 지표 카드 4개 ── -->
@@ -37,7 +69,7 @@
                     {% elif checked_in_today %}
                         어제보다 줄여나가 볼까요?
                     {% else %}
-                        우측 상단 배너를 눌러 기록해 주세요.
+                        체크인을 완료하면 표시돼요.
                     {% endif %}
                 </p>
             </div>
@@ -126,6 +158,7 @@
                     <i class="bi bi-graph-up text-muted me-1"></i> 흡연량 추세 (최근 30일)
                 </h5>
                 <canvas id="smokingChart" height="160"></canvas>
+                <p id="smokingTrendNote" class="text-muted small mt-2 mb-0"></p>
             </div>
         </div>
         <div class="col-md-6">
@@ -173,22 +206,45 @@ const labels  = {{ chart_labels|safe }};
 const smoking = {{ chart_smoking|safe }};
 const grade   = {{ chart_grade|safe }};
 
+// ── 30일 평균 계산 (평균선용) ──
+const smokingAvg = smoking.length
+    ? smoking.reduce((sum, v) => sum + v, 0) / smoking.length
+    : 0;
+const avgLine = labels.map(() => smokingAvg);
+
 new Chart(document.getElementById('smokingChart'), {
     type: 'line',
     data: {
         labels,
-        datasets: [{
-            data: smoking,
-            borderColor: '#EF4444',
-            backgroundColor: 'rgba(239,68,68,.1)',
-            fill: true,
-            tension: 0.35,
-            pointRadius: 3,
-        }]
+        datasets: [
+            {
+                label: '흡연량',
+                data: smoking,
+                borderColor: '#EF4444',
+                backgroundColor: 'rgba(239,68,68,.1)',
+                fill: true,
+                tension: 0.35,
+                pointRadius: 3,
+            },
+            {
+                label: '30일 평균',
+                data: avgLine,
+                borderColor: '#9CA3AF',
+                borderDash: [6, 4],
+                borderWidth: 1.5,
+                pointRadius: 0,
+                fill: false,
+            }
+        ]
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        plugins: {
+            legend: {
+                display: true,
+                labels: { boxWidth: 12, font: { size: 11 } }
+            }
+        },
         scales: { y: { beginAtZero: true } }
     }
 });
@@ -209,5 +265,19 @@ new Chart(document.getElementById('gradeChart'), {
         scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } }
     }
 });
+
+// ── 흡연량 증가 추세 안내 (최근 3일 비교) ──
+const trendNote = document.getElementById('smokingTrendNote');
+if (smoking.length >= 4) {
+    const recent = smoking.slice(-3);
+    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+    if (recentAvg > smokingAvg * 1.2) {
+        trendNote.textContent = '⚠️ 최근 3일간 평균보다 흡연량이 늘었어요.';
+        trendNote.style.color = '#c62828';
+    } else if (recentAvg < smokingAvg * 0.8) {
+        trendNote.textContent = '👍 최근 3일간 평균보다 흡연량이 줄었어요.';
+        trendNote.style.color = '#2e7d32';
+    }
+}
 </script>
 {% endblock %}
