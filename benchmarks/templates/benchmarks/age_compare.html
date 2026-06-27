@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}동연령대 비교 리포트{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'benchmarks/css/age_compare.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="age-compare-page">
+
+    <div class="page-header">
+        <h1 class="page-title">동연령대 비교 리포트</h1>
+        <p class="page-subtitle">나와 같은 연령대·성별의 평균과 비교해볼 수 있어요</p>
+    </div>
+
+    {% if not has_data %}
+    <div class="empty-state-card">
+        <i class="bi bi-bar-chart-line"></i>
+        <p>아직 비교할 검사 결과가 없습니다.</p>
+        <p class="empty-state-sub">문진과 검진수치를 먼저 제출해주세요.</p>
+    </div>
+    {% else %}
+
+    <div class="compare-meta">
+        <span class="meta-badge">
+            <i class="bi bi-people"></i>
+            {{ data.age_group }} · {% if data.sex == 'M' %}남성{% else %}여성{% endif %} 평균과 비교
+        </span>
+        <span class="meta-date">최근 검사일: {{ data.result_created_at|date:"Y.m.d" }}</span>
+    </div>
+
+    {% if data.score_comparison %}
+    <section class="compare-section score-section">
+        <h2 class="section-title">폐활량검사 권고 점수</h2>
+        <p class="section-desc">
+            내 권고 점수는 동연령대 평균보다
+            {% if data.score_comparison.is_higher %}
+                <strong class="text-higher">{{ data.score_comparison.diff }}%p 높습니다.</strong>
+            {% else %}
+                <strong class="text-lower">{{ data.score_comparison.diff|cut:"-" }}%p 낮습니다.</strong>
+            {% endif %}
+        </p>
+        <div class="chart-card">
+            <canvas id="scoreChart" height="120"></canvas>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if data.variable_comparisons %}
+    <section class="compare-section variable-section">
+        <h2 class="section-title">건강 지표 비교</h2>
+        <p class="section-desc">동연령대·동성별 평균 대비 내 검진수치를 항목별로 확인해보세요.</p>
+
+        <div class="variable-tabs" role="tablist">
+            {% for item in data.variable_comparisons %}
+            <button
+                type="button"
+                class="variable-tab{% if forloop.first %} active{% endif %}"
+                data-target="{{ item.variable_name }}"
+                role="tab">
+                {{ item.label }}
+            </button>
+            {% endfor %}
+        </div>
+
+        {% for item in data.variable_comparisons %}
+        <div class="variable-panel{% if forloop.first %} active{% endif %}" data-panel="{{ item.variable_name }}">
+
+            <div class="variable-panel-body">
+                <div class="chart-card">
+                    <div class="variable-panel-header">
+                        <span class="variable-label">{{ item.label }}</span>
+                        <span class="variable-diff {% if item.is_higher %}text-higher{% else %}text-lower{% endif %}">
+                            {% if item.is_higher %}▲{% else %}▼{% endif %}
+                            {{ item.diff|cut:"-" }}{{ item.unit }}
+                        </span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas
+                            class="variable-chart"
+                            id="chart-{{ item.variable_name }}"
+                            data-my-value="{{ item.my_value }}"
+                            data-benchmark-value="{{ item.benchmark_value }}"
+                            data-label="{{ item.label }}"
+                            data-unit="{{ item.unit }}">
+                        </canvas>
+                    </div>
+                </div>
+
+                <div class="variable-explanation">
+                    <div class="explanation-block">
+                        <h3 class="explanation-title"><i class="bi bi-info-circle"></i> 이 수치는</h3>
+                        <p>{{ item.description }}</p>
+                    </div>
+                    <div class="explanation-block">
+                        <h3 class="explanation-title">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            평균보다 {% if item.is_higher %}높은{% else %}낮은{% endif %} 편이라면
+                        </h3>
+                        <p>{{ item.interpretation }}</p>
+                    </div>
+                    <div class="explanation-block copd-block">
+                        <h3 class="explanation-title"><i class="bi bi-lungs"></i> COPD와의 관련성</h3>
+                        <p>{{ item.copd_relation }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_data %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+    window.SCORE_COMPARISON = {{ data.score_comparison|default:"null"|safe }};
+</script>
+<script src="{% static 'benchmarks/js/age_compare.js' %}"></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}추적기록 타임라인{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'benchmarks/css/timeline.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="timeline-page">
+
+    <div class="page-header">
+        <h1 class="page-title">추적기록 타임라인</h1>
+        <p class="page-subtitle">검사를 받을 때마다 권고 점수와 건강 지표가 어떻게 변해왔는지 확인해보세요</p>
+    </div>
+
+    {% if not has_data %}
+    <div class="empty-state-card">
+        <i class="bi bi-graph-up"></i>
+        <p>아직 비교할 검사 결과가 없습니다.</p>
+        <p class="empty-state-sub">문진과 검진수치를 먼저 제출해주세요.</p>
+    </div>
+    {% else %}
+
+    <div class="compare-meta">
+        <span class="meta-badge">
+            <i class="bi bi-clipboard2-pulse"></i>
+            총 {{ data.result_count }}회 검사 기록
+        </span>
+        <span class="meta-date">{{ data.first_date|date:"Y.m.d" }} ~ {{ data.latest_date|date:"Y.m.d" }}</span>
+    </div>
+
+    {% if not data.has_enough_data %}
+    <div class="info-banner">
+        <i class="bi bi-info-circle"></i>
+        아직 비교할 이전 기록이 없습니다. 다음 검사부터 추이를 확인할 수 있어요.
+    </div>
+    {% endif %}
+
+    <div class="timeline-tabs" role="tablist">
+        <button type="button" class="timeline-tab active" data-target="score" role="tab">
+            폐활량검사 권고 점수
+        </button>
+        {% for item in data.variable_timelines %}
+        <button type="button" class="timeline-tab" data-target="{{ item.variable_name }}" role="tab">
+            {{ item.label }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <div class="timeline-panel active" data-panel="score">
+        <div class="chart-card">
+            <div class="timeline-panel-header">
+                <span class="variable-label">폐활량검사 권고 점수</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas
+                    id="scoreTimelineChart"
+                    data-series='{{ data.score_series_json|default:"[]"|safe }}'
+                    data-unit="%">
+                </canvas>
+            </div>
+        </div>
+    </div>
+
+    {% for item in data.variable_timelines %}
+    <div class="timeline-panel" data-panel="{{ item.variable_name }}">
+        <div class="chart-card">
+            <div class="timeline-panel-header">
+                <span class="variable-label">{{ item.label }}</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas
+                    class="variable-timeline-chart"
+                    id="chart-timeline-{{ item.variable_name }}"
+                    data-series='{{ item.series_json|default:"[]"|safe }}'
+                    data-unit="{{ item.unit }}">
+                </canvas>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_data %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="{% static 'benchmarks/js/timeline.js' %}"></script>
+{% endif %}
+{% endblock %}
