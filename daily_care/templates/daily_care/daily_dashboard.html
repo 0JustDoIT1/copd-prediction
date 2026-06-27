@@ -18,6 +18,8 @@
     border-radius: 16px;
     padding: 1.5rem 1.75rem;
     color: white;
+    position: relative;
+    overflow: hidden;
 }
 .dc-memo-card {
     border-left: 4px solid #0D9488;
@@ -45,13 +47,79 @@
     border-radius: 20px;
     margin-bottom: 0.75rem;
 }
+
+/* ── 호흡 애니메이션 (들숨-멈춤-날숨) ── */
+.dc-lung-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.dc-lung-icon {
+    font-size: 2.2rem;
+    color: white;
+    opacity: .9;
+    animation: dcBreathing 4s ease-in-out infinite;
+    transform-origin: center;
+}
+@keyframes dcBreathing {
+    0%   { transform: scale(1);    opacity: .85; }
+    35%  { transform: scale(1.18); opacity: 1;   }
+    50%  { transform: scale(1.18); opacity: 1;   }
+    85%  { transform: scale(1);    opacity: .85; }
+    100% { transform: scale(1);    opacity: .85; }
+}
+
+/* ── 숨을 내뱉듯 퍼지는 링 ── */
+.dc-lung-wrap::before,
+.dc-lung-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.5);
+    animation: dcBreathRing 4s ease-out infinite;
+}
+.dc-lung-wrap::after {
+    animation-delay: 2s;
+}
+@keyframes dcBreathRing {
+    0%   { transform: scale(0.7); opacity: 0; }
+    35%  { transform: scale(0.7); opacity: 0; }
+    50%  { transform: scale(0.7); opacity: .7; }
+    100% { transform: scale(2.0); opacity: 0; }
+}
+
+/* ── 인사말 카드 배경 호흡 파형 ── */
+.dc-breath-wave {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    width: 200%;
+    height: 30px;
+    opacity: 0.22;
+    animation: dcWaveScroll 8s linear infinite;
+}
+@keyframes dcWaveScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
 </style>
 
 <div class="container-fluid p-0">
 
     <!-- ── 인사말 헤더 ── -->
     <div class="dc-greeting d-flex justify-content-between align-items-center mb-4">
-        <div>
+        <!-- 배경 호흡 파형 (장식용, 완만한 사인 곡선) -->
+        <svg class="dc-breath-wave" viewBox="0 0 600 40" preserveAspectRatio="none" style="z-index: 0;">
+            <path d="M0,20 C25,5 50,5 75,20 C100,35 125,35 150,20
+                     C175,5 200,5 225,20 C250,35 275,35 300,20
+                     C325,5 350,5 375,20 C400,35 425,35 450,20
+                     C475,5 500,5 525,20 C550,35 575,35 600,20"
+                  fill="none" stroke="white" stroke-width="2" />
+        </svg>
+
+        <div style="position: relative; z-index: 1;">
             <h5 class="fw-bold mb-1" style="color: white;">
                 {{ request.user.first_name|default:request.user.username|default:"환자" }}님, 안녕하세요 👋
             </h5>
@@ -59,7 +127,10 @@
                 {% now "n월 j일" %} · 오늘도 건강 기록 잊지 마세요
             </p>
         </div>
-        <i class="bi bi-heart-pulse" style="font-size: 2.2rem; opacity: .85;"></i>
+
+        <div class="dc-lung-wrap" style="z-index: 1;">
+            <i class="bi bi-lungs dc-lung-icon"></i>
+        </div>
     </div>
 
     {% if checked_in_today %}
