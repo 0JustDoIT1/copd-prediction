@@ -2,9 +2,7 @@
 
 {% block title %}오늘의 일상 체크인 | COPD 시스템{% endblock %}
 
-{% block page_title %}
-<h1 class="page-title">📝 오늘의 일상 체크인</h1>
-{% endblock %}
+{% block page_title %}📝 오늘의 일상 체크인{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-0" style="max-width: 800px; margin: 0 auto;">
@@ -20,19 +18,19 @@
         {% if form.non_field_errors %}
         <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px;">
             {% for error in form.non_field_errors %}
-                <i class="ti ti-alert-circle me-1"></i> {{ error }}
+                <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
             {% endfor %}
         </div>
         {% endif %}
 
         <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-4" style="color: #333;"><i class="ti ti-calculator text-primary me-2"></i>건강 수치 입력</h5>
+            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-calculator text-primary me-2"></i>건강 수치 입력</h5>
             
             <div class="row g-4">
                 <div class="col-12 col-md-6">
                     <label for="{{ form.smoking_count.id_for_label }}" class="form-label fw-medium text-secondary">오늘의 흡연량 (개비)</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="ti ti-smoking"></i></span>
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-smoke"></i></span>
                         <input type="number" name="smoking_count" id="{{ form.smoking_count.id_for_label }}" 
                                class="form-control bg-light border-start-0 {% if form.smoking_count.errors %}is-invalid{% endif %}" 
                                value="{{ form.smoking_count.value|default:0 }}" min="0" required>
@@ -46,7 +44,7 @@
                 <div class="col-12 col-md-6">
                     <label for="{{ form.spo2.id_for_label }}" class="form-label fw-medium text-secondary">산소포화도 (SpO₂ %)</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="ti ti-heart-rate-monitor"></i></span>
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-heart-pulse"></i></span>
                         <input type="number" step="0.1" name="spo2" id="{{ form.spo2.id_for_label }}" 
                                class="form-control bg-light border-start-0 {% if form.spo2.errors %}is-invalid{% endif %}" 
                                value="{{ form.spo2.value|default:'' }}" placeholder="예: 98.5">
@@ -60,7 +58,7 @@
         </div>
 
         <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-3" style="color: #333;"><i class="ti ti-lungs text-primary me-2"></i>mMRC 호흡 곤란 등급</h5>
+            <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-lungs text-primary me-2"></i>mMRC 호흡 곤란 등급</h5>
             <p class="text-muted small mb-3">현재 나의 호흡 상태와 가장 유사한 단계를 선택해 주세요.</p>
             
             <div class="mb-3">
@@ -78,7 +76,7 @@
         </div>
 
         <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-4" style="color: #333;"><i class="ti ti-checkbox text-primary me-2"></i>오늘의 증상 및 활동</h5>
+            <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-check2-square text-primary me-2"></i>오늘의 증상 및 활동</h5>
             
             <div class="d-flex flex-column gap-3">
                 <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
@@ -101,7 +99,7 @@
         </div>
 
         <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <h5 class="fw-bold mb-3" style="color: #333;"><i class="ti ti-notes text-primary me-2"></i>오늘의 컨디션 노트</h5>
+            <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-journal-text text-primary me-2"></i>오늘의 컨디션 노트</h5>
             <div>
                 <textarea name="memo" id="{{ form.memo.id_for_label }}" class="form-control bg-light {% if form.memo.errors %}is-invalid{% endif %}" 
                           rows="4" placeholder="특이사항이나 의료진에게 공유하고 싶은 호흡기 컨디션을 자유롭게 작성해 주세요. (최대 500자)">{{ form.memo.value|default:'' }}</textarea>

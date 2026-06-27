@@ -2,9 +2,7 @@
 
 {% block title %}기록 및 추세 히스토리 | COPD 시스템{% endblock %}
 
-{% block page_title %}
-<h1 class="page-title">📊 기록 및 추세 히스토리</h1>
-{% endblock %}
+{% block page_title %}📊 기록 및 추세 히스토리{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-0">
@@ -12,14 +10,14 @@
     <div class="card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
         <form method="get" class="row g-3 align-items-center">
             <div class="col-12 col-sm-auto">
-                <span class="fw-medium text-secondary"><i class="ti ti-filter me-1"></i> 조회 기간 선택</span>
+                <span class="fw-medium text-secondary"><i class="bi bi-funnel me-1"></i> 조회 기간 선택</span>
             </div>
             <div class="col-6 col-sm-auto">
-                <input type="date" name="start" class="form-control bg-light border-0" value="{{ request.GET.get 'start'|default:'' }}">
+                <input type="date" name="start" class="form-control bg-light border-0" value="{{ request.GET.start|default:'' }}">
             </div>
             <div class="col-auto px-0 text-center">~</div>
             <div class="col-6 col-sm-auto">
-                <input type="date" name="end" class="form-control bg-light border-0" value="{{ request.GET.get 'end'|default:'' }}">
+                <input type="date" name="end" class="form-control bg-light border-0" value="{{ request.GET.end|default:'' }}">
             </div>
             <div class="col-12 col-sm-auto ms-sm-auto d-flex gap-2">
                 <a href="{% url 'daily_care:history' %}" class="btn btn-light w-100 shadow-sm" style="border-radius: 8px;">초기화</a>
@@ -28,16 +26,61 @@
         </form>
     </div>
 
-    <div class="card p-4 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-        <h5 class="fw-bold mb-4" style="color: #333;"><i class="ti ti-chart-line text-primary me-2"></i>건강 지표 추세 분석</h5>
-        <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="healthTrendChart"></canvas>
+    <!-- ── 추세 차트 + 통계 카드 (좌우 배치) ── -->
+    <div class="row g-4 mb-4">
+
+        <!-- 차트 -->
+        <div class="col-12 col-xl-8">
+            <div class="card p-4 bg-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-4" style="color: #333;"><i class="bi bi-graph-up text-primary me-2"></i>건강 지표 추세 분석</h5>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="healthTrendChart"></canvas>
+                </div>
+            </div>
         </div>
+
+        <!-- 통계 카드 3개 -->
+        <div class="col-12 col-xl-4">
+            <div class="d-flex flex-column gap-3 h-100">
+
+                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small mb-1">평균 흡연량</div>
+                            <div class="fw-bold fs-4" style="color: #1a1a1a;">{{ avg_smoking }} <span class="fs-6 text-muted fw-normal">개비</span></div>
+                        </div>
+                        <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #ffebee; color: #c62828;"><i class="bi bi-clipboard-data"></i></span>
+                    </div>
+                </div>
+
+                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small mb-1">평균 호흡 곤란 등급</div>
+                            <div class="fw-bold fs-4" style="color: #1a1a1a;">{{ avg_grade }} <span class="fs-6 text-muted fw-normal">단계</span></div>
+                        </div>
+                        <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #e3f2fd; color: #1565c0;"><i class="bi bi-lungs"></i></span>
+                    </div>
+                </div>
+
+                <div class="card p-3 bg-white border-0 shadow-sm flex-fill d-flex justify-content-center" style="border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small mb-1">체크인 달성률</div>
+                            <div class="fw-bold fs-4" style="color: #0D9488;">{{ checkin_rate }} <span class="fs-6 text-muted fw-normal">%</span></div>
+                        </div>
+                        <span class="badge px-2 py-1" style="border-radius: 6px; background-color: #e0f2f1; color: #00695c;"><i class="bi bi-calendar-check"></i></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
     <div class="card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
-        <h5 class="fw-bold mb-3" style="color: #333;"><i class="ti ti-list text-primary me-2"></i>날짜별 상세 기록 목록</h5>
-        
+        <h5 class="fw-bold mb-3" style="color: #333;"><i class="bi bi-list-ul text-primary me-2"></i>날짜별 상세 기록 목록</h5>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" style="min-width: 700px;">
                 <thead class="table-light text-secondary small fw-bold">
@@ -75,7 +118,7 @@
                                     {% if log.has_sputum %}<span class="badge bg-warning-subtle text-warning-emphasis">가래</span>{% endif %}
                                 </div>
                             {% else %}
-                                <span class="text-success small"><i class="ti ti-circle-check-filled"></i> 무증상</span>
+                                <span class="text-success small"><i class="bi bi-check-circle-fill"></i> 무증상</span>
                             {% endif %}
                         </td>
                         <td>
@@ -92,7 +135,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="7" class="text-center py-5 text-muted">
-                            <i class="ti ti-database-off fs-2 d-block mb-2"></i>
+                            <i class="bi bi-database-x fs-2 d-block mb-2"></i>
                             선택한 기간 내에 등록된 일상 관리 기록이 없습니다.
                         </td>
                     </tr>
@@ -103,19 +146,21 @@
     </div>
 
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('healthTrendChart').getContext('2d');
-        
-        // 장고 템플릿 루프를 활용해 안전하게 자바스크립트 배열 데이터 추출 (역순 정렬하여 그래프는 과거->최신 흐름)
+
+        // 장고 템플릿 루프로 데이터 추출 (reversed → 과거→최신 흐름)
         const rawLabels = [];
         const rawSmokingData = [];
         const rawSpo2Data = [];
-        
+
         {% for log in logs reversed %}
-            rawLabels.push('{{ log.log_date|date:"m-dd" }}');
+            rawLabels.push('{{ log.log_date|date:"m-d" }}');
             rawSmokingData.push({{ log.smoking_count }});
             rawSpo2Data.push({% if log.spo2 %}{{ log.spo2 }}{% else %}null{% endif %});
         {% endfor %}
@@ -142,7 +187,7 @@
                         borderWidth: 2,
                         tension: 0.2,
                         yAxisID: 'y1',
-                        spanGaps: true // 데이터가 없는 날(null)은 선을 이어서 표시
+                        spanGaps: true
                     }
                 ]
             },
@@ -169,7 +214,7 @@
                         title: { display: true, text: '산소포화도 (%)' },
                         min: 80,
                         max: 100,
-                        grid: { drawOnChartArea: false } // 우측 축의 그리드선은 겹치지 않게 숨김
+                        grid: { drawOnChartArea: false }
                     }
                 }
             }
