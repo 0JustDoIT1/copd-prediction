@@ -1,9 +1,9 @@
 import json
 from datetime import timedelta
-
+from .utils import has_checked_in_today
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
-from django.db.models import Avg
+
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, ListView, TemplateView
@@ -22,7 +22,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         # 오늘 체크인 여부
         today_log = DailyLog.objects.filter(user=user, log_date=today).first()
-        context['checked_in_today'] = today_log is not None
+        context['checked_in_today'] = has_checked_in_today(user)
         context['today_log'] = today_log
 
         # 최근 30일 데이터 (한 번만 조회해서 재사용)
@@ -63,10 +63,8 @@ class CheckinView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        today = timezone.localdate()
-        context['checked_in_today'] = DailyLog.objects.filter(
-            user=self.request.user, log_date=today
-        ).exists()
+        
+        context['checked_in_today'] = has_checked_in_today(self.request.user)
         return context
 
     def form_valid(self, form):
@@ -107,9 +105,7 @@ class HistoryView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['checked_in_today'] = DailyLog.objects.filter(
-            user=self.request.user, log_date=timezone.localdate()
-        ).exists()
+        context['checked_in_today'] = has_checked_in_today(self.request.user)
 
         logs = list(context['logs'])  # 한 번만 평가
         total_days = len(logs)
