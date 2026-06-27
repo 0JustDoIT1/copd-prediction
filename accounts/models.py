@@ -24,4 +24,4 @@ class PatientProfile(models.Model):
 
 class DoctorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    license_no = models.CharField(max_length=50, blank=False)
+    license_no = models.CharField(max_length=50, unique=True)

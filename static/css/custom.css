@@ -341,14 +341,9 @@ body {
 }
 
 .nav-submenu {
-  display: flex !important;
   flex-direction: column;
   padding-left: 14px;
   margin-bottom: 4px;
-}
-
-.nav-submenu.d-none {
-  display: none !important;
 }
 
 .nav-sublink {

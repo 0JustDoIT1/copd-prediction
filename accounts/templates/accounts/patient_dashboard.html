@@ -180,6 +180,21 @@
 
 {% endblock %}
 
+{% block checkin_toast %}
+<a href="#" class="checkin-toast" id="checkinToast">
+  <i class="bi bi-pencil-square checkin-toast-icon"></i>
+  <div class="checkin-toast-body">
+    <div class="checkin-toast-title">오늘의 체크인을 작성해주세요</div>
+    <div class="checkin-toast-desc">흡연·호흡 상태를 1분이면 기록할 수 있어요</div>
+  </div>
+  <i
+    class="bi bi-x checkin-toast-close"
+    id="checkinToastClose"
+    aria-label="닫기"
+  ></i>
+</a>
+{% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'accounts/js/dashboard_hero.js' %}"></script>
 <script>
@@ -187,4 +202,5 @@
   window.WHATIF_CURRENT_AMOUNT = {{ whatif_current_amount }};
 </script>
 <script src="{% static 'accounts/js/patient_dashboard.js' %}"></script>
+<script src="{% static 'js/checkin_toast.js' %}"></script>
 {% endblock %}

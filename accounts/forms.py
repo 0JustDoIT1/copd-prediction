@@ -195,6 +195,9 @@ class DoctorSignupForm(BaseSignupForm):
 
         if not re.match(DOCTOR_LICENSE_NO_REGEX, license_no):
             raise forms.ValidationError('면허번호는 숫자 4~6자리로 입력해주세요.')
+        
+        if DoctorProfile.objects.filter(license_no=license_no).exists():
+            raise forms.ValidationError('이미 등록된 면허번호입니다.')
 
         return license_no
 

@@ -44,20 +44,19 @@
           </a>
 
           <div class="nav-section">검진/검사</div>
-          <div
-            class="nav-group {% if active_group == 'screening' %}open{% endif %}"
-          >
+          <div class="nav-group">
             <a
               href="javascript:void(0)"
               class="nav-link nav-group-toggle"
-              data-target="group-screening"
+              data-bs-toggle="collapse"
+              data-bs-target="#group-screening"
               aria-expanded="{% if active_group == 'screening' %}true{% else %}false{% endif %}"
             >
               <i class="bi bi-clipboard2-pulse"></i><span>검진/검사</span>
               <i class="bi bi-chevron-down nav-caret"></i>
             </a>
             <div
-              class="nav-submenu {% if active_group != 'screening' %}d-none{% endif %}"
+              class="nav-submenu collapse {% if active_group == 'screening' %}show{% endif %}"
               id="group-screening"
             >
               <!-- TODO: screening 앱 구현 후 href="url name='screening:questionnaire'"로 복원 -->
@@ -82,20 +81,19 @@
           </div>
 
           <div class="nav-section">비교 리포트</div>
-          <div
-            class="nav-group {% if active_group == 'benchmarks' %}open{% endif %}"
-          >
+          <div class="nav-group">
             <a
               href="javascript:void(0)"
               class="nav-link nav-group-toggle"
-              data-target="group-benchmarks"
+              data-bs-toggle="collapse"
+              data-bs-target="#group-benchmarks"
               aria-expanded="{% if active_group == 'benchmarks' %}true{% else %}false{% endif %}"
             >
               <i class="bi bi-bar-chart"></i><span>비교 리포트</span>
               <i class="bi bi-chevron-down nav-caret"></i>
             </a>
             <div
-              class="nav-submenu {% if active_group != 'benchmarks' %}d-none{% endif %}"
+              class="nav-submenu collapse {% if active_group == 'benchmarks' %}show{% endif %}"
               id="group-benchmarks"
             >
               <!-- TODO: benchmarks 앱 구현 후 href="url name='benchmarks:report'"로 복원 -->
@@ -206,21 +204,8 @@
       </div>
     </div>
 
-    {% if user.is_authenticated and user.role == 'patient' %}
-    <!-- TODO: daily_care 앱 구현 후 href="url name='daily_care:daily_log'"로 복원 -->
-    <a href="#" class="checkin-toast" id="checkinToast">
-      <i class="bi bi-pencil-square checkin-toast-icon"></i>
-      <div class="checkin-toast-body">
-        <div class="checkin-toast-title">오늘의 체크인을 작성해주세요</div>
-        <div class="checkin-toast-desc">흡연·호흡 상태를 1분이면 기록할 수 있어요</div>
-      </div>
-      <i
-        class="bi bi-x checkin-toast-close"
-        id="checkinToastClose"
-        aria-label="닫기"
-      ></i>
-    </a>
-    {% endif %}
+    {% block checkin_toast %}
+    {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
@@ -229,7 +214,6 @@
     <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/parsley.min.js"></script>
     <script src="{% static 'js/parsley_config.js' %}"></script>
     <script src="{% static 'js/topbar_date.js' %}"></script>
-    <script src="{% static 'js/checkin_toast.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
