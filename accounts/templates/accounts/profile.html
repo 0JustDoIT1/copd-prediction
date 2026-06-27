@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}내 정보 수정 - 미래의료병원{% endblock %}
-{% block page_title %}내 정보 수정{% endblock %}
+{% block title %}내 정보 - 미래의료병원{% endblock %}
+{% block page_title %}내 정보{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}" />
+{% endblock %}
 
 {% block content %}
 {% if messages %}
@@ -10,49 +14,104 @@
   {% endfor %}
 {% endif %}
 
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body p-4">
-        <form method="post" novalidate data-parsley-validate>
-          {% csrf_token %}
+<div class="profile-page">
 
-          <div class="mb-3">
-            <label class="form-label">{{ user_form.username.label }}</label>
-            {{ user_form.username }}
-            {% if user_form.username.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_username" style="font-size:13px; padding:8px 12px;">{{ user_form.username.errors }}</div>{% endif %}
-          </div>
-
-          <hr>
-
-          {% if request.user.role == 'patient' %}
-            <div class="mb-3">
-              <label class="form-label">{{ profile_form.birth_date.label }}</label>
-              {{ profile_form.birth_date }}
-            </div>
-            <div class="mb-3" data-parsley-required="true" data-parsley-multiple="sex"
-                 data-parsley-required-message="성별을 선택해주세요.">
-              <label class="form-label d-block">{{ profile_form.sex.label }}</label>
-              {% for radio in profile_form.sex %}
-                <div class="form-check form-check-inline">
-                  {{ radio.tag }}
-                  <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="mb-3">
-              <label class="form-label">{{ profile_form.license_no.label }}</label>
-              {{ profile_form.license_no }}
-              <div class="text-muted" style="font-size:11.5px; margin-top:4px;">숫자 4~6자리</div>
-            </div>
-          {% endif %}
-
-          <button type="submit" class="btn btn-primary w-100 mt-2">저장</button>
-        </form>
+  <!-- ===================== 프로필 헤더 ===================== -->
+  <div class="profile-header">
+    <div class="profile-header-pattern"></div>
+    <div class="profile-header-inner">
+      <div class="profile-avatar">{{ user_obj.username|slice:":1"|upper }}</div>
+      <div class="profile-header-text">
+        <div class="profile-email">{{ user_obj.username }}</div>
+        <span class="profile-role-badge {% if user_obj.role == 'doctor' %}is-doctor{% endif %}">
+          <i class="bi {% if user_obj.role == 'patient' %}bi-person-heart{% else %}bi-clipboard2-pulse{% endif %}"></i>
+          {% if user_obj.role == 'patient' %}환자{% else %}의사{% endif %}
+        </span>
       </div>
     </div>
   </div>
+
+  <!-- ===================== 읽기 전용 정보 ===================== -->
+  <div class="profile-section">
+    <div class="profile-section-title">
+      <i class="bi bi-shield-lock"></i>기본 정보
+      <span class="profile-section-hint">변경할 수 없는 정보예요</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label"><i class="bi bi-lock-fill"></i>이메일</div>
+        <div class="info-value">{{ user_obj.username }}</div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-label"><i class="bi bi-lock-fill"></i>가입일</div>
+        <div class="info-value">{{ user_obj.date_joined|date:"Y년 m월 d일" }}</div>
+      </div>
+
+      {% if user_obj.role == 'patient' %}
+      <div class="info-item">
+        <div class="info-label"><i class="bi bi-lock-fill"></i>생년월일</div>
+        <div class="info-value">{{ profile.birth_date|date:"Y년 m월 d일" }}</div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-label"><i class="bi bi-lock-fill"></i>성별</div>
+        <div class="info-value">{{ profile.get_sex_display }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if user_obj.role == 'patient' %}
+  <!-- ===================== 검사 현황 (환자) ===================== -->
+  <div class="profile-section">
+    <div class="profile-section-title">
+      <i class="bi bi-clipboard2-pulse"></i>검사 현황
+    </div>
+
+    <div class="stat-row">
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">누적 검사 횟수</div>
+        <!-- TODO: screening 앱 구현 후 prediction_count 실제 값으로 교체 -->
+        <div class="profile-stat-value">{{ prediction_count }}<span class="profile-stat-unit">회</span></div>
+      </div>
+
+      <div class="profile-stat-card">
+        <div class="profile-stat-label">최근 검사 결과 확인일</div>
+        <!-- TODO: screening 앱 구현 후 latest_result_date 실제 값으로 교체 -->
+        {% if latest_result_date %}
+          <div class="profile-stat-value profile-stat-value-date">{{ latest_result_date|date:"Y.m.d" }}</div>
+        {% else %}
+          <div class="profile-stat-empty">아직 진행한 검사가 없어요</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- ===================== 면허 정보 (의사, 수정 가능) ===================== -->
+  <div class="profile-section profile-section-editable">
+    <div class="profile-section-title">
+      <i class="bi bi-pencil-square"></i>면허 정보
+      <span class="profile-section-hint profile-section-hint-edit">수정가능</span>
+    </div>
+
+    <form method="post" novalidate data-parsley-validate class="license-form">
+      {% csrf_token %}
+      <label class="form-label" for="{{ profile_form.license_no.id_for_label }}">{{ profile_form.license_no.label }}</label>
+      {{ profile_form.license_no }}
+      <div class="license-hint">보건복지부 기준 숫자 4~6자리</div>
+      {% if profile_form.license_no.errors %}
+        <div class="alert-danger-soft mt-2 mb-0" style="font-size:13px; padding:8px 12px;">
+          {{ profile_form.license_no.errors }}
+        </div>
+      {% endif %}
+      <button type="submit" class="btn btn-primary license-submit">저장</button>
+    </form>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 

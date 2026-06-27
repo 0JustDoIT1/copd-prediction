@@ -141,6 +141,10 @@ def patient_dashboard_view(request):
     콘텐츠는 각 카드를 클릭해 들어가는 content 앱의 목록 페이지에서 확인한다.
     FAQ만 content.models.FAQ에서 상위 4개를 가져와 미리보기로 보여준다.
 
+    체크인 토스트는 Django session 플래그(checkin_toast_shown)로 노출 여부를
+    결정한다 — 로그인 세션당 1회만 노출되고, 로그아웃 시 Django가 세션을
+    새로 발급하므로 플래그도 자동으로 초기화되어 다음 로그인 때 다시 노출된다.
+
     TODO: 아래는 여전히 더미 데이터인 부분. 각 항목이 실제로 연동될 자리:
     - has_health_record: screening.HealthRecord 존재 여부로 분기 (What-if 빈 상태 처리)
     - whatif_current_smoking/amount: 가장 최근 Questionnaire/HealthRecord에서 가져옴
@@ -154,6 +158,10 @@ def patient_dashboard_view(request):
     # TODO: screening.HealthRecord.objects.filter(patient=request.user.patientprofile).exists() 로 교체
     has_health_record = False
 
+    show_checkin_toast = not request.session.get('checkin_toast_shown', False)
+    if show_checkin_toast:
+        request.session['checkin_toast_shown'] = True
+
     context = {
         'active_menu': 'home',
 
@@ -163,49 +171,48 @@ def patient_dashboard_view(request):
         # TODO: 아래 두 값은 screening.PredictionResult / Questionnaire에서 가장 최근 값으로 교체
         'whatif_current_smoking': 2,
         'whatif_current_amount': 20,
+
+        'show_checkin_toast': show_checkin_toast,
     }
     return render(request, 'accounts/patient_dashboard.html', context)
 
-
-# def doctor_dashboard_view(request):
-#     return render(request, 'accounts/doctor_dashboard.html', {
-#         'active_menu': 'home',
-#     }) -> 주석 처리
-
-from django.shortcuts import redirect # 수정구간(3줄)❗
 
 def doctor_dashboard_view(request):
     return redirect('screening:doctor_dashboard')
 
 
+# from screening.models import PredictionResult  # TODO: screening 앱 구현 후 주석 해제
+
 def profile_view(request):
-    """topbar 프로필 드롭다운 → 내 정보 수정. User 기본정보 + role별 프로필 정보를 같이 처리."""
     user = request.user
 
-    if request.method == 'POST':
-        user_form = ProfileUpdateForm(request.POST, instance=user)
+    if user.role == 'patient':
+        profile = user.patientprofile
 
-        if user.role == 'patient':
-            profile = user.patientprofile
-            profile_form = PatientProfileUpdateForm(request.POST, instance=profile)
-        else:
-            profile = user.doctorprofile
-            profile_form = DoctorProfileUpdateForm(request.POST, instance=profile)
+        # TODO: screening 앱 구현 후 아래 더미를 실제 쿼리로 교체
+        # prediction_count = PredictionResult.objects.filter(user=user).count()
+        # latest_result = PredictionResult.objects.filter(user=user).order_by('-created_at').first()
+        prediction_count = 0
+        latest_result_date = None
 
-        if user_form.is_valid() and profile_form.is_valid():
-            with transaction.atomic():
-                user_form.save()
-                profile_form.save()
-            messages.success(request, '내 정보가 수정되었습니다.')
-            return redirect('accounts:profile')
+        context = {
+            'user_obj': user,
+            'profile': profile,
+            'prediction_count': prediction_count,
+            'latest_result_date': latest_result_date,
+        }
     else:
-        user_form = ProfileUpdateForm(instance=user)
-        if user.role == 'patient':
-            profile_form = PatientProfileUpdateForm(instance=user.patientprofile)
-        else:
-            profile_form = DoctorProfileUpdateForm(instance=user.doctorprofile)
+        profile_form = DoctorProfileUpdateForm(
+            request.POST or None, instance=user.doctorprofile
+        )
+        if request.method == 'POST' and profile_form.is_valid():
+            profile_form.save()
+            messages.success(request, '면허번호가 변경되었습니다.')
+            return redirect('accounts:profile')
 
-    return render(request, 'accounts/profile.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-    })
+        context = {
+            'user_obj': user,
+            'profile_form': profile_form,
+        }
+
+    return render(request, 'accounts/profile.html', context)

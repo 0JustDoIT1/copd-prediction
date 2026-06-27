@@ -203,67 +203,26 @@ class DoctorSignupForm(BaseSignupForm):
 
 
 class ProfileUpdateForm(forms.ModelForm):
-    """topbar 프로필 드롭다운 → '내 정보 수정'에서 사용. User 모델의 기본 정보만 다룬다."""
-
+    """
+    topbar 프로필 드롭다운 → '내 정보 수정'에서 사용.
+    이메일(아이디)은 로그인 식별자로 쓰이므로 수정 불가 — 읽기 전용으로만 표시.
+    실제로는 더 이상 수정 가능한 User 필드가 없어 폼 자체가 비어있지만,
+    템플릿에서 user.username을 읽기 전용 표시하는 데 view 컨텍스트로 user 객체를 넘긴다.
+    """
     class Meta:
         model = User
-        fields = ['username']
-        labels = {
-            'username': '이메일',
-        }
-        widgets = {
-            'username': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'data-parsley-required': 'true',
-                'data-parsley-pattern': EMAIL_REGEX,
-                'data-parsley-required-message': '이메일을 입력해주세요.',
-                'data-parsley-pattern-message': '올바른 이메일 형식이 아닙니다.',
-                'data-parsley-type-message': '올바른 이메일 형식이 아닙니다.',
-            }),
-        }
-        error_messages = {
-            'username': {
-                'required': '이메일을 입력해주세요.',
-            },
-        }
-
-    def clean_username(self):
-        email = self.cleaned_data['username']
-
-        if not re.match(EMAIL_REGEX, email):
-            raise forms.ValidationError('올바른 이메일 형식이 아닙니다.')
-
-        qs = User.objects.filter(username=email).exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise forms.ValidationError('이미 가입된 이메일입니다.')
-
-        return email
+        fields = []
 
 
 class PatientProfileUpdateForm(forms.ModelForm):
+    """
+    생년월일/성별은 ML 모델의 핵심 피처(age, sex)이자 과거 PredictionResult와의
+    정합성을 위해 가입 후 수정 불가 — 읽기 전용으로만 표시.
+    실제로는 더 이상 수정 가능한 PatientProfile 필드가 없어 폼 자체가 비어있다.
+    """
     class Meta:
         model = PatientProfile
-        fields = ['birth_date', 'sex']
-        widgets = {
-            'birth_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-                'data-parsley-required': 'true',
-                'data-parsley-required-message': '생년월일을 입력해주세요.',
-                'data-parsley-type-message': '올바른 날짜 형식이 아닙니다.',
-            }),
-            'sex': forms.RadioSelect,
-        }
-        error_messages = {
-            'birth_date': {'required': '생년월일을 입력해주세요.'},
-            'sex': {'required': '성별을 선택해주세요.'},
-        }
-
-    def clean_birth_date(self):
-        birth_date = self.cleaned_data['birth_date']
-        if birth_date > date.today():
-            raise forms.ValidationError('생년월일은 미래 날짜일 수 없습니다.')
-        return birth_date
+        fields = []
 
 
 class DoctorProfileUpdateForm(forms.ModelForm):
@@ -282,6 +241,7 @@ class DoctorProfileUpdateForm(forms.ModelForm):
         error_messages = {
             'license_no': {
                 'required': '면허번호를 입력해주세요.',
+                'unique': '이미 등록된 면허번호입니다.',
             },
         }
 
