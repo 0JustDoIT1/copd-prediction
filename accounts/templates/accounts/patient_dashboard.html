@@ -181,6 +181,7 @@
 {% endblock %}
 
 {% block checkin_toast %}
+{% if show_checkin_toast %}
 <a href="#" class="checkin-toast" id="checkinToast">
   <i class="bi bi-pencil-square checkin-toast-icon"></i>
   <div class="checkin-toast-body">
@@ -193,6 +194,7 @@
     aria-label="닫기"
   ></i>
 </a>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
