@@ -52,11 +52,28 @@ class LoginForm(forms.Form):
 
 class BaseSignupForm(forms.Form):
     """
-    환자/의사 가입 폼이 공통으로 갖는 필드(이메일, 비밀번호).
+    환자/의사 가입 폼이 공통으로 갖는 필드(이름, 이메일, 비밀번호).
     역할별 폼(PatientSignupForm/DoctorSignupForm)이 이를 상속해서 추가 필드를 덧붙인다.
 
     아이디는 이메일 형식을 그대로 사용한다 (User.username 필드에 이메일 문자열을 저장).
+    User.email도 가입 시 동일한 값으로 채워, Django 기본 기능(admin 표시, 비밀번호
+    재설정 메일 발송 등)에서 일관되게 쓰이도록 한다.
     """
+    name = forms.CharField(
+        label='이름',
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'name',
+            'data-parsley-required': 'true',
+            'data-parsley-required-message': '이름을 입력해주세요.',
+        }),
+        error_messages={
+            'required': '이름을 입력해주세요.',
+            'max_length': '이름은 50자를 넘을 수 없습니다.',
+        },
+    )
     email = forms.CharField(
         label='이메일',
         max_length=150,
@@ -195,7 +212,7 @@ class DoctorSignupForm(BaseSignupForm):
 
         if not re.match(DOCTOR_LICENSE_NO_REGEX, license_no):
             raise forms.ValidationError('면허번호는 숫자 4~6자리로 입력해주세요.')
-        
+
         if DoctorProfile.objects.filter(license_no=license_no).exists():
             raise forms.ValidationError('이미 등록된 면허번호입니다.')
 

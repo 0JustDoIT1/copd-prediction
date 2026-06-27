@@ -85,7 +85,9 @@ def signup_patient_view(request):
             with transaction.atomic():
                 user = User.objects.create_user(
                     username=form.cleaned_data['email'],
+                    email=form.cleaned_data['email'],
                     password=form.cleaned_data['password1'],
+                    name=form.cleaned_data['name'],
                     role='patient',
                 )
                 PatientProfile.objects.create(
@@ -109,7 +111,9 @@ def signup_doctor_view(request):
             with transaction.atomic():
                 user = User.objects.create_user(
                     username=form.cleaned_data['email'],
+                    email=form.cleaned_data['email'],
                     password=form.cleaned_data['password1'],
+                    name=form.cleaned_data['name'],
                     role='doctor',
                 )
                 DoctorProfile.objects.create(

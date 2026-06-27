@@ -8,6 +8,7 @@ class User(AbstractUser):
         ('doctor', '의사'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    name = models.CharField('이름', max_length=50)
 
 
 class PatientProfile(models.Model):
