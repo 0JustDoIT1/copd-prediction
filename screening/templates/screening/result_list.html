@@ -49,7 +49,6 @@
                         </td>
 
                         <td>
-
                             {% if prediction.decision %}
                                 <span class="badge bg-success">
                                     검토 완료
@@ -59,7 +58,6 @@
                                     검토 대기
                                 </span>
                             {% endif %}
-
                         </td>
 
                         <td>
@@ -77,22 +75,22 @@
                                 {% endif %}
 
                             {% else %}
+
                                 <span class="text-muted">
                                     의사 검토 중
                                 </span>
+
                             {% endif %}
 
                         </td>
 
                         <td class="text-end">
-
                             <a
                                 href="{% url 'screening:result_detail' prediction.id %}"
                                 class="btn btn-outline-primary btn-sm"
                             >
                                 확인하기
                             </a>
-
                         </td>
 
                     </tr>

@@ -70,6 +70,23 @@ def health_record_create(request, questionnaire_id):
                 2
             )
 
+            # 고혈압 단계 자동 계산
+            if health_record.bp_medication:
+                health_record.hp_stage = 4
+            else:
+                sbp = health_record.sbp
+                dbp = health_record.dbp
+
+                if sbp is not None and dbp is not None:
+                    if sbp < 120 and dbp < 80:
+                        health_record.hp_stage = 1
+                    elif 120 <= sbp < 130 and dbp < 80:
+                        health_record.hp_stage = 2
+                    elif 130 <= sbp < 140 or 80 <= dbp < 90:
+                        health_record.hp_stage = 3
+                    elif sbp >= 140 or dbp >= 90:
+                        health_record.hp_stage = 4
+
             health_record.save()
            
             prediction = create_prediction_result(

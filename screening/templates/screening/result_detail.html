@@ -1,137 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}
-검사 결과 조회 | 미래의료병원
-{% endblock %}
-
-{% block page_title %}
-검사 결과 조회
-{% endblock %}
+{% block title %}검사 결과 상세 | 미래의료병원{% endblock %}
+{% block page_title %}검사 결과 상세{% endblock %}
 
 {% block content %}
-
 <div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">폐활량검사 권고 검토 상태</h5>
+  </div>
 
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">
-            내 검사 결과
-        </h5>
+  <div class="card-body">
 
-        <span class="badge bg-primary">
-            총 {{ predictions|length }}건
-        </span>
+    {% if prediction.decision %}
+
+      {% if prediction.decision.decision == "recommend" %}
+        <div class="alert-warning-soft mb-4">
+          <strong>폐활량검사 권고</strong><br>
+          담당 의사 검토 결과, 폐활량검사를 받아보실 것을 권고합니다.
+        </div>
+      {% elif prediction.decision.decision == "normal" %}
+        <div class="alert-warning-soft mb-4">
+          <strong>정상</strong><br>
+          담당 의사 검토 결과, 현재 추가적인 폐활량검사 권고 사항은 없습니다.
+        </div>
+      {% endif %}
+
+      {% if prediction.decision.memo %}
+        <div class="mt-4">
+          <h6>의사 메모</h6>
+          <p>{{ prediction.decision.memo }}</p>
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div class="alert-warning-soft mb-4">
+        <strong>의사 검토 대기</strong><br>
+        입력하신 문진 및 건강검진 정보가 정상적으로 제출되었습니다.
+        담당 의사의 검토 후 결과가 표시됩니다.
+      </div>
+    {% endif %}
+
+    <hr>
+
+    <p class="text-muted mb-0">
+      이 결과는 COPD 확정 진단이 아니며, 정확한 판단은 의료진 상담 및 필요한 검사를 통해 이루어집니다.
+    </p>
+
+    <div class="mt-4">
+      <a href="{% url 'screening:result_list' %}" class="btn btn-outline-secondary">
+        ← 목록으로 돌아가기
+      </a>
     </div>
 
-    <div class="card-body">
-
-        {% if predictions %}
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>제출일</th>
-                        <th>검토 상태</th>
-                        <th>판정 결과</th>
-                        <th class="text-end">상세보기</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    {% for prediction in predictions %}
-                    <tr>
-
-                        <td>
-                            {{ prediction.created_at|date:"Y-m-d H:i" }}
-                        </td>
-
-                        <td>
-                            {% if prediction.decision %}
-                                <span class="badge bg-success">
-                                    검토 완료
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary">
-                                    검토 대기
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-
-                            {% if prediction.decision %}
-
-                                {% if prediction.decision.decision == "recommend" %}
-                                    <span class="text-danger fw-semibold">
-                                        폐활량검사 권고
-                                    </span>
-                                {% else %}
-                                    <span class="text-success fw-semibold">
-                                        정상
-                                    </span>
-                                {% endif %}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    의사 검토 중
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td class="text-end">
-                            <a
-                                href="{% url 'screening:result_detail' prediction.id %}"
-                                class="btn btn-outline-primary btn-sm"
-                            >
-                                확인하기
-                            </a>
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        {% else %}
-
-        <div class="text-center py-5">
-
-            <i
-                class="bi bi-clipboard-x"
-                style="font-size:60px; color:#cfd8dc;"
-            ></i>
-
-            <h5 class="mt-3">
-                아직 제출한 검사 결과가 없습니다.
-            </h5>
-
-            <p class="text-muted">
-                COPD 선별 문진과 건강검진 정보를 먼저 입력해주세요.
-            </p>
-
-            <a
-                href="{% url 'screening:questionnaire' %}"
-                class="btn btn-primary"
-            >
-                문진 시작하기
-            </a>
-
-        </div>
-
-        {% endif %}
-
-    </div>
-
+  </div>
 </div>
-
 {% endblock %}

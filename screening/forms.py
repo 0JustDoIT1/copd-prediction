@@ -27,7 +27,7 @@ class HealthRecordForm(forms.ModelForm):
         model = HealthRecord
         fields = [
             "height", "weight",
-            "sbp", "dbp", "hp_stage",
+            "sbp", "dbp", "bp_medication",
             "glucose", "hba1c", "cholesterol", "hdl", "triglyceride",
             "ast", "alt", "hemoglobin", "wbc", "rbc",
             "hscrp", "asthma_history", "rhinitis_history",
@@ -38,7 +38,7 @@ class HealthRecordForm(forms.ModelForm):
             "weight": "Weight (몸무게, kg)",
             "sbp": "SBP (수축기 혈압, mmHg)",
             "dbp": "DBP (이완기 혈압, mmHg)",
-            "hp_stage": "Hypertension Stage (고혈압 단계)",
+            "bp_medication": "현재 혈압약을 복용 중입니까?",
             "glucose": "Glucose (혈당, mg/dL)",
             "hba1c": "HbA1c (당화혈색소, %)",
             "cholesterol": "Total Cholesterol (총 콜레스테롤, mg/dL)",

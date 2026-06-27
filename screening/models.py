@@ -21,6 +21,7 @@ class HealthRecord(models.Model):
     sbp = models.FloatField(null=True, blank=True)
     dbp = models.FloatField(null=True, blank=True)
     hp_stage = models.IntegerField(null=True, blank=True)
+    bp_medication = models.BooleanField(default=False)
     glucose = models.FloatField(null=True, blank=True)
     hba1c = models.FloatField(null=True, blank=True)
     cholesterol = models.FloatField(null=True, blank=True)
@@ -35,6 +36,7 @@ class HealthRecord(models.Model):
     asthma_history = models.BooleanField(null=True, blank=True)
     rhinitis_history = models.BooleanField(null=True, blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
+    
 
 
 class PredictionResult(models.Model):
