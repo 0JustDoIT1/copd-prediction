@@ -167,10 +167,15 @@ def patient_dashboard_view(request):
     return render(request, 'accounts/patient_dashboard.html', context)
 
 
+# def doctor_dashboard_view(request):
+#     return render(request, 'accounts/doctor_dashboard.html', {
+#         'active_menu': 'home',
+#     }) -> 주석 처리
+
+from django.shortcuts import redirect # 수정구간(3줄)❗
+
 def doctor_dashboard_view(request):
-    return render(request, 'accounts/doctor_dashboard.html', {
-        'active_menu': 'home',
-    })
+    return redirect('screening:doctor_dashboard')
 
 
 def profile_view(request):
