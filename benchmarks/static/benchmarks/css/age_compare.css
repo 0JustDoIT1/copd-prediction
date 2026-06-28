@@ -16,27 +16,6 @@
   flex-wrap: wrap;
 }
 
-.pdf-export-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  border: 1px solid var(--color-main);
-  background: #fff;
-  color: var(--color-main);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 9px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.pdf-export-btn:hover {
-  background: var(--color-main);
-  color: #fff;
-}
-
 .page-title {
   font-size: 24px;
   font-weight: 700;
