@@ -37,7 +37,7 @@
 <div class="row g-3 mb-4">
 
   <div class="col-6 col-lg-3">
-    <a href="#" class="dashboard-action-card dashboard-action-card-main">
+    <a href="{% url 'screening:home' %}" class="dashboard-action-card dashboard-action-card-main">
       <div class="dashboard-action-icon dashboard-action-icon-main"><i class="bi bi-clipboard2-pulse"></i></div>
       <div class="dashboard-action-title">검진정보 입력</div>
       <div class="dashboard-action-desc">문진과 검진수치를 입력하고 권고 점수를 확인하세요</div>
@@ -46,7 +46,7 @@
   </div>
 
   <div class="col-6 col-lg-3">
-    <a href="#" class="dashboard-action-card dashboard-action-card-warning">
+    <a href="{% url 'appointments:appointment_request' %}" class="dashboard-action-card dashboard-action-card-warning">
       <div class="dashboard-action-icon dashboard-action-icon-warning"><i class="bi bi-calendar-check"></i></div>
       <div class="dashboard-action-title">검사 예약</div>
       <div class="dashboard-action-desc">폐활량검사 일정을 확인하고 예약하세요</div>
@@ -100,7 +100,7 @@
         <label class="whatif-label">하루 흡연량</label>
         <span class="whatif-value" id="amountOut">20개비</span>
       </div>
-      <input type="range" id="amountSlider" min="0" max="40" value="20" step="5" class="form-range">
+      <input type="range" id="amountSlider" min="0" max="40" value="20" step="1" class="form-range">
     </div>
 
     <div class="whatif-field">
@@ -133,6 +133,12 @@
       <i class="bi bi-info-circle"></i>
       이 결과는 상관관계 기반의 참고용 시뮬레이션이며, 의학적으로 검증된 인과관계가 아닙니다.
     </div>
+    <p class="whatif-field-hint">
+      <i class="bi bi-info-circle"></i>
+      이 모델은 체중이 늘수록 권고 점수가 단순히 낮아지는 경향으로 학습되었습니다.
+      저체중·고체중을 모두 위험으로 보는 일반적인 체중-COPD 관계와는 다를 수 있어,
+      체중 변화 결과는 참고용으로만 봐주세요.
+    </p>
   </div>
 
   {% else %}
@@ -142,7 +148,7 @@
     <div class="whatif-empty-desc">
       검진정보를 입력하면 흡연, 체중 변화에 따른<br>COPD 검사 권고 점수 변화를 미리 살펴볼 수 있어요.
     </div>
-    <a href="#" class="btn btn-primary mt-2">검진정보 입력하기</a>
+    <a href="{% url 'screening:home' %}" class="btn btn-primary mt-2">검진정보 입력하기</a>
   </div>
   {% endif %}
 
@@ -188,7 +194,7 @@
     <div class="checkin-toast-title">오늘의 체크인을 작성해주세요</div>
     <div class="checkin-toast-desc">흡연·호흡 상태를 1분이면 기록할 수 있어요</div>
     <div class="checkin-toast-actions">
-      <a href="#" class="checkin-toast-link">기록하기</a>
+      <a href="{% url 'daily_care:dashboard' %}" class="checkin-toast-link">기록하기</a>
       <button type="button" class="checkin-toast-dismiss" id="checkinToastDismiss">오늘 하루 안 보기</button>
     </div>
   </div>

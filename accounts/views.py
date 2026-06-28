@@ -149,21 +149,41 @@ def patient_dashboard_view(request):
 
     체크인 토스트는 daily_care.utils.has_checked_in_today()로 노출 여부를
     결정한다 — 오늘 daily_log를 실제로 기록했는지 여부로 판단하므로, 세션이나
-    로그인 여부와 무관하게 정확하게 동작한다. (이전에는 임시로 Django session
-    플래그를 썼으나, daily_care 앱 구현 완료로 실제 체크인 여부 기반으로 교체함)
+    로그인 여부와 무관하게 정확하게 동작한다.
 
-    TODO: 아래는 여전히 더미 데이터인 부분. 각 항목이 실제로 연동될 자리:
-    - has_health_record: screening.HealthRecord 존재 여부로 분기 (What-if 빈 상태 처리)
-    - whatif_current_smoking/amount: 가장 최근 Questionnaire/HealthRecord에서 가져옴
-    - whatif_compute_url: screening 팀이 /predict/what-if/ 를 만들면 그 경로로 교체.
-      입력: {smoking_status, smoking_amount, weight_delta}, 출력: {risk_probability}
+    What-if 시뮬레이션은 환자의 가장 최근 PredictionResult(검사 기록)를 기준으로
+    현재 흡연 상태/흡연량을 가져와 슬라이더 초기값으로 채운다. 검사 기록이 한
+    건도 없으면 시뮬레이션 자체를 빈 상태(has_health_record=False)로 보여준다.
+
+    whatif_compute_url: screening 팀이 /predict/what-if/ 를 만들면 그 경로로 교체.
+    입력: {smoking_status, smoking_amount, weight_delta}, 출력: {risk_probability}
+    (아직 미구현이라 이 부분은 TODO로 남겨둠)
     """
     from content.models import FAQ
+    from screening.models import PredictionResult
 
     faqs = FAQ.objects.all()[:4]
 
-    # TODO: screening.HealthRecord.objects.filter(patient=request.user.patientprofile).exists() 로 교체
-    has_health_record = False
+    patient = request.user.patientprofile
+
+    latest_result = (
+        PredictionResult.objects
+        .filter(questionnaire__patient=patient)
+        .select_related('questionnaire', 'health_record')
+        .order_by('-created_at')
+        .first()
+    )
+
+    has_health_record = latest_result is not None
+
+    # 검사 기록이 있으면 가장 최근 값으로 슬라이더 초기값을 채우고,
+    # 없으면 화면 자체가 empty-state로 빠지므로 기본값(0, 0)을 넣어도 사용되지 않는다.
+    if has_health_record:
+        whatif_current_smoking = latest_result.questionnaire.smoking_status
+        whatif_current_amount = latest_result.questionnaire.smoking_amount
+    else:
+        whatif_current_smoking = 0
+        whatif_current_amount = 0
 
     show_checkin_toast = not has_checked_in_today(request.user)
 
@@ -173,9 +193,8 @@ def patient_dashboard_view(request):
         'faqs': faqs,
 
         'has_health_record': has_health_record,
-        # TODO: 아래 두 값은 screening.PredictionResult / Questionnaire에서 가장 최근 값으로 교체
-        'whatif_current_smoking': 2,
-        'whatif_current_amount': 20,
+        'whatif_current_smoking': whatif_current_smoking,
+        'whatif_current_amount': whatif_current_amount,
 
         'show_checkin_toast': show_checkin_toast,
     }
@@ -186,19 +205,20 @@ def doctor_dashboard_view(request):
     return redirect('screening:doctor_dashboard')
 
 
-# from screening.models import PredictionResult  # TODO: screening 앱 구현 후 주석 해제
-
 def profile_view(request):
     user = request.user
 
     if user.role == 'patient':
         profile = user.patientprofile
 
-        # TODO: screening 앱 구현 후 아래 더미를 실제 쿼리로 교체
-        # prediction_count = PredictionResult.objects.filter(user=user).count()
-        # latest_result = PredictionResult.objects.filter(user=user).order_by('-created_at').first()
-        prediction_count = 0
-        latest_result_date = None
+        from screening.models import PredictionResult
+
+        patient_predictions = PredictionResult.objects.filter(
+            questionnaire__patient=profile
+        )
+        prediction_count = patient_predictions.count()
+        latest_result = patient_predictions.order_by('-created_at').first()
+        latest_result_date = latest_result.created_at if latest_result else None
 
         context = {
             'user_obj': user,

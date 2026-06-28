@@ -407,6 +407,23 @@
   margin-bottom: 18px;
 }
 
+.whatif-field-hint {
+  font-size: 11px;
+  color: var(--color-muted);
+  line-height: 1.6;
+  margin: 8px 0 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.whatif-field-hint i {
+  color: var(--color-main);
+  font-size: 12px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
 /* ===================== 환자 대시보드: FAQ 아코디언 ===================== */
 .faq-item .accordion-button {
   font-size: 13.5px;

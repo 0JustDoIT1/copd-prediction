@@ -35,6 +35,23 @@ document.addEventListener("DOMContentLoaded", function () {
   var resultText = document.getElementById("resultText");
   var resultBadge = document.getElementById("resultBadge");
 
+  // 슬라이더의 실제 핸들 위치/표시 텍스트를 현재 JS 값(amountVal, weightVal)에 맞춰 동기화.
+  // HTML의 value="20" 같은 하드코딩된 초기 속성을 덮어써서, 페이지 로드 시점부터
+  // "최근 검진값"이 슬라이더 위치에도 그대로 반영되도록 한다.
+  function syncSlidersToCurrentValues() {
+    amountSlider.value = amountVal;
+    amountOut.textContent = amountVal + "개비";
+
+    weightSlider.value = weightVal;
+    if (weightVal === 0) {
+      weightOut.textContent = "현재와 동일";
+    } else if (weightVal > 0) {
+      weightOut.textContent = "+" + weightVal + "kg";
+    } else {
+      weightOut.textContent = weightVal + "kg";
+    }
+  }
+
   function updateButtons() {
     smokingButtons.forEach(function (btn) {
       var active = parseInt(btn.dataset.val, 10) === smokingVal;
@@ -110,6 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     render();
   });
 
+  syncSlidersToCurrentValues();
   updateButtons();
   render();
 });

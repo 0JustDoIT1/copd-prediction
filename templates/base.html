@@ -59,24 +59,59 @@
               class="nav-submenu collapse {% if active_group == 'screening' %}show{% endif %}"
               id="group-screening"
             >
-              <!-- TODO: screening 앱 구현 후 href="url name='screening:questionnaire'"로 복원 -->
               <a
                 href="{% url 'screening:home' %}"
                 class="nav-link nav-sublink {% if active_menu == 'questionnaire' %}active{% endif %}"
               >
                 문진 입력
               </a>
-             
-              <!-- TODO: screening 앱 구현 후 href="url name='screening:result_list'"로 복원 -->
-             <a
-              href="{% url 'screening:result_list' %}"
-              class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}"
-            >
-              검사 결과/이력
-            </a>
-
+              <a
+                href="{% url 'screening:result_list' %}"
+                class="nav-link nav-sublink {% if active_menu == 'result_list' %}active{% endif %}"
+              >
+                검사 결과/이력
+              </a>
             </div>
           </div>
+
+          <div class="nav-section">예약</div>
+          <div class="nav-group">
+            <a
+              href="javascript:void(0)"
+              class="nav-link nav-group-toggle"
+              data-bs-toggle="collapse"
+              data-bs-target="#group-appointments"
+              aria-expanded="{% if active_group == 'appointments' %}true{% else %}false{% endif %}"
+            >
+              <i class="bi bi-calendar-check"></i><span>예약</span>
+              <i class="bi bi-chevron-down nav-caret"></i>
+            </a>
+            <div
+              class="nav-submenu collapse {% if active_group == 'appointments' %}show{% endif %}"
+              id="group-appointments"
+            >
+              <a
+                href="{% url 'appointments:appointment_request' %}"
+                class="nav-link nav-sublink {% if active_menu == 'appointment_request' %}active{% endif %}"
+              >
+                진료예약
+              </a>
+              <a
+                href="{% url 'appointments:appointment_confirm' %}"
+                class="nav-link nav-sublink {% if active_menu == 'appointment_confirm' %}active{% endif %}"
+              >
+                예약 확인
+              </a>
+            </div>
+          </div>
+
+          <div class="nav-section">관리</div>
+          <a
+            href="{% url 'daily_care:dashboard' %}"
+            class="nav-link {% if active_menu == 'daily_log' %}active{% endif %}"
+          >
+            <i class="bi bi-heart-pulse"></i><span>일상 관리</span>
+          </a>
 
           <div class="nav-section">비교 리포트</div>
           <div class="nav-group">
@@ -95,14 +130,14 @@
               id="group-benchmarks"
             >
               <a
-                href="{% url 'benchmarks:age_compare' %}"
-                class="nav-link nav-sublink {% if active_menu == 'age_compare' %}active{% endif %}"
-                >동연령대 비교</a
-              >
-              <a
                 href="{% url 'benchmarks:risk_factors' %}"
                 class="nav-link nav-sublink {% if active_menu == 'risk_factors' %}active{% endif %}"
                 >위험요인 시각화</a
+              >
+              <a
+                href="{% url 'benchmarks:age_compare' %}"
+                class="nav-link nav-sublink {% if active_menu == 'age_compare' %}active{% endif %}"
+                >동연령대 비교</a
               >
               <a
                 href="{% url 'benchmarks:timeline' %}"
@@ -112,21 +147,42 @@
             </div>
           </div>
 
-          <div class="nav-section">관리</div>
-          <!-- TODO: daily_care 앱 구현 후 href="url name='daily_care:daily_log'"로 복원 -->
-          <a
-            href="#"
-            class="nav-link {% if active_menu == 'daily_log' %}active{% endif %}"
-          >
-            <i class="bi bi-heart-pulse"></i><span>일상 관리</span>
-          </a>
-          <!-- TODO: appointments 앱 구현 후 href="url name='appointments:appointment'"로 복원 -->
-          <a
-            href="#"
-            class="nav-link {% if active_menu == 'appointment' %}active{% endif %}"
-          >
-            <i class="bi bi-calendar-check"></i><span>검사 예약</span>
-          </a>
+          <div class="nav-section">콘텐츠</div>
+          <div class="nav-group">
+            <a
+              href="javascript:void(0)"
+              class="nav-link nav-group-toggle"
+              data-bs-toggle="collapse"
+              data-bs-target="#group-content"
+              aria-expanded="{% if active_group == 'content' %}true{% else %}false{% endif %}"
+            >
+              <i class="bi bi-journal-text"></i><span>콘텐츠</span>
+              <i class="bi bi-chevron-down nav-caret"></i>
+            </a>
+            <div
+              class="nav-submenu collapse {% if active_group == 'content' %}show{% endif %}"
+              id="group-content"
+            >
+              <a
+                href="{% url 'content:health_tips' %}"
+                class="nav-link nav-sublink {% if active_menu == 'health_tips' %}active{% endif %}"
+              >
+                COPD 알아보기
+              </a>
+              <a
+                href="{% url 'content:breathing_guides' %}"
+                class="nav-link nav-sublink {% if active_menu == 'breathing_guides' %}active{% endif %}"
+              >
+                호흡운동 알아보기
+              </a>
+              <a
+                href="{% url 'content:faq' %}"
+                class="nav-link nav-sublink {% if active_menu == 'faq' %}active{% endif %}"
+              >
+                FAQ
+              </a>
+            </div>
+          </div>
 
           {% elif user.role == 'doctor' %}
           <!-- 의사용 메뉴 (참고용 placeholder, 별도 설계 예정) -->
