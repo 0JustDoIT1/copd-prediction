@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from .services import get_age_compare_context, get_timeline_context, get_risk_factors_context
 
+
 def age_compare_view(request):
     """
     환자 본인의 최신 검사 결과를 동연령대·동성별 평균과 비교하는 화면.

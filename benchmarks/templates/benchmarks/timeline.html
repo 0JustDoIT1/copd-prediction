@@ -61,6 +61,12 @@
                     data-unit="%">
                 </canvas>
             </div>
+            {% if data.score_description %}
+            <div class="timeline-variable-description">
+                <i class="bi bi-info-circle"></i>
+                <p>{{ data.score_description }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -78,6 +84,12 @@
                     data-unit="{{ item.unit }}">
                 </canvas>
             </div>
+            {% if item.description %}
+            <div class="timeline-variable-description">
+                <i class="bi bi-info-circle"></i>
+                <p>{{ item.description }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

@@ -1,7 +1,7 @@
 from common.utils.age_group import calculate_age_group
 from screening.models import PredictionResult
 from .models import Benchmark
-from .variable_info import get_variable_explanation, get_variable_label_info
+from .variable_info import get_variable_explanation, get_variable_label_info, SCORE_DESCRIPTION
 
 # 화면에 표시할 6개 벤치마크 변수와, HealthRecord/Questionnaire 필드 매핑
 # label: 화면 표시명, unit: 단위 표시
@@ -174,11 +174,13 @@ def get_timeline_context(patient):
         series = variable_series_map[var_name]
         if not series:
             continue  # 한 번도 기록되지 않은 변수는 탭에서 제외
+        explanation = get_variable_explanation(var_name)
         variable_timelines.append({
             'variable_name': var_name,
             'label': info['label'],
             'unit': info['unit'],
             'series': series,
+            'description': explanation['description'] if explanation else '',
         })
 
     latest_result = results[-1]
@@ -188,6 +190,7 @@ def get_timeline_context(patient):
         'has_enough_data': len(results) >= 2,  # 1건뿐이면 추이 비교 의미 없음
         'result_count': len(results),
         'score_series': score_series,
+        'score_description': SCORE_DESCRIPTION,
         'variable_timelines': variable_timelines,
         'first_date': first_result.created_at,
         'latest_date': latest_result.created_at,
