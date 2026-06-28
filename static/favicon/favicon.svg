@@ -1,0 +1,38 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5fa893"/>
+      <stop offset="100%" stop-color="#2c6b5c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- 화이트 라인 스타일 폐 아이콘 -->
+  <g transform="translate(32,30)" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 기관 -->
+    <path d="M 0 -16 L 0 -4"/>
+    <!-- 좌측 기관지 -->
+    <path d="M -1.5 -4 C -6 -4, -9 0, -9.5 6"/>
+    <!-- 우측 기관지 -->
+    <path d="M 1.5 -4 C 6 -4, 9 0, 9.5 6"/>
+    <!-- 좌측 폐엽 -->
+    <path d="M -9.5 3
+             C -10.5 -1, -16 -2, -19 4
+             C -22 10, -21 22, -15 26
+             C -10 29, -6 25, -6 17
+             C -6 11, -7 6, -9.5 3 Z"
+          fill="#ffffff" stroke="none"/>
+    <!-- 우측 폐엽 -->
+    <path d="M 9.5 3
+             C 10.5 -1, 16 -2, 19 4
+             C 22 10, 21 22, 15 26
+             C 10 29, 6 25, 6 17
+             C 6 11, 7 6, 9.5 3 Z"
+          fill="#ffffff" stroke="none"/>
+  </g>
+
+  <!-- 작은 하트비트 라인 포인트 (생기/트렌디함) -->
+  <path d="M 20 47 L 24 47 L 26 43 L 29 51 L 32 47 L 44 47"
+        fill="none" stroke="#d8f0e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+</svg>

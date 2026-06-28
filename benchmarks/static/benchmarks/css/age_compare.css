@@ -8,6 +8,14 @@
   margin-bottom: 24px;
 }
 
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .page-title {
   font-size: 24px;
   font-weight: 700;

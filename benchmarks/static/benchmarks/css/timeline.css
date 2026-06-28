@@ -8,6 +8,14 @@
   margin-bottom: 24px;
 }
 
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .page-title {
   font-size: 24px;
   font-weight: 700;
@@ -172,4 +180,27 @@
 .chart-canvas-wrap canvas {
   position: absolute;
   inset: 0;
+}
+
+.timeline-variable-description {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin: 16px 0 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.timeline-variable-description i {
+  color: var(--color-main);
+  font-size: 14px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.timeline-variable-description p {
+  margin: 0;
 }

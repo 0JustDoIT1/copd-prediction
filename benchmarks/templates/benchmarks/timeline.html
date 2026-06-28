@@ -8,11 +8,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="timeline-page">
+<div class="timeline-page" id="pdfExportTarget">
 
     <div class="page-header">
-        <h1 class="page-title">추적기록 타임라인</h1>
-        <p class="page-subtitle">검사를 받을 때마다 권고 점수와 건강 지표가 어떻게 변해왔는지 확인해보세요</p>
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">추적기록 타임라인</h1>
+                <p class="page-subtitle">검사를 받을 때마다 권고 점수와 건강 지표가 어떻게 변해왔는지 확인해보세요</p>
+            </div>
+            {% if has_data %}
+            <button type="button" class="pdf-export-btn" id="pdfExportBtn">
+                <i class="bi bi-file-earmark-pdf"></i> PDF로 저장
+            </button>
+            {% endif %}
+        </div>
     </div>
 
     {% if not has_data %}
@@ -61,6 +70,12 @@
                     data-unit="%">
                 </canvas>
             </div>
+            {% if data.score_description %}
+            <div class="timeline-variable-description">
+                <i class="bi bi-info-circle"></i>
+                <p>{{ data.score_description }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -78,6 +93,12 @@
                     data-unit="{{ item.unit }}">
                 </canvas>
             </div>
+            {% if item.description %}
+            <div class="timeline-variable-description">
+                <i class="bi bi-info-circle"></i>
+                <p>{{ item.description }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
@@ -90,5 +111,16 @@
 {% if has_data %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="{% static 'benchmarks/js/timeline.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{% static 'js/pdf_export.js' %}"></script>
+<script>
+    const pdfExportBtn = document.getElementById('pdfExportBtn');
+    if (pdfExportBtn) {
+        pdfExportBtn.addEventListener('click', function () {
+            exportVisibleAreaToPdf('pdfExportTarget', '{{ pdf_filename }}');
+        });
+    }
+</script>
 {% endif %}
 {% endblock %}
