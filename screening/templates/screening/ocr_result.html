@@ -4,17 +4,98 @@
 {% block page_title %}OCR 결과{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h5 class="mb-0">OCR 추출 결과</h5>
-  </div>
 
-  <div class="card-body">
-    <pre style="white-space: pre-wrap;">{{ ocr_result.raw_text }}</pre>
+<style>
+  .ocr-result-page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 
-    <a href="{% url 'screening:ocr_upload' %}" class="btn btn-outline-secondary">
-      다시 업로드
-    </a>
+  .ocr-result-card {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  }
+
+  .ocr-result-card .card-header {
+    background: linear-gradient(135deg, #f2fbf7, #ffffff);
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+  }
+
+  .ocr-result-card .card-body {
+    padding: 26px;
+  }
+
+  .ocr-guide-box {
+    background-color: #f8fbfa;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid var(--color-main);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    color: var(--color-dark);
+    line-height: 1.6;
+  }
+
+  .ocr-text-box {
+    background-color: #fbfdfc;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 20px;
+    min-height: 280px;
+    max-height: 520px;
+    overflow-y: auto;
+    margin-bottom: 22px;
+  }
+
+  .ocr-text-box pre {
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    margin: 0;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--color-darker);
+  }
+
+  .ocr-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .ocr-actions .btn {
+    min-width: 130px;
+    height: 42px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+</style>
+
+<div class="ocr-result-page">
+  <div class="card ocr-result-card">
+    <div class="card-header">
+      <h5 class="mb-0 fw-bold">OCR 추출 결과</h5>
+    </div>
+
+    <div class="card-body">
+      <div class="ocr-guide-box">
+        추출된 검진결과지 텍스트입니다. 자동 인식 결과이므로 실제 결과지와 비교해 확인해주세요.
+      </div>
+
+      <div class="ocr-text-box">
+        <pre>{{ ocr_result.raw_text }}</pre>
+      </div>
+
+      <div class="ocr-actions">
+        <a href="{% url 'screening:ocr_upload' %}" class="btn btn-outline-secondary">
+          다시 업로드
+        </a>
+      </div>
+    </div>
   </div>
 </div>
+
 {% endblock %}

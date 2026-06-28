@@ -10,128 +10,237 @@
 
 {% block content %}
 
-<div class="card">
+<style>
+  .result-list-page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">
-            내 검사 결과
-        </h5>
+  .result-list-card {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  }
 
-        <span class="badge bg-primary">
-            총 {{ predictions|length }}건
-        </span>
-    </div>
+  .result-list-card .card-header {
+    background: linear-gradient(135deg, #f2fbf7, #ffffff);
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+  }
 
-    <div class="card-body">
+  .result-list-card .card-body {
+    padding: 26px;
+  }
 
-        {% if predictions %}
+  .result-count-badge {
+    border-radius: 999px;
+    padding: 8px 13px;
+    font-weight: 700;
+    background-color: var(--color-main) !important;
+  }
 
-        <div class="table-responsive">
+  .result-table {
+    margin-bottom: 0;
+  }
 
-            <table class="table table-hover align-middle">
+  .result-table thead th {
+    background-color: #f8fbfa;
+    color: var(--color-muted);
+    font-size: 14px;
+    font-weight: 800;
+    border-bottom: 1px solid var(--color-border);
+    padding: 15px 14px;
+  }
 
-                <thead class="table-light">
-                    <tr>
-                        <th>제출일</th>
-                        <th>검토 상태</th>
-                        <th>판정 결과</th>
-                        <th class="text-end">상세보기</th>
-                    </tr>
-                </thead>
+  .result-table tbody td {
+    padding: 16px 14px;
+    border-bottom: 1px solid #edf3f1;
+    font-size: 14px;
+  }
 
-                <tbody>
+  .result-table tbody tr:hover {
+    background-color: #fbfdfc;
+  }
 
-                    {% for prediction in predictions %}
-                    <tr>
+  .status-badge {
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-                        <td>
-                            {{ prediction.created_at|date:"Y-m-d H:i" }}
-                        </td>
+  .detail-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 7px 13px;
+  }
 
-                        <td>
-                            {% if prediction.decision %}
-                                <span class="badge bg-success">
-                                    검토 완료
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary">
-                                    검토 대기
-                                </span>
-                            {% endif %}
-                        </td>
+  .empty-result-box {
+    background-color: #fbfdfc;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 54px 24px;
+  }
 
-                        <td>
+  .empty-icon {
+    width: 78px;
+    height: 78px;
+    border-radius: 24px;
+    background-color: var(--color-bg);
+    color: var(--color-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+  }
 
-                            {% if prediction.decision %}
+  .empty-result-box h5 {
+    color: var(--color-dark);
+    font-weight: 800;
+  }
 
-                                {% if prediction.decision.decision == "recommend" %}
-                                    <span class="text-danger fw-semibold">
-                                        폐활량검사 권고
-                                    </span>
-                                {% else %}
-                                    <span class="text-success fw-semibold">
-                                        정상
-                                    </span>
-                                {% endif %}
+  .empty-result-box .btn {
+    min-width: 150px;
+    height: 44px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
 
-                            {% else %}
+  @media (max-width: 768px) {
+    .result-list-card .card-body {
+      padding: 20px;
+    }
 
-                                <span class="text-muted">
-                                    의사 검토 중
-                                </span>
+    .result-table {
+      min-width: 720px;
+    }
+  }
+</style>
 
-                            {% endif %}
+<div class="result-list-page">
+  <div class="card result-list-card">
 
-                        </td>
+      <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">
+              내 검사 결과
+          </h5>
 
-                        <td class="text-end">
-                            <a
-                                href="{% url 'screening:result_detail' prediction.id %}"
-                                class="btn btn-outline-primary btn-sm"
-                            >
-                                확인하기
-                            </a>
-                        </td>
+          <span class="badge bg-primary result-count-badge">
+              총 {{ predictions|length }}건
+          </span>
+      </div>
 
-                    </tr>
-                    {% endfor %}
+      <div class="card-body">
 
-                </tbody>
+          {% if predictions %}
 
-            </table>
+          <div class="table-responsive">
 
-        </div>
+              <table class="table table-hover align-middle result-table">
 
-        {% else %}
+                  <thead>
+                      <tr>
+                          <th>제출일</th>
+                          <th>검토 상태</th>
+                          <th>판정 결과</th>
+                          <th class="text-end">상세보기</th>
+                      </tr>
+                  </thead>
 
-        <div class="text-center py-5">
+                  <tbody>
 
-            <i
-                class="bi bi-clipboard-x"
-                style="font-size:60px; color:#cfd8dc;"
-            ></i>
+                      {% for prediction in predictions %}
+                      <tr>
 
-            <h5 class="mt-3">
-                아직 제출한 검사 결과가 없습니다.
-            </h5>
+                          <td>
+                              {{ prediction.created_at|date:"Y-m-d H:i" }}
+                          </td>
 
-            <p class="text-muted">
-                COPD 선별 문진과 건강검진 정보를 먼저 입력해주세요.
-            </p>
+                          <td>
+                              {% if prediction.decision %}
+                                  <span class="badge bg-success status-badge">
+                                      검토 완료
+                                  </span>
+                              {% else %}
+                                  <span class="badge bg-secondary status-badge">
+                                      검토 대기
+                                  </span>
+                              {% endif %}
+                          </td>
 
-            <a
-                href="{% url 'screening:questionnaire' %}"
-                class="btn btn-primary"
-            >
-                문진 시작하기
-            </a>
+                          <td>
 
-        </div>
+                              {% if prediction.decision %}
 
-        {% endif %}
+                                  {% if prediction.decision.decision == "recommend" %}
+                                      <span class="text-danger fw-semibold">
+                                          폐활량검사 권고
+                                      </span>
+                                  {% else %}
+                                      <span class="text-success fw-semibold">
+                                          정상
+                                      </span>
+                                  {% endif %}
 
-    </div>
+                              {% else %}
 
+                                  <span class="text-muted">
+                                      의사 검토 중
+                                  </span>
+
+                              {% endif %}
+
+                          </td>
+
+                          <td class="text-end">
+                              <a
+                                  href="{% url 'screening:result_detail' prediction.id %}"
+                                  class="btn btn-outline-primary btn-sm detail-btn"
+                              >
+                                  확인하기
+                              </a>
+                          </td>
+
+                      </tr>
+                      {% endfor %}
+
+                  </tbody>
+
+              </table>
+
+          </div>
+
+          {% else %}
+
+          <div class="text-center empty-result-box">
+
+              <div class="empty-icon">
+                <i class="bi bi-clipboard-x"></i>
+              </div>
+
+              <h5 class="mt-3">
+                  아직 제출한 검사 결과가 없습니다.
+              </h5>
+
+              <p class="text-muted">
+                  COPD 선별 문진과 건강검진 정보를 먼저 입력해주세요.
+              </p>
+
+              <a
+                  href="{% url 'screening:questionnaire' %}"
+                  class="btn btn-primary"
+              >
+                  문진 시작하기
+              </a>
+
+          </div>
+
+          {% endif %}
+
+      </div>
+
+  </div>
 </div>
 
 {% endblock %}

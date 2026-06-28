@@ -4,54 +4,224 @@
 {% block page_title %}검사 결과 상세{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h5 class="mb-0">폐활량검사 권고 검토 상태</h5>
-  </div>
 
-  <div class="card-body">
+<style>
+  .result-detail-page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
 
-    {% if prediction.decision %}
+  .result-detail-card {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  }
 
-      {% if prediction.decision.decision == "recommend" %}
-        <div class="alert-warning-soft mb-4">
-          <strong>폐활량검사 권고</strong><br>
-          담당 의사 검토 결과, 폐활량검사를 받아보실 것을 권고합니다.
-        </div>
-      {% elif prediction.decision.decision == "normal" %}
-        <div class="alert-warning-soft mb-4">
-          <strong>정상</strong><br>
-          담당 의사 검토 결과, 현재 추가적인 폐활량검사 권고 사항은 없습니다.
-        </div>
-      {% endif %}
+  .result-detail-card .card-header {
+    background: linear-gradient(135deg, #f2fbf7, #ffffff);
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+  }
 
-      {% if prediction.decision.memo %}
-        <div class="mt-4">
-          <h6>의사 메모</h6>
-          <p>{{ prediction.decision.memo }}</p>
-        </div>
-      {% endif %}
+  .result-detail-card .card-body {
+    padding: 28px;
+  }
 
-    {% else %}
-      <div class="alert-warning-soft mb-4">
-        <strong>의사 검토 대기</strong><br>
-        입력하신 문진 및 건강검진 정보가 정상적으로 제출되었습니다.
-        담당 의사의 검토 후 결과가 표시됩니다.
-      </div>
-    {% endif %}
+  .result-status-box {
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--color-border);
+    background-color: #fbfdfc;
+    border-left: 6px solid var(--color-main);
+  }
 
-    <hr>
+  .result-status-box.recommend {
+    background-color: #fff8f4;
+    border-left-color: var(--color-danger);
+  }
 
-    <p class="text-muted mb-0">
-      이 결과는 COPD 확정 진단이 아니며, 정확한 판단은 의료진 상담 및 필요한 검사를 통해 이루어집니다.
-    </p>
+  .result-status-box.normal {
+    background-color: #f6fbf8;
+    border-left-color: var(--color-main);
+  }
 
-    <div class="mt-4">
-      <a href="{% url 'screening:result_list' %}" class="btn btn-outline-secondary">
-        ← 목록으로 돌아가기
-      </a>
+  .result-status-box.pending {
+    background-color: #fffdf7;
+    border-left-color: var(--color-warning);
+  }
+
+  .status-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin-bottom: 10px;
+  }
+
+  .status-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .status-desc {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.7;
+    font-size: 14.5px;
+  }
+
+  .doctor-memo-box {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 24px;
+  }
+
+  .doctor-memo-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 4px solid var(--color-main);
+  }
+
+  .doctor-memo-text {
+    margin: 0;
+    color: var(--color-darker);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  .notice-box {
+    background-color: #f8fbfa;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 18px;
+    color: var(--color-muted);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+
+  .result-actions {
+    border-top: 1px solid var(--color-border);
+    padding-top: 24px;
+    margin-top: 24px;
+  }
+
+  .result-actions .btn {
+    min-width: 160px;
+    height: 44px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .result-detail-card .card-body {
+      padding: 22px;
+    }
+
+    .result-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .result-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="result-detail-page">
+  <div class="card result-detail-card">
+    <div class="card-header">
+      <h5 class="mb-0 fw-bold">폐활량검사 권고 검토 상태</h5>
     </div>
 
+    <div class="card-body">
+
+      {% if prediction.decision %}
+
+        {% if prediction.decision.decision == "recommend" %}
+          <div class="result-status-box recommend">
+            <div class="status-title">
+              <span class="status-icon">🫁</span>
+              폐활량검사 권고
+            </div>
+            <p class="status-desc">
+              담당 의사 검토 결과, 폐활량검사를 받아보실 것을 권고합니다.
+            </p>
+          </div>
+        {% elif prediction.decision.decision == "normal" %}
+          <div class="result-status-box normal">
+            <div class="status-title">
+              <span class="status-icon">✓</span>
+              정상
+            </div>
+            <p class="status-desc">
+              담당 의사 검토 결과, 현재 추가적인 폐활량검사 권고 사항은 없습니다.
+            </p>
+          </div>
+        {% endif %}
+
+        {% if prediction.decision.memo %}
+          <div class="doctor-memo-box">
+            <h6 class="doctor-memo-title">의사 메모</h6>
+            <p class="doctor-memo-text">{{ prediction.decision.memo }}</p>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="result-status-box pending">
+          <div class="status-title">
+            <span class="status-icon">⏳</span>
+            의사 검토 대기
+          </div>
+          <p class="status-desc">
+            입력하신 문진 및 건강검진 정보가 정상적으로 제출되었습니다.
+            담당 의사의 검토 후 결과가 표시됩니다.
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="notice-box">
+        이 결과는 COPD 확정 진단이 아니며, 정확한 판단은 의료진 상담 및 필요한 검사를 통해 이루어집니다.
+      </div>
+
+      <div class="d-flex justify-content-between result-actions">
+
+        <a
+          href="{% url 'screening:result_list' %}"
+          class="btn btn-outline-secondary"
+        >
+          ← 목록으로 돌아가기
+        </a>
+
+        {% if prediction.decision and prediction.decision.decision == "recommend" %}
+          <a
+            href="/appoint/"
+            class="btn btn-primary"
+          >
+            폐활량검사 예약하기
+          </a>
+        {% endif %}
+
+      </div>
+
+    </div>
   </div>
 </div>
+
 {% endblock %}

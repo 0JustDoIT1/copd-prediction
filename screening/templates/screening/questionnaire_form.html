@@ -1,17 +1,133 @@
+```html
 {% extends "base.html" %}
 
 {% block title %}COPD 선별 문진 | 미래의료병원{% endblock %}
 {% block page_title %}COPD 선별 문진{% endblock %}
 
 {% block content %}
-<div class="card">
+
+<style>
+  .questionnaire-card {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.05);
+  }
+
+  .questionnaire-card .card-header {
+    background: linear-gradient(135deg, #f2fbf7, #ffffff);
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+  }
+
+  .questionnaire-card .card-body {
+    padding: 28px;
+  }
+
+  .guide-box {
+    background-color: #f8fbfa;
+    border: 1px solid var(--color-border);
+    border-left: 5px solid var(--color-main);
+    border-radius: 16px;
+    padding: 16px 18px;
+    line-height: 1.7;
+    color: var(--color-dark);
+  }
+
+  .question-box {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 22px;
+    height: 100%;
+    transition: all 0.15s ease;
+  }
+
+  .question-box:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  .question-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 16px;
+  }
+
+  .question-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: var(--color-bg);
+    color: var(--color-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  form select,
+  form input[type="number"] {
+    width: 100%;
+    border-radius: 12px !important;
+    border: 1px solid var(--color-border) !important;
+    padding: 10px 12px;
+  }
+
+  form select:focus,
+  form input[type="number"]:focus {
+    border-color: var(--color-main) !important;
+    box-shadow: 0 0 0 3px rgba(74,124,114,0.12) !important;
+  }
+
+  .form-check {
+    background: #f8fbfa;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .form-text {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .next-btn {
+    min-width: 230px;
+    height: 46px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+
+  @media (max-width:768px) {
+    .questionnaire-card .card-body {
+      padding: 20px;
+    }
+
+    .next-btn {
+      width: 100%;
+    }
+
+    .text-end {
+      text-align: center !important;
+    }
+  }
+</style>
+
+<div class="card questionnaire-card">
   <div class="card-header">
     <h5 class="mb-0">문진 정보 입력</h5>
   </div>
 
   <div class="card-body">
 
-    <div class="alert-warning-soft mb-4">
+    <div class="guide-box mb-4">
       폐활량검사 권고 여부 판단을 위한 간단한 문진입니다.
     </div>
 
@@ -20,61 +136,70 @@
 
       <div class="row g-4">
 
-        <!-- 흡연 상태 -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">
-            흡연 상태
-          </label>
-          {{ form.smoking_status }}
-        </div>
+          <div class="question-box">
+            <div class="question-title">
+              <span class="question-icon">🚬</span>
+              흡연 상태
+            </div>
 
-        <!-- 하루 흡연량 -->
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">
-            하루 흡연량 (개비/일)
-          </label>
-
-          {{ form.smoking_amount }}
-
-          <div class="form-text">
-            현재 흡연 중인 경우 하루 평균 흡연 개비 수를 입력해주세요.<br>
-            비흡연자와 과거흡연자는 0을 입력합니다.
+            {{ form.smoking_status }}
           </div>
         </div>
 
-        <!-- 기침 -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">
-            기침
-          </label>
+          <div class="question-box">
+            <div class="question-title">
+              <span class="question-icon">📊</span>
+              하루 흡연량 (개비/일)
+            </div>
 
-          <div class="form-check">
-            {{ form.cough }}
-            <label class="form-check-label">
-              3개월 이상 기침이 지속되었습니다.
-            </label>
-          </div>
+            {{ form.smoking_amount }}
 
-          <div class="form-text">
-            감기와 관계없이 기침이 3개월 이상 계속된 경우 체크해주세요.
+            <div class="form-text">
+              현재 흡연 중인 경우 하루 평균 흡연 개비 수를 입력해주세요.<br>
+              비흡연자와 과거흡연자는 0을 입력합니다.
+            </div>
           </div>
         </div>
 
-        <!-- 가래 -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">
-            가래
-          </label>
+          <div class="question-box">
+            <div class="question-title">
+              <span class="question-icon">😷</span>
+              기침
+            </div>
 
-          <div class="form-check">
-            {{ form.sputum }}
-            <label class="form-check-label">
-              3개월 이상 가래가 지속되었습니다.
-            </label>
+            <div class="form-check">
+              {{ form.cough }}
+              <label class="form-check-label">
+                3개월 이상 기침이 지속되었습니다.
+              </label>
+            </div>
+
+            <div class="form-text">
+              감기와 관계없이 기침이 3개월 이상 계속된 경우 체크해주세요.
+            </div>
           </div>
+        </div>
 
-          <div class="form-text">
-            감기와 관계없이 가래가 3개월 이상 계속된 경우 체크해주세요.
+        <div class="col-md-6">
+          <div class="question-box">
+            <div class="question-title">
+              <span class="question-icon">🫁</span>
+              가래
+            </div>
+
+            <div class="form-check">
+              {{ form.sputum }}
+              <label class="form-check-label">
+                3개월 이상 가래가 지속되었습니다.
+              </label>
+            </div>
+
+            <div class="form-text">
+              감기와 관계없이 가래가 3개월 이상 계속된 경우 체크해주세요.
+            </div>
           </div>
         </div>
 
@@ -85,9 +210,9 @@
       <div class="text-end">
         <button
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-primary next-btn"
         >
-          다음: 건강검진 수치 입력
+          다음 : 건강검진 수치 입력
         </button>
       </div>
 
@@ -95,4 +220,6 @@
 
   </div>
 </div>
+
 {% endblock %}
+```
