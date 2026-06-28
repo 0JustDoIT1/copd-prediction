@@ -8,11 +8,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="risk-factors-page">
+<div class="risk-factors-page" id="pdfExportTarget">
 
     <div class="page-header">
-        <h1 class="page-title">위험요인 시각화</h1>
-        <p class="page-subtitle">최근 검사에서 권고 점수에 가장 크게 영향을 준 요인들을 확인해보세요</p>
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">위험요인 시각화</h1>
+                <p class="page-subtitle">최근 검사에서 권고 점수에 가장 크게 영향을 준 요인들을 확인해보세요</p>
+            </div>
+            {% if has_data and data.factors %}
+            <button type="button" class="pdf-export-btn" id="pdfExportBtn">
+                <i class="bi bi-file-earmark-pdf"></i> PDF로 저장
+            </button>
+            {% endif %}
+        </div>
     </div>
 
     {% if not has_data %}
@@ -77,4 +86,20 @@
 
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_data and data.factors %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{% static 'js/pdf_export.js' %}"></script>
+<script>
+    const pdfExportBtn = document.getElementById('pdfExportBtn');
+    if (pdfExportBtn) {
+        pdfExportBtn.addEventListener('click', function () {
+            exportVisibleAreaToPdf('pdfExportTarget', '{{ pdf_filename }}');
+        });
+    }
+</script>
+{% endif %}
 {% endblock %}

@@ -8,11 +8,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="age-compare-page">
+<div class="age-compare-page" id="pdfExportTarget">
 
     <div class="page-header">
-        <h1 class="page-title">동연령대 비교 리포트</h1>
-        <p class="page-subtitle">나와 같은 연령대·성별의 평균과 비교해볼 수 있어요</p>
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">동연령대 비교 리포트</h1>
+                <p class="page-subtitle">나와 같은 연령대·성별의 평균과 비교해볼 수 있어요</p>
+            </div>
+            {% if has_data %}
+            <button type="button" class="pdf-export-btn" id="pdfExportBtn">
+                <i class="bi bi-file-earmark-pdf"></i> PDF로 저장
+            </button>
+            {% endif %}
+        </div>
     </div>
 
     {% if not has_data %}
@@ -123,5 +132,17 @@
     window.SCORE_COMPARISON = {{ data.score_comparison|default:"null"|safe }};
 </script>
 <script src="{% static 'benchmarks/js/age_compare.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{% static 'js/pdf_export.js' %}"></script>
+<script>
+    const pdfExportBtn = document.getElementById('pdfExportBtn');
+    if (pdfExportBtn) {
+        pdfExportBtn.addEventListener('click', function () {
+            // 지금 화면에 보이는 모습(현재 선택된 탭 1개) 그대로를 PDF로 저장한다.
+            exportVisibleAreaToPdf('pdfExportTarget', '{{ pdf_filename }}');
+        });
+    }
+</script>
 {% endif %}
 {% endblock %}

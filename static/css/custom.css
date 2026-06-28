@@ -1,3 +1,42 @@
+/* ===================== 웹폰트: 에스코어드림(SCDream) ===================== */
+/* 의료 신뢰감을 위해 Pretendard에서 SCDream으로 교체.
+   9단계 굵기 중 본문~제목에 자주 쓰이는 5단계만 로드해 로딩 속도를 확보. */
+@font-face {
+  font-family: "SCDream";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff")
+    format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SCDream";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff")
+    format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SCDream";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff")
+    format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SCDream";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff")
+    format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SCDream";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff")
+    format("woff");
+  font-weight: 800;
+  font-display: swap;
+}
+
 :root {
   --color-bg: #f0f7f5;
   --color-accent: #a8cdc3;
@@ -19,6 +58,7 @@
 body {
   margin: 0;
   font-family:
+    "SCDream",
     "Pretendard",
     -apple-system,
     "Segoe UI",

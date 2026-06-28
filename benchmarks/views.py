@@ -2,6 +2,7 @@ import json
 
 from django.shortcuts import render
 
+from common.utils.pdf_filename import build_pdf_filename
 from .services import get_age_compare_context, get_timeline_context, get_risk_factors_context
 
 
@@ -19,6 +20,7 @@ def age_compare_view(request):
         'data': context,
         'active_group': 'benchmarks',
         'active_menu': 'age_compare',
+        'pdf_filename': build_pdf_filename('동연령대비교리포트', request.user.name),
     })
 
 
@@ -43,6 +45,7 @@ def timeline_view(request):
         'data': context,
         'active_group': 'benchmarks',
         'active_menu': 'tracking',
+        'pdf_filename': build_pdf_filename('추적기록타임라인', request.user.name),
     })
 
 
@@ -61,4 +64,5 @@ def risk_factors_view(request):
         'data': context,
         'active_group': 'benchmarks',
         'active_menu': 'risk_factors',
+        'pdf_filename': build_pdf_filename('위험요인시각화', request.user.name),
     })

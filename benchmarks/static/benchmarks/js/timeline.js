@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       options: {
         maintainAspectRatio: false,
+        devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2), // PDF 캡처 시 흐려지지 않도록 캔버스 자체 해상도를 높임
         plugins: {
           legend: { display: false },
           tooltip: {
