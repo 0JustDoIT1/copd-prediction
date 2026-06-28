@@ -44,3 +44,8 @@ Thumbs.db
 
 # ocr_json키
 secrets/
+
+# Google Cloud API Key
+google_ocr_key.json
+copd-ocr-500805-25013272a0de.json
+

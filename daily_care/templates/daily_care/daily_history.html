@@ -30,7 +30,7 @@
 <div class="container-fluid p-0">
 
     <div class="card dc-card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
-        <form method="get" class="row g-3 align-items-center">
+        <form method="get" class="row g-3 align-items-center" id="filterForm">
             <div class="col-12 col-sm-auto">
                 <span class="fw-medium text-secondary"><i class="bi bi-funnel me-1"></i> 조회 기간 선택</span>
             </div>
@@ -114,7 +114,7 @@
         </div>
 
         <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
-            <table class="table table-hover align-middle mb-0 table-sticky" style="min-width: 700px;">
+            <table class="table table-hover align-middle mb-0 table-sticky" style="min-width: 760px;">
                 <thead class="table-light text-secondary small fw-bold">
                     <tr>
                         <th style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;">날짜</th>
@@ -123,7 +123,8 @@
                         <th>산소포화도</th>
                         <th>기침/가래</th>
                         <th>호흡운동</th>
-                        <th style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; width: 30%;">컨디션 메모</th>
+                        <th style="width: 26%;">컨디션 메모</th>
+                        <th class="text-center" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px;">수정</th>
                     </tr>
                 </thead>
                 <tbody class="text-dark fs-7">
@@ -171,10 +172,16 @@
                         <td class="text-truncate text-muted small" style="max-width: 200px;" title="{{ log.memo }}">
                             {{ log.memo|default:"-" }}
                         </td>
+                        <td class="text-center">
+                            <a href="{% url 'daily_care:log_edit' log.pk %}"
+                               class="btn btn-sm btn-outline-secondary" style="border-radius: 6px;" title="수정">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             <i class="bi bi-database-x fs-2 d-block mb-2"></i>
                             {% if request.GET.start or request.GET.end %}
                                 선택한 기간({{ request.GET.start|default:"전체" }} ~ {{ request.GET.end|default:"전체" }}) 내에 등록된 기록이 없습니다.<br>
@@ -194,7 +201,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/chart.js)"></script>
 <script>
     // ── 빠른 기간 선택 ──
     function setQuickRange(days) {
@@ -202,11 +209,19 @@
         const start = new Date();
         start.setDate(end.getDate() - (days - 1));
 
-        const fmt = (d) => d.toISOString().split('T')[0];
+        // 로컬(한국) 시간 기준 날짜 포맷 — toISOString의 UTC 하루 밀림 방지
+        const fmt = (d) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+
         document.getElementById('startInput').value = fmt(start);
         document.getElementById('endInput').value = fmt(end);
 
-        document.querySelector('form').submit();
+        // 로그아웃 폼이 아니라 조회 폼만 콕 집어 제출
+        document.getElementById('filterForm').submit();
     }
 
     document.addEventListener("DOMContentLoaded", function() {

@@ -11,4 +11,8 @@ urlpatterns = [
     path("checkin/", views.CheckinView.as_view(), name="checkin"),
     # 히스토리 목록
     path("history/", views.HistoryView.as_view(), name="history"),
+
+    path("calendar/events/", views.calendar_events_api, name="calendar_events"),
+    path('history/<int:pk>/edit/', views.LogUpdateView.as_view(), name='log_edit'),
+
 ]

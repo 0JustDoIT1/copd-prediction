@@ -13,9 +13,10 @@ grpcio==1.81.1
 grpcio-status==1.81.1
 idna==3.18
 joblib==1.5.3
+joLib==0.0.1
 mysqlclient==2.2.8
 narwhals==2.22.1
-numpy==2.5.0
+numpy==2.4.6
 pillow==12.2.0
 proto-plus==1.28.0
 protobuf==7.35.1
@@ -26,7 +27,7 @@ python-decouple==3.8
 python-dotenv==1.2.2
 requests==2.34.2
 scikit-learn==1.9.0
-scipy==1.18.0
+scipy==1.17.1
 sqlparse==0.5.5
 threadpoolctl==3.6.0
 typing_extensions==4.15.0

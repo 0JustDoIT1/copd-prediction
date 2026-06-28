@@ -14,7 +14,7 @@
     box-shadow: 0 10px 24px rgba(0,0,0,.08) !important;
 }
 .dc-greeting {
-    background: linear-gradient(135deg, #0D9488 0%, #14b8a6 100%);
+    background: linear-gradient(135deg, #2c4a44 0%, #4a7c72 100%);
     border-radius: 16px;
     padding: 1.5rem 1.75rem;
     color: white;
@@ -23,14 +23,6 @@
 }
 .dc-memo-card {
     border-left: 4px solid #0D9488;
-}
-.dc-week-circle {
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .2s ease;
 }
 .dc-metric-num {
     font-size: 2.3rem;
@@ -47,8 +39,6 @@
     border-radius: 20px;
     margin-bottom: 0.75rem;
 }
-
-/* ── 호흡 애니메이션 (들숨-멈춤-날숨) ── */
 .dc-lung-wrap {
     position: relative;
     display: inline-flex;
@@ -69,8 +59,6 @@
     85%  { transform: scale(1);    opacity: .85; }
     100% { transform: scale(1);    opacity: .85; }
 }
-
-/* ── 숨을 내뱉듯 퍼지는 링 ── */
 .dc-lung-wrap::before,
 .dc-lung-wrap::after {
     content: '';
@@ -80,17 +68,13 @@
     border: 2px solid rgba(255,255,255,.5);
     animation: dcBreathRing 4s ease-out infinite;
 }
-.dc-lung-wrap::after {
-    animation-delay: 2s;
-}
+.dc-lung-wrap::after { animation-delay: 2s; }
 @keyframes dcBreathRing {
     0%   { transform: scale(0.7); opacity: 0; }
     35%  { transform: scale(0.7); opacity: 0; }
     50%  { transform: scale(0.7); opacity: .7; }
     100% { transform: scale(2.0); opacity: 0; }
 }
-
-/* ── 인사말 카드 배경 호흡 파형 ── */
 .dc-breath-wave {
     position: absolute;
     bottom: 8px;
@@ -104,13 +88,15 @@
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
 }
+#dc-calendar .fc-toolbar-title { font-size: 1rem; font-weight: 700; }
+#dc-calendar .fc-event { cursor: pointer; font-size: 0.72rem; border: none; }
+#dc-calendar .fc-daygrid-day-number { font-size: 0.8rem; }
 </style>
 
 <div class="container-fluid p-0">
 
     <!-- ── 인사말 헤더 ── -->
     <div class="dc-greeting d-flex justify-content-between align-items-center mb-4">
-        <!-- 배경 호흡 파형 (장식용, 완만한 사인 곡선) -->
         <svg class="dc-breath-wave" viewBox="0 0 600 40" preserveAspectRatio="none" style="z-index: 0;">
             <path d="M0,20 C25,5 50,5 75,20 C100,35 125,35 150,20
                      C175,5 200,5 225,20 C250,35 275,35 300,20
@@ -118,7 +104,6 @@
                      C475,5 500,5 525,20 C550,35 575,35 600,20"
                   fill="none" stroke="white" stroke-width="2" />
         </svg>
-
         <div style="position: relative; z-index: 1;">
             <h5 class="fw-bold mb-1" style="color: white;">
                 {{ request.user.first_name|default:request.user.username|default:"환자" }}님, 안녕하세요 👋
@@ -127,7 +112,6 @@
                 {% now "n월 j일" %} · 오늘도 건강 기록 잊지 마세요
             </p>
         </div>
-
         <div class="dc-lung-wrap" style="z-index: 1;">
             <i class="bi bi-lungs dc-lung-icon"></i>
         </div>
@@ -141,7 +125,6 @@
         </div>
     </div>
     {% else %}
-    <!-- ── 빈 상태 CTA 배너 ── -->
     <div class="alert d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background-color: #e0f2f1; color: #00695c;">
         <div class="d-flex align-items-center">
             <i class="bi bi-pencil-square fs-3 me-2"></i>
@@ -155,7 +138,6 @@
     </div>
     {% endif %}
 
-    <!-- ── 위험 신호 경고 배너 ── -->
     {% if checked_in_today and today_log.spo2 and today_log.spo2 < 95 or checked_in_today and today_log.dyspnea_grade >= 3 %}
     <div class="alert d-flex align-items-start mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background-color: #ffebee; color: #c62828;">
         <i class="bi bi-exclamation-triangle fs-3 me-2 flex-shrink-0"></i>
@@ -176,6 +158,7 @@
     <!-- ── 지표 카드 4개 ── -->
     <div class="row g-4">
 
+        <!-- 흡연량 카드 -->
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card dc-card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -200,6 +183,7 @@
             </div>
         </div>
 
+        <!-- 호흡 곤란 등급 카드 -->
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card dc-card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -212,10 +196,27 @@
                     </h3>
                     <span class="text-muted ms-2" style="font-size: 0.9rem;">단계</span>
                 </div>
-                <p class="text-muted small mt-2 mb-0">0(정상) ~ 4(심함) 단계 기준</p>
+                <p class="text-muted small mt-2 mb-0">
+                    {% if checked_in_today %}
+                        {% if today_log.dyspnea_grade == 0 %}
+                            0단계 · 심한 운동 시에만 호흡 곤란
+                        {% elif today_log.dyspnea_grade == 1 %}
+                            1단계 · 빠르게 걷거나 언덕 오를 때 호흡 곤란
+                        {% elif today_log.dyspnea_grade == 2 %}
+                            2단계 · 동년배보다 천천히 걷거나 자주 멈춤
+                        {% elif today_log.dyspnea_grade == 3 %}
+                            3단계 · 100m 걷기도 힘들어 자주 쉬어야 함
+                        {% elif today_log.dyspnea_grade == 4 %}
+                            4단계 · 집 밖 외출 불가, 옷 입기도 힘듦
+                        {% endif %}
+                    {% else %}
+                        0(정상) ~ 4(심함) 단계 기준
+                    {% endif %}
+                </p>
             </div>
         </div>
 
+        <!-- 산소포화도 카드 -->
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card dc-card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -232,6 +233,7 @@
             </div>
         </div>
 
+        <!-- 증상 카드 -->
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card dc-card h-100 p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -264,7 +266,7 @@
                 </h5>
                 <p class="mb-0" style="color: #555; line-height: 1.6; {% if checked_in_today and today_log.memo %}font-style: italic;{% endif %}">
                     {% if checked_in_today and today_log.memo %}
-                        “{{ today_log.memo }}”
+                        "{{ today_log.memo }}"
                     {% elif checked_in_today %}
                         <span class="text-muted fst-italic">기록된 컨디션 메모가 없습니다.</span>
                     {% else %}
@@ -283,7 +285,7 @@
                     <i class="bi bi-graph-up text-muted me-1"></i> 흡연량 추세 (최근 30일)
                 </h5>
                 <span id="smokingWeekStat" class="dc-chart-stat"></span>
-                <canvas id="smokingChart" height="160"></canvas>
+                <canvas id="smokingChart" height="200"></canvas>
                 <p id="smokingTrendNote" class="text-muted small mt-2 mb-0"></p>
             </div>
         </div>
@@ -293,50 +295,137 @@
                     <i class="bi bi-bar-chart text-muted me-1"></i> 호흡 곤란 등급 (최근 30일)
                 </h5>
                 <span id="gradeWeekStat" class="dc-chart-stat"></span>
-                <canvas id="gradeChart" height="160"></canvas>
+                <canvas id="gradeChart" height="200"></canvas>
+
             </div>
         </div>
     </div>
 
-    <!-- ── 주간 달성률 ── -->
+    <!-- ── 체크인 달성률 (주간 / 월간) ── -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dc-card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
+                <h5 class="fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                    <i class="bi bi-calendar-check text-muted me-1"></i> 체크인 달성률
+                </h5>
+                <div class="row g-4 align-items-center">
+
+                    <!-- 주간: 막대바 -->
+                    <div class="col-md-7">
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <span class="small fw-medium text-secondary">이번 주 (최근 7일)</span>
+                            <span class="fw-bold" style="color: #0D9488;">{{ weekly_rate }}%</span>
+                        </div>
+                        <div class="progress" style="height: 12px; border-radius: 8px; background:#e9ecef;">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ weekly_rate }}%; background-color: #0D9488; border-radius: 8px;"
+                                 aria-valuenow="{{ weekly_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="small text-muted mt-1">최근 7일 중 기록한 날의 비율이에요.</div>
+                    </div>
+
+                    <!-- 월간: 원형 게이지 -->
+                    <div class="col-md-5">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <div style="position: relative; width: 96px; height: 96px;">
+                                <svg width="96" height="96" viewBox="0 0 96 96">
+                                    <circle cx="48" cy="48" r="40" fill="none" stroke="#e9ecef" stroke-width="10"></circle>
+                                    <circle cx="48" cy="48" r="40" fill="none" stroke="#0D9488" stroke-width="10"
+                                            stroke-linecap="round" transform="rotate(-90 48 48)"
+                                            stroke-dasharray="251.2"
+                                            stroke-dashoffset="{{ monthly_dashoffset }}"></circle>
+                                </svg>
+                                <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                                    <span class="fw-bold" style="font-size:1.1rem; color:#0D9488;">{{ monthly_rate }}%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="small fw-medium text-secondary">이번 달 (최근 30일)</div>
+                                <div class="small text-muted">30일 기준 달성률</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 풀캘린더 ── -->
     <div class="row mt-4 mb-4">
         <div class="col-12">
             <div class="card dc-card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0" style="font-size: 1.1rem; color: #333;">
-                        <i class="bi bi-calendar-check text-muted me-1"></i> 주간 체크인 달성률
+                        <i class="bi bi-calendar3 text-muted me-1"></i> 체크인 캘린더
                     </h5>
-                    <span class="fw-bold fs-5" style="color: #0D9488;">{{ weekly_rate }}%</span>
+                    <span class="small" style="color:#555;">
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0D9488;margin-right:4px;"></span>양호
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#F59E0B;margin-left:8px;margin-right:4px;"></span>주의
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#EF4444;margin-left:8px;margin-right:4px;"></span>심함
+                    </span>
                 </div>
-                <div class="d-flex justify-content-around">
-                    {% for day in weekly %}
-                    <div class="text-center">
-                        <div class="dc-week-circle rounded-circle mx-auto mb-1"
-                             style="background: {% if day.checked %}#0D9488{% else %}#E2E8F0{% endif %};">
-                            {% if day.checked %}<i class="bi bi-check-lg" style="color: white; font-size: 1rem;"></i>{% endif %}
-                        </div>
-                        <div class="small text-muted">{{ day.day }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
+                <div id="dc-calendar"></div>
             </div>
         </div>
     </div>
 
 </div>
+
+<!-- ── 상세 팝업 모달 ── -->
+<div class="modal fade" id="logDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 14px;">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="modalDate"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="row g-2 text-center mb-3">
+                    <div class="col-4">
+                        <div class="p-2 rounded" style="background:#ffebee;">
+                            <div class="fw-bold" style="color:#c62828; font-size:1.4rem;" id="modalSmoking">-</div>
+                            <div class="small text-muted">흡연량(개비)</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded" style="background:#e3f2fd;">
+                            <div class="fw-bold" style="color:#1565c0; font-size:1.4rem;" id="modalGrade">-</div>
+                            <div class="small text-muted">mMRC 등급</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded" style="background:#e0f7fa;">
+                            <div class="fw-bold" style="color:#00838f; font-size:1.4rem;" id="modalSpo2">-</div>
+                            <div class="small text-muted">SpO₂(%)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mb-3" id="modalBadges"></div>
+                <div id="modalMemoWrap" class="p-3 rounded" style="background:#f5f5f5; display:none;">
+                    <i class="bi bi-journal-text text-muted me-1"></i>
+                    <span id="modalMemo" style="font-style:italic; color:#555;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales/ko.global.min.js"></script>
+
 <script>
 const labels  = {{ chart_labels|safe }};
 const smoking = {{ chart_smoking|safe }};
 const grade   = {{ chart_grade|safe }};
 
-// ── 30일 평균 계산 (평균선용) ──
 const smokingAvg = smoking.length
-    ? smoking.reduce((sum, v) => sum + v, 0) / smoking.length
-    : 0;
+    ? smoking.reduce((sum, v) => sum + v, 0) / smoking.length : 0;
 const avgLine = labels.map(() => smokingAvg);
 
 new Chart(document.getElementById('smokingChart'), {
@@ -349,9 +438,7 @@ new Chart(document.getElementById('smokingChart'), {
                 data: smoking,
                 borderColor: '#EF4444',
                 backgroundColor: 'rgba(239,68,68,.1)',
-                fill: true,
-                tension: 0.35,
-                pointRadius: 3,
+                fill: true, tension: 0.35, pointRadius: 3,
             },
             {
                 label: '30일 평균',
@@ -359,19 +446,13 @@ new Chart(document.getElementById('smokingChart'), {
                 borderColor: '#9CA3AF',
                 borderDash: [6, 4],
                 borderWidth: 1.5,
-                pointRadius: 0,
-                fill: false,
+                pointRadius: 0, fill: false,
             }
         ]
     },
     options: {
         responsive: true,
-        plugins: {
-            legend: {
-                display: true,
-                labels: { boxWidth: 12, font: { size: 11 } }
-            }
-        },
+        plugins: { legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } } },
         scales: { y: { beginAtZero: true } }
     }
 });
@@ -382,18 +463,33 @@ new Chart(document.getElementById('gradeChart'), {
         labels,
         datasets: [{
             data: grade,
-            backgroundColor: '#F59E0B',
-            borderRadius: 4,
+            backgroundColor: 'rgba(245, 158, 11, 0.75)',
+            borderRadius: 6,
+            barPercentage: 0.55,
+            categoryPercentage: 0.7,
+            maxBarThickness: 20
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } }
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 4,
+                ticks: { stepSize: 1 },
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                border: { display: false }
+            },
+            x: {
+                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+                grid: { display: false }
+            }
+        }
     }
 });
 
-// ── 흡연량 증가 추세 안내 (최근 3일 비교) ──
+
 const trendNote = document.getElementById('smokingTrendNote');
 if (smoking.length >= 4) {
     const recent = smoking.slice(-3);
@@ -407,17 +503,65 @@ if (smoking.length >= 4) {
     }
 }
 
-// ── 차트 카드 상단 이번 주 평균 뱃지 ──
 const last7Smoking = smoking.slice(-7);
 const last7Grade = grade.slice(-7);
 const smokingWeekAvg = last7Smoking.length
-    ? (last7Smoking.reduce((a, b) => a + b, 0) / last7Smoking.length).toFixed(1)
-    : 0;
+    ? (last7Smoking.reduce((a, b) => a + b, 0) / last7Smoking.length).toFixed(1) : 0;
 const gradeWeekAvg = last7Grade.length
-    ? (last7Grade.reduce((a, b) => a + b, 0) / last7Grade.length).toFixed(1)
-    : 0;
-
+    ? (last7Grade.reduce((a, b) => a + b, 0) / last7Grade.length).toFixed(1) : 0;
 document.getElementById('smokingWeekStat').textContent = `이번 주 평균 ${smokingWeekAvg}개비`;
 document.getElementById('gradeWeekStat').textContent = `이번 주 평균 등급 ${gradeWeekAvg}`;
+
+// ── 풀캘린더 ──
+document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('dc-calendar');
+    const modal = new bootstrap.Modal(document.getElementById('logDetailModal'));
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ko',
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+        },
+        events: "{% url 'daily_care:calendar_events' %}",
+
+        eventContent: function(arg) {
+            const p = arg.event.extendedProps;
+            return {
+                html: `<div style="padding:1px 4px; line-height:1.4;">
+                    🚬${p.smoking_count} &nbsp; mMRC ${p.dyspnea_grade}
+                </div>`
+            };
+        },
+
+        eventClick: function(info) {
+            const p = info.event.extendedProps;
+            document.getElementById('modalDate').textContent = info.event.startStr;
+            document.getElementById('modalSmoking').textContent = p.smoking_count ?? '-';
+            document.getElementById('modalGrade').textContent = p.dyspnea_grade ?? '-';
+            document.getElementById('modalSpo2').textContent = p.spo2 ? p.spo2 + '%' : '-';
+
+            const badges = [];
+            if (p.has_cough)  badges.push('<span class="badge" style="background:#ffe082;color:#6d4c41;">기침</span>');
+            if (p.has_sputum) badges.push('<span class="badge" style="background:#ffe082;color:#6d4c41;">가래</span>');
+            if (p.exercised)  badges.push('<span class="badge" style="background:#c8e6c9;color:#1b5e20;">호흡운동</span>');
+            document.getElementById('modalBadges').innerHTML = badges.join('');
+
+            const memoWrap = document.getElementById('modalMemoWrap');
+            if (p.memo) {
+                document.getElementById('modalMemo').textContent = p.memo;
+                memoWrap.style.display = 'block';
+            } else {
+                memoWrap.style.display = 'none';
+            }
+            modal.show();
+        }
+    });
+
+    calendar.render();
+});
 </script>
 {% endblock %}
