@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load tz %}
 
 {% block title %}검사 권고 검토 목록 | 미래의료병원{% endblock %}
 {% block page_title %}검사 권고 검토 목록{% endblock %}
@@ -41,7 +42,7 @@
                 </td>
 
                 <td>
-                  {{ prediction.created_at|date:"Y-m-d H:i" }}
+                  {{ prediction.created_at|localtime|date:"Y-m-d H:i" }}
                 </td>
 
                 <td>
@@ -120,7 +121,7 @@
                 </td>
 
                 <td>
-                  {{ prediction.decision.decided_at|date:"Y-m-d H:i" }}
+                  {{ prediction.decision.decided_at|localtime|date:"Y-m-d H:i" }}
                 </td>
               </tr>
             {% endfor %}

@@ -65,7 +65,7 @@
           <div class="col-md-4">
             <div class="stat-label">생년월일 / Birth date</div>
             <div class="stat-value" style="font-size:18px;">
-              {{ patient.birth_date }}
+              {{ patient.birth_date|date:"Y년 n월 j일" }}
             </div>
           </div>
 
