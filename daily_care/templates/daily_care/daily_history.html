@@ -29,6 +29,12 @@
 
 <div class="container-fluid p-0">
 
+    <div class="mb-3">
+        <a href="{% url 'daily_care:dashboard' %}" class="text-decoration-none small fw-medium" style="color:#0D9488;">
+            <i class="bi bi-arrow-left"></i> 대시보드로 돌아가기
+        </a>
+    </div>
+
     <div class="card dc-card p-3 bg-white border-0 shadow-sm mb-4" style="border-radius: 12px;">
         <form method="get" class="row g-3 align-items-center" id="filterForm">
             <div class="col-12 col-sm-auto">
@@ -42,9 +48,17 @@
                 <input type="date" id="endInput" name="end" class="form-control bg-light border-0" value="{{ request.GET.end|default:'' }}">
             </div>
             <div class="col-12 col-sm-auto ms-sm-auto d-flex gap-2">
-                <a href="{% url 'daily_care:history' %}" class="btn btn-light w-100 shadow-sm" style="border-radius: 8px;">초기화</a>
-                <button type="submit" class="btn w-100 shadow-sm fw-bold" style="border-radius: 8px; background-color: #0D9488; color: white; border: none;">조회하기</button>
-            </div>
+    <a href="{% url 'daily_care:history' %}"
+       class="btn btn-light w-100 shadow-sm d-flex align-items-center justify-content-center gap-1"
+       style="border-radius: 8px; font-weight: 600; font-size: 0.88rem; color: #555; padding: 0.55rem 1rem; white-space: nowrap;">
+        <i class="bi bi-arrow-counterclockwise"></i> 초기화
+    </a>
+    <button type="submit"
+            class="btn w-100 shadow-sm d-flex align-items-center justify-content-center gap-1"
+            style="border-radius: 8px; background-color: #0D9488; color: white; border: none; font-weight: 700; font-size: 0.88rem; padding: 0.55rem 1rem; white-space: nowrap;">
+        <i class="bi bi-search"></i> 조회하기
+    </button>
+</div>
 
             <!-- ── 빠른 기간 선택 ── -->
             <div class="col-12 d-flex gap-2 mt-1">
@@ -201,7 +215,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // ── 빠른 기간 선택 ──
     function setQuickRange(days) {

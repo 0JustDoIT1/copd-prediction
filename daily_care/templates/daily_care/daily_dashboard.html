@@ -88,9 +88,107 @@
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
 }
-#dc-calendar .fc-toolbar-title { font-size: 1rem; font-weight: 700; }
-#dc-calendar .fc-event { cursor: pointer; font-size: 0.72rem; border: none; }
-#dc-calendar .fc-daygrid-day-number { font-size: 0.8rem; }
+
+/* ── 풀캘린더 Toss 스타일 ── */
+#dc-calendar .fc-scrollgrid,
+#dc-calendar .fc-theme-standard td,
+#dc-calendar .fc-theme-standard th {
+    border: none;
+}
+#dc-calendar .fc-daygrid-day-frame {
+    border-radius: 14px;
+    min-height: 88px;
+    padding: 2px;
+    transition: background .15s ease;
+}
+#dc-calendar .fc-daygrid-day:hover .fc-daygrid-day-frame {
+    background: #f4f9f8;
+}
+#dc-calendar .fc-day-today .fc-daygrid-day-frame {
+    background: #e6f7f5 !important;
+}
+#dc-calendar .fc-daygrid-day-number {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #555;
+    padding: 6px 9px;
+    text-decoration: none;
+}
+#dc-calendar .fc-day-today .fc-daygrid-day-number {
+    color: #0D9488;
+    font-weight: 800;
+}
+#dc-calendar .fc-col-header-cell {
+    border: none;
+    padding: 8px 0 6px;
+}
+#dc-calendar .fc-col-header-cell-cushion {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #9aa5a3;
+    text-decoration: none;
+}
+#dc-calendar .fc-toolbar-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #333;
+}
+#dc-calendar .fc-button {
+    background: #f0f9f8 !important;
+    border: none !important;
+    color: #00695c !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    font-weight: 700 !important;
+    padding: 6px 13px !important;
+    font-size: 0.82rem !important;
+}
+#dc-calendar .fc-button:hover {
+    background: #d8efec !important;
+}
+#dc-calendar .fc-button-active {
+    background: #0D9488 !important;
+    color: white !important;
+}
+#dc-calendar .fc-event {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    margin: 2px 3px 0;
+}
+
+/* 이벤트 칩 (날짜 셀 안 표시되는 작은 알약 모양) */
+.dc-cal-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 3px 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #555;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    white-space: nowrap;
+}
+.dc-cal-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.dc-cal-dot.good    { background: #0D9488; }
+.dc-cal-dot.caution { background: #F59E0B; }
+.dc-cal-dot.severe  { background: #EF4444; }
+
+/* 범례 점도 동그랗게 */
+.dc-legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
 </style>
 
 <div class="container-fluid p-0">
@@ -281,9 +379,14 @@
     <div class="row g-4 mt-2">
         <div class="col-md-6">
             <div class="card dc-card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
-                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #333;">
-                    <i class="bi bi-graph-up text-muted me-1"></i> 흡연량 추세 (최근 30일)
-                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem; color: #333;">
+                        <i class="bi bi-graph-up text-muted me-1"></i> 흡연량 추세 (최근 30일)
+                    </h5>
+                    <a href="{% url 'daily_care:history' %}" class="small fw-medium text-decoration-none" style="color:#0D9488;">
+                        전체 기록 보기 <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
                 <span id="smokingWeekStat" class="dc-chart-stat"></span>
                 <canvas id="smokingChart" height="200"></canvas>
                 <p id="smokingTrendNote" class="text-muted small mt-2 mb-0"></p>
@@ -291,12 +394,16 @@
         </div>
         <div class="col-md-6">
             <div class="card dc-card p-4 bg-white border-0 shadow-sm" style="border-radius: 12px;">
-                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #333;">
-                    <i class="bi bi-bar-chart text-muted me-1"></i> 호흡 곤란 등급 (최근 30일)
-                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem; color: #333;">
+                        <i class="bi bi-bar-chart text-muted me-1"></i> 호흡 곤란 등급 (최근 30일)
+                    </h5>
+                    <a href="{% url 'daily_care:history' %}" class="small fw-medium text-decoration-none" style="color:#0D9488;">
+                        전체 기록 보기 <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
                 <span id="gradeWeekStat" class="dc-chart-stat"></span>
                 <canvas id="gradeChart" height="200"></canvas>
-
             </div>
         </div>
     </div>
@@ -360,9 +467,9 @@
                         <i class="bi bi-calendar3 text-muted me-1"></i> 체크인 캘린더
                     </h5>
                     <span class="small" style="color:#555;">
-                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0D9488;margin-right:4px;"></span>양호
-                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#F59E0B;margin-left:8px;margin-right:4px;"></span>주의
-                        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#EF4444;margin-left:8px;margin-right:4px;"></span>심함
+                        <span class="dc-legend-dot" style="background:#0D9488;"></span>양호
+                        <span class="dc-legend-dot" style="background:#F59E0B; margin-left:10px;"></span>주의
+                        <span class="dc-legend-dot" style="background:#EF4444; margin-left:10px;"></span>심함
                     </span>
                 </div>
                 <div id="dc-calendar"></div>
@@ -452,8 +559,27 @@ new Chart(document.getElementById('smokingChart'), {
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } } },
-        scales: { y: { beginAtZero: true } }
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    boxWidth: 12,
+                    font: { size: 12, weight: '600' },
+                    color: '#333'
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { color: '#555', font: { size: 11 } },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+                ticks: { color: '#555', font: { size: 11 } },
+                grid: { display: false }
+            }
+        }
     }
 });
 
@@ -530,9 +656,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         eventContent: function(arg) {
             const p = arg.event.extendedProps;
+
+            // 심각도 판정 (범례: 양호/주의/심함과 매칭)
+            let severity = 'good';
+            if ((p.spo2 && p.spo2 < 95) || p.dyspnea_grade >= 3) {
+                severity = 'severe';
+            } else if (p.dyspnea_grade === 2 || p.has_cough || p.has_sputum) {
+                severity = 'caution';
+            }
+
             return {
-                html: `<div style="padding:1px 4px; line-height:1.4;">
-                    🚬${p.smoking_count} &nbsp; mMRC ${p.dyspnea_grade}
+                html: `<div class="dc-cal-chip">
+                    <span class="dc-cal-dot ${severity}"></span>
+                    🚬${p.smoking_count} · mMRC${p.dyspnea_grade}
                 </div>`
             };
         },
