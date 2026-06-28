@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 from .models import Questionnaire, PredictionResult
 from .forms import (
@@ -153,32 +154,58 @@ def result_detail(request, prediction_id):
 
 @login_required
 def doctor_dashboard(request):
-    pending_predictions = (
-        PredictionResult.objects
-        .filter(decision__isnull=True)
-        .select_related(
-            "questionnaire__patient__user"
+    sort = request.GET.get("sort", "priority")
+
+    if sort == "latest":
+        pending_predictions = (
+            PredictionResult.objects
+            .filter(decision__isnull=True)
+            .select_related(
+                "questionnaire__patient__user"
+            )
+            .order_by("-created_at")
         )
-        .order_by("-risk_probability")
-    )
+    else:
+        pending_predictions = (
+            PredictionResult.objects
+            .filter(decision__isnull=True)
+            .select_related(
+                "questionnaire__patient__user"
+            )
+            .order_by("-risk_probability")
+        )
+
+    priority_count = pending_predictions.filter(
+        risk_probability__gte=0.4
+    ).count()
 
     completed_predictions = (
         PredictionResult.objects
         .filter(decision__isnull=False)
-        .select_related(
-            "questionnaire__patient__user",
-            "decision"
-        )
+        .select_related("questionnaire__patient__user", "decision")
         .order_by("-decision__decided_at")
     )
+
+    pending_paginator = Paginator(pending_predictions, 5)
+    completed_paginator = Paginator(completed_predictions, 5)
+
+    pending_page_number = request.GET.get("pending_page")
+    completed_page_number = request.GET.get("completed_page")
+
+    pending_page_obj = pending_paginator.get_page(pending_page_number)
+    completed_page_obj = completed_paginator.get_page(completed_page_number)
 
     return render(
         request,
         "screening/doctor_dashboard.html",
         {
-            "pending_predictions": pending_predictions,
-            "completed_predictions": completed_predictions,
+            "pending_predictions": pending_page_obj,
+            "completed_predictions": completed_page_obj,
+            "pending_page_obj": pending_page_obj,
+            "completed_page_obj": completed_page_obj,
             "active_menu": "doctor_dashboard",
+            "sort": sort,
+            "priority_count": priority_count,
         }
     )
 

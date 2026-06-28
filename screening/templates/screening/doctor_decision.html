@@ -4,158 +4,360 @@
 {% block page_title %}검사 권고 검토{% endblock %}
 
 {% block content %}
-<div class="row g-4">
 
-  <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header">
-        <h5 class="mb-0">환자 입력 정보</h5>
-      </div>
+<style>
+  .decision-page {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-      <div class="card-body">
-        <h6 class="mb-3">문진 정보</h6>
+  .decision-card {
+    border: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  }
 
-        <table class="table table-sm">
-          <tr>
-            <th>환자명</th>
-            <td>{{ prediction.questionnaire.patient.user.username }}</td>
-          </tr>
-          <tr>
-            <th>흡연 상태</th>
-            <td>{{ prediction.questionnaire.get_smoking_status_display }}</td>
-          </tr>
-          <tr>
-            <th>하루 흡연량</th>
-            <td>{{ prediction.questionnaire.smoking_amount }}</td>
-          </tr>
-          <tr>
-            <th>기침</th>
-            <td>{{ prediction.questionnaire.cough|yesno:"있음,없음" }}</td>
-          </tr>
-          <tr>
-            <th>가래</th>
-            <td>{{ prediction.questionnaire.sputum|yesno:"있음,없음" }}</td>
-          </tr>
-        </table>
+  .decision-card .card-header {
+    background: linear-gradient(135deg, #f2fbf7, #ffffff);
+    border-bottom: 1px solid var(--color-border);
+    padding: 18px 22px;
+  }
 
-        <h6 class="mt-4 mb-3">건강검진 수치</h6>
+  .decision-card .card-body {
+    padding: 24px;
+  }
 
-        <table class="table table-sm">
-          <tr>
-            <th>키</th>
-            <td>{{ prediction.health_record.height }} cm</td>
-          </tr>
-          <tr>
-            <th>몸무게</th>
-            <td>{{ prediction.health_record.weight }} kg</td>
-          </tr>
-          <tr>
-            <th>BMI</th>
-            <td>{{ prediction.health_record.bmi }}</td>
-          </tr>
-          <tr>
-            <th>혈압</th>
-            <td>
-              {{ prediction.health_record.sbp }} /
-              {{ prediction.health_record.dbp }} mmHg
-            </td>
-          </tr>
-          <tr>
-            <th>공복혈당</th>
-            <td>{{ prediction.health_record.glucose }}</td>
-          </tr>
-          <tr>
-            <th>당화혈색소</th>
-            <td>{{ prediction.health_record.hba1c }}</td>
-          </tr>
-          <tr>
-            <th>총 콜레스테롤</th>
-            <td>{{ prediction.health_record.cholesterol }}</td>
-          </tr>
-          <tr>
-            <th>HDL</th>
-            <td>{{ prediction.health_record.hdl }}</td>
-          </tr>
-          <tr>
-            <th>중성지방</th>
-            <td>{{ prediction.health_record.triglyceride }}</td>
-          </tr>
-          <tr>
-            <th>AST / ALT</th>
-            <td>
-              {{ prediction.health_record.ast }} /
-              {{ prediction.health_record.alt }}
-            </td>
-          </tr>
-          <tr>
-            <th>헤모글로빈</th>
-            <td>{{ prediction.health_record.hemoglobin }}</td>
-          </tr>
-          <tr>
-            <th>백혈구 / 적혈구</th>
-            <td>
-              {{ prediction.health_record.wbc }} /
-              {{ prediction.health_record.rbc }}
-            </td>
-          </tr>
-          <tr>
-            <th>hsCRP</th>
-            <td>{{ prediction.health_record.hscrp }}</td>
-          </tr>
-          <tr>
-            <th>천식 진단 이력</th>
-            <td>{{ prediction.health_record.asthma_history|yesno:"있음,없음" }}</td>
-          </tr>
-          <tr>
-            <th>비염 진단 이력</th>
-            <td>{{ prediction.health_record.rhinitis_history|yesno:"있음,없음" }}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-  </div>
+  .section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin-bottom: 14px;
+    padding-left: 10px;
+    border-left: 4px solid var(--color-main);
+  }
 
-  <div class="col-lg-4">
-    <div class="card mb-4">
-      <div class="card-header">
-        <h5 class="mb-0">모델 참고 정보</h5>
-      </div>
+  .info-table {
+    margin-bottom: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
 
-      <div class="card-body">
-        <div class="stat-card mb-3">
-          <div class="stat-label">폐활량검사 권고 점수</div>
-          <div class="stat-value">
-            {{ prediction.risk_probability|floatformat:3 }}
-          </div>
-          <div class="stat-trend">
-            진단값이 아닌 의사 참고용 점수입니다.
-          </div>
+  .info-table th {
+    width: 32%;
+    background-color: #f8fbfa;
+    color: var(--color-muted);
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 13px 15px;
+    border-bottom: 1px solid #edf3f1;
+  }
+
+  .info-table td {
+    color: var(--color-darker);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 13px 15px;
+    border-bottom: 1px solid #edf3f1;
+  }
+
+  .info-table tr:last-child th,
+  .info-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .model-score-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.035);
+  }
+
+  .model-score-card .stat-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-muted);
+  }
+
+  .model-score-card .stat-value {
+    font-size: 34px;
+    font-weight: 800;
+    margin-top: 8px;
+  }
+
+  .model-score-card .stat-trend {
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--color-main);
+  }
+
+  .decision-form-box {
+    background-color: #fbfdfc;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .decision-form-box select,
+  .decision-form-box textarea,
+  .decision-form-box input {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+  }
+
+  .decision-form-box textarea {
+    min-height: 220px;
+    resize: vertical;
+  }
+
+  .decision-form-box select:focus,
+  .decision-form-box textarea:focus,
+  .decision-form-box input:focus {
+    border-color: var(--color-main);
+    box-shadow: 0 0 0 3px rgba(74, 124, 114, 0.12);
+  }
+
+  #decision-badge {
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .submit-btn {
+    height: 46px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+
+  .alert-warning-soft {
+    border-radius: 14px;
+    line-height: 1.6;
+  }
+</style>
+
+<div class="decision-page">
+  <div class="row g-4">
+
+    <div class="col-lg-8">
+      <div class="card decision-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">환자 입력 정보</h5>
         </div>
 
-        <div class="alert-warning-soft">
-          이 점수는 COPD 확정 진단이 아니며, 최종 판단은 의사 검토를 통해 결정됩니다.
+        <div class="card-body">
+          <h6 class="section-title">문진 정보</h6>
+
+          <table class="table table-sm info-table">
+            <tr>
+              <th>환자명</th>
+              <td>{{ prediction.questionnaire.patient.user.username }}</td>
+            </tr>
+            <tr>
+              <th>흡연 상태</th>
+              <td>{{ prediction.questionnaire.get_smoking_status_display }}</td>
+            </tr>
+            <tr>
+              <th>하루 흡연량</th>
+              <td>{{ prediction.questionnaire.smoking_amount|floatformat:0 }}개비</td>
+            </tr>
+            <tr>
+              <th>기침</th>
+              <td>{{ prediction.questionnaire.cough|yesno:"있음,없음" }}</td>
+            </tr>
+            <tr>
+              <th>가래</th>
+              <td>{{ prediction.questionnaire.sputum|yesno:"있음,없음" }}</td>
+            </tr>
+          </table>
+
+          <h6 class="section-title mt-4">건강검진 수치</h6>
+
+          <table class="table table-sm info-table">
+            <tr>
+              <th>키</th>
+              <td>{{ prediction.health_record.height }} cm</td>
+            </tr>
+            <tr>
+              <th>몸무게</th>
+              <td>{{ prediction.health_record.weight }} kg</td>
+            </tr>
+            <tr>
+              <th>BMI</th>
+              <td>{{ prediction.health_record.bmi }} kg/m²</td>
+            </tr>
+            <tr>
+              <th>혈압</th>
+              <td>
+                {{ prediction.health_record.sbp }} /
+                {{ prediction.health_record.dbp }} mmHg
+              </td>
+            </tr>
+            <tr>
+              <th>공복혈당</th>
+              <td>{{ prediction.health_record.glucose }} mg/dL</td>
+            </tr>
+            <tr>
+              <th>당화혈색소</th>
+              <td>{{ prediction.health_record.hba1c }} %</td>
+            </tr>
+            <tr>
+              <th>총 콜레스테롤</th>
+              <td>{{ prediction.health_record.cholesterol }} mg/dL</td>
+            </tr>
+            <tr>
+              <th>HDL</th>
+              <td>{{ prediction.health_record.hdl }} mg/dL</td>
+            </tr>
+            <tr>
+              <th>중성지방</th>
+              <td>{{ prediction.health_record.triglyceride }} mg/dL</td>
+            </tr>
+            <tr>
+              <th>AST</th>
+              <td>{{ prediction.health_record.ast }} U/L</td>
+            </tr>
+            <tr>
+              <th>ALT</th>
+              <td>{{ prediction.health_record.alt }} U/L</td>
+            </tr>
+            <tr>
+              <th>헤모글로빈</th>
+              <td>{{ prediction.health_record.hemoglobin }} g/dL</td>
+            </tr>
+            <tr>
+              <th>WBC</th>
+              <td>{{ prediction.health_record.wbc }} ×10³/μL</td>
+            </tr>
+            <tr>
+              <th>RBC</th>
+              <td>{{ prediction.health_record.rbc }} ×10⁶/μL</td>
+            </tr>
+            <tr>
+              <th>hsCRP</th>
+              <td>{{ prediction.health_record.hscrp }} mg/L</td>
+            </tr>
+            <tr>
+              <th>천식 진단 이력</th>
+              <td>{{ prediction.health_record.asthma_history|yesno:"있음,없음" }}</td>
+            </tr>
+            <tr>
+              <th>비염 진단 이력</th>
+              <td>{{ prediction.health_record.rhinitis_history|yesno:"있음,없음" }}</td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">최종 판정</h5>
+    <div class="col-lg-4">
+      <div class="card decision-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">모델 참고 정보</h5>
+        </div>
+
+        <div class="card-body">
+          <div class="model-score-card mb-3">
+            <div class="stat-label">COPD 모델 참고 점수</div>
+
+            {% if prediction.risk_probability >= 0.4 %}
+              <div class="stat-value text-danger">
+                {% widthratio prediction.risk_probability 1 100 %}점
+              </div>
+            {% else %}
+              <div class="stat-value text-success">
+                {% widthratio prediction.risk_probability 1 100 %}점
+              </div>
+            {% endif %}
+
+            <div class="stat-trend">
+              진단값이 아닌 의사 참고용 점수입니다.
+            </div>
+          </div>
+
+          <div class="alert-warning-soft">
+            이 점수는 COPD 확정 진단이 아니며, 최종 판단은 의사 검토를 통해 결정됩니다.
+          </div>
+        </div>
       </div>
 
-      <div class="card-body">
-        <form method="post">
-          {% csrf_token %}
+      <div class="card decision-card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">최종 판정</h5>
+        </div>
 
-          {{ form.as_p }}
+        <div class="card-body">
+          <form method="post" class="decision-form-box">
+            {% csrf_token %}
 
-          <button type="submit" class="btn btn-primary w-100">
-            판정 저장
-          </button>
-        </form>
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                {{ form.decision.label }}
+              </label>
+
+              {{ form.decision }}
+
+              <div class="mt-3">
+                <span
+                  id="decision-badge"
+                  class="badge fs-6 px-3 py-2 bg-secondary"
+                >
+                  판정 선택
+                </span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                {{ form.memo.label }}
+              </label>
+
+              {{ form.memo }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 submit-btn">
+              판정 저장
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const decision = document.getElementById("id_decision");
+    const badge = document.getElementById("decision-badge");
+
+    function updateBadge() {
+        const text =
+            decision.options[decision.selectedIndex].text;
+
+        if (text === "폐활량검사 권고") {
+            badge.className =
+                "badge fs-6 px-3 py-2 bg-danger";
+            badge.innerText = "폐활량검사 권고";
+        }
+        else if (text === "정상") {
+            badge.className =
+                "badge fs-6 px-3 py-2 bg-success";
+            badge.innerText = "정상";
+        }
+        else {
+            badge.className =
+                "badge fs-6 px-3 py-2 bg-secondary";
+            badge.innerText = "판정 선택";
+        }
+    }
+
+    decision.addEventListener("change", updateBadge);
+    updateBadge();
+});
+</script>
+
 {% endblock %}

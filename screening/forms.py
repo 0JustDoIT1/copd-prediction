@@ -118,6 +118,16 @@ class ClinicalDecisionForm(forms.ModelForm):
             "decision",
             "memo",
         ]
+        labels = {
+            "memo": "의사 소견",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["decision"].choices = [
+            ("", "판정을 선택해주세요.")
+        ] + list(self.fields["decision"].choices)
 
 
 class OCRUploadForm(forms.Form):

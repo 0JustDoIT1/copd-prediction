@@ -615,3 +615,15 @@ body {
     top: 72px;
   }
 }
+
+.priority-row {
+    background-color: #fff0f0 !important;
+}
+
+.priority-row:hover {
+    background-color: #ffeaea;
+}
+
+.priority-row td:first-child {
+    border-left: 5px solid #dc3545;
+}
