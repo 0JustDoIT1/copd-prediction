@@ -9,7 +9,7 @@ class AppointmentRequest(models.Model):
         ('cancelled', '취소'),
     ]
 
-    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='appointments')
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)    
     decision = models.ForeignKey(ClinicalDecision, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
     slot_datetime = models.DateTimeField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='confirmed')

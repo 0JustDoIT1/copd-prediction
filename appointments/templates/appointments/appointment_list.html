@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}예약 목록{% endblock %}
+
+{% block page_title %}<h1 class="page-title">예약 목록</h1>{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="card" style="padding: 28px;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #d7e6e2;">
+          <th style="padding:12px; text-align:left; color:#62756f; font-size:14px;">환자명</th>
+          <th style="padding:12px; text-align:left; color:#62756f; font-size:14px;">예약 일시</th>
+          <th style="padding:12px; text-align:left; color:#62756f; font-size:14px;">상태</th>
+          <th style="padding:12px; text-align:left; color:#62756f; font-size:14px;">요청사항</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in appointments %}
+        <tr style="border-bottom: 1px solid #d7e6e2;">
+          <td style="padding:12px; font-size:14px;">{% if appointment.patient %}{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}{% else %}정보 없음{% endif %}</td>
+          <td style="padding:12px; font-size:14px;">{{ appointment.slot_datetime|date:"Y년 m월 d일 H:i" }}</td>
+          <td style="padding:12px; font-size:14px;">
+            <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ appointment.get_status_display }}</span>
+          </td>
+          <td style="padding:12px; font-size:14px; color:#62756f;">{{ appointment.note|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="padding:24px; text-align:center; color:#62756f;">예약 내역이 없습니다.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

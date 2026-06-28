@@ -54,8 +54,8 @@
 </div>
 <!-- 선택 정보 + 다음 버튼 -->
 <p style="font-size:25px; font-weight:700; margin-bottom:16px; margin-top:32px;">선택한 예약 일시</p>
-<div id="selected-info" style="display:block; padding:16px 20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);">
-  <p id="selected-info-text" style="font-size:18px; font-weight:700; margin-bottom:18px;"></p>
+<div id="selected-info" style=" padding:20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);display:flex; align-items:center;">
+  <p id="selected-info-text" style="font-size:18px; font-weight:700; margin-bottom:0px;"></p>
   </div>
   <button onclick="goToConfirm()" style="width:100%; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; fo nt-weight:600; cursor:pointer; margin-top:10px; box-shadow: 0 4px 12px rgba(74,124,114,0.15);">다음 →</button>
 
@@ -141,6 +141,7 @@ selectedTime = '';
 document.getElementById('selected-info').style.display = 'block';
 document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
 document.querySelectorAll('.slot-btn-item').forEach(b => {
+  if (b.disabled) return;
   b.style.background = '#fff';
   b.style.color = '#1a2e2a';
   b.style.borderColor = '#d7e6e2';
@@ -184,6 +185,7 @@ if (isToday) {
   } else {
     document.getElementById('pm-section').style.display = 'block';
   }
+  updateSlotAvailability(year + '년 ' + month + '월 ' + day + '일');
 }
 
 let selectedTime = '';
@@ -208,10 +210,11 @@ function selectSlot(btn, time) {
   
   // 기존 선택 초기화
   document.querySelectorAll('.slot-btn-item').forEach(b => {
-    b.style.background = '#fff';
-    b.style.color = '#1a2e2a';
-    b.style.borderColor = '#d7e6e2';
-  });
+  if (b.disabled) return;
+  b.style.background = '#fff';
+  b.style.color = '#1a2e2a';
+  b.style.borderColor = '#d7e6e2';
+});
   
   btn.style.background = '#4a7c72';
   btn.style.color = '#fff';
@@ -234,5 +237,74 @@ function goToConfirm() {
 }
 
 renderCalendar();
+// 이전 선택 복원
+const savedDate = "{{ saved_date }}";
+const savedTime = "{{ saved_time }}";
+
+if (savedDate) {
+  const parts = savedDate.match(/(\d+)년 (\d+)월 (\d+)일/);
+  if (parts) {
+    const year = parseInt(parts[1]);
+    const month = parseInt(parts[2]);
+    const day = parseInt(parts[3]);
+    
+    // 달력 해당 월로 이동
+    current = new Date(year, month-1, 1);
+    renderCalendar();
+    
+    // 날짜 선택 표시
+    setTimeout(() => {
+      const cells = document.querySelectorAll('#calendar-grid div[onclick]');
+      cells.forEach(cell => {
+        if (cell.textContent == day) {
+          cell.style.background = '#4a7c72';
+          cell.style.color = '#fff';
+          cell.style.fontWeight = '700';
+        }
+      });
+      document.getElementById('slot-label').textContent = savedDate;
+      document.getElementById('selected-info').style.display = 'block';
+      if (savedTime) {
+        const hour = parseInt(savedTime.split(':')[0]);
+        const ampm = hour < 12 ? '오전' : '오후';
+        document.getElementById('selected-info-text').textContent = `${savedDate} · ${ampm} ${savedTime}`;
+      } else {
+        document.getElementById('selected-info-text').textContent = savedDate;
+      }
+    }, 100);
+  }
+}
+
+if (savedTime) {
+  selectedTime = savedTime;
+  const hour = parseInt(savedTime.split(':')[0]);
+  const ampm = hour < 12 ? '오전' : '오후';
+  document.getElementById('selected-info-text').textContent = `${savedDate} · ${ampm} ${savedTime}`;
+  
+  setTimeout(() => {
+    document.querySelectorAll('.slot-btn-item').forEach(btn => {
+      if (btn.textContent.trim() === savedTime) {
+        btn.style.background = '#4a7c72';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#4a7c72';
+      }
+    });
+  }, 100);
+}
+const bookedTimes = {{ booked_times|safe }};
+
+function updateSlotAvailability(dateStr) {
+  document.querySelectorAll('.slot-btn-item').forEach(btn => {
+    if (btn.disabled) return;
+    const key = `${dateStr}|${btn.textContent.trim()}`;
+    if (bookedTimes.includes(key)) {
+      btn.disabled = true;
+      btn.style.background = '#f5f5f5';
+      btn.style.color = '#bbb';
+      btn.style.borderColor = '#e0e0e0';
+      btn.style.cursor = 'not-allowed';
+    }
+  });
+}
 </script>
 {% endblock %}
