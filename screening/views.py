@@ -1,16 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-
-from .models import Questionnaire, HealthRecord, PredictionResult, ClinicalDecision
-from .forms import QuestionnaireForm, HealthRecordForm, ClinicalDecisionForm
-from .services.prediction_service import create_prediction_result, calculate_age
+from .models import Questionnaire, PredictionResult
 from .forms import (
     QuestionnaireForm,
     HealthRecordForm,
     ClinicalDecisionForm,
     OCRUploadForm,
 )
+from .services.prediction_service import create_prediction_result, calculate_age
 from .services.ocr_service import extract_health_data
 
 @login_required
@@ -109,7 +107,10 @@ def health_record_create(request, questionnaire_id):
             )
 
     else:
-        form = HealthRecordForm()
+        ocr_extracted = request.session.pop("ocr_extracted", None)
+        ocr_success = bool(ocr_extracted)
+
+        form = HealthRecordForm(initial=ocr_extracted)
 
     patient = request.user.patientprofile
 
@@ -121,6 +122,7 @@ def health_record_create(request, questionnaire_id):
             "questionnaire": questionnaire,
             "patient": patient,
             "age": calculate_age(patient.birth_date),
+            "ocr_success": ocr_success,
         }
     )
 
@@ -249,14 +251,14 @@ def ocr_upload(request):
 
             ocr_result = extract_health_data(image)
 
-            return render(
-                request,
-                "screening/ocr_result.html",
-                {
-                    "ocr_result": ocr_result,
-                    "active_group": "screening",
-                }
-            )
+            print(ocr_result["raw_text"])
+            print(ocr_result["extracted"])
+
+            # OCR 원문과 추출값을 세션에 저장
+            request.session["ocr_raw_text"] = ocr_result["raw_text"]
+            request.session["ocr_extracted"] = ocr_result["extracted"]
+
+            return redirect("screening:questionnaire")
 
     else:
         form = OCRUploadForm()
@@ -267,5 +269,6 @@ def ocr_upload(request):
         {
             "form": form,
             "active_group": "screening",
+            "active_menu": "ocr_upload",
         }
     )

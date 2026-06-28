@@ -10,10 +10,42 @@
   </div>
 
   <div class="card-body">
+
+    {% if ocr_success %}
+    <div class="alert alert-success mb-3">
+      ✓ 검진결과지가 성공적으로 인식되었습니다.
+      자동 입력된 값을 확인해주세요.
+    </div>
+    {% endif %}
+
     <div class="alert-warning-soft mb-4">
       <strong>입력 안내</strong><br>
       키는 cm, 몸무게는 kg 기준으로 입력해주세요.<br>
       BMI와 고혈압 단계는 서버에서 자동 계산됩니다.
+    </div>
+
+    <div class="card border-primary mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-1">
+              <i class="bi bi-camera"></i>
+              검진결과지 자동 입력
+            </h6>
+            <p class="text-muted mb-0">
+              건강검진 결과지를 업로드하면 일부 검진 수치가 자동으로 입력됩니다.
+            </p>
+          </div>
+
+          <a href="{% url 'screening:ocr_upload' %}" class="btn btn-primary">
+            OCR 업로드
+          </a>
+        </div>
+
+        <small class="text-secondary">
+          ※ OCR 결과는 자동 입력 후 반드시 직접 확인 및 수정해주세요.
+        </small>
+      </div>
     </div>
 
     <div class="card mb-4">
@@ -84,23 +116,12 @@
 
           <div class="d-flex gap-3 mt-2">
             <div>
-              <input
-                type="radio"
-                name="bp_medication"
-                value="True"
-                id="bp_med_yes"
-              >
+              <input type="radio" name="bp_medication" value="True" id="bp_med_yes">
               <label for="bp_med_yes">예</label>
             </div>
 
             <div>
-              <input
-                type="radio"
-                name="bp_medication"
-                value="False"
-                id="bp_med_no"
-                checked
-              >
+              <input type="radio" name="bp_medication" value="False" id="bp_med_no" checked>
               <label for="bp_med_no">아니오</label>
             </div>
           </div>
@@ -189,23 +210,12 @@
 
           <div class="d-flex gap-3 mt-2">
             <div>
-              <input
-                type="radio"
-                name="asthma_history"
-                value="True"
-                id="asthma_yes"
-              >
+              <input type="radio" name="asthma_history" value="True" id="asthma_yes">
               <label for="asthma_yes">예</label>
             </div>
 
             <div>
-              <input
-                type="radio"
-                name="asthma_history"
-                value="False"
-                id="asthma_no"
-                checked
-              >
+              <input type="radio" name="asthma_history" value="False" id="asthma_no" checked>
               <label for="asthma_no">아니오</label>
             </div>
           </div>
@@ -216,23 +226,12 @@
 
           <div class="d-flex gap-3 mt-2">
             <div>
-              <input
-                type="radio"
-                name="rhinitis_history"
-                value="True"
-                id="rhinitis_yes"
-              >
+              <input type="radio" name="rhinitis_history" value="True" id="rhinitis_yes">
               <label for="rhinitis_yes">예</label>
             </div>
 
             <div>
-              <input
-                type="radio"
-                name="rhinitis_history"
-                value="False"
-                id="rhinitis_no"
-                checked
-              >
+              <input type="radio" name="rhinitis_history" value="False" id="rhinitis_no" checked>
               <label for="rhinitis_no">아니오</label>
             </div>
           </div>
@@ -242,21 +241,16 @@
       <hr>
 
       <div class="d-flex justify-content-between mt-4">
-        <a
-          href="{% url 'screening:questionnaire' %}"
-          class="btn btn-outline-secondary"
-        >
+        <a href="{% url 'screening:questionnaire' %}" class="btn btn-outline-secondary">
           ← 이전
         </a>
 
-        <button
-          class="btn btn-primary"
-          type="submit"
-        >
+        <button class="btn btn-primary" type="submit">
           검사 정보 제출
         </button>
       </div>
     </form>
+
   </div>
 </div>
 {% endblock %}

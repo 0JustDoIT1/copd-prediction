@@ -15,6 +15,10 @@ class QuestionnaireForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.fields["smoking_status"].choices = [
+            ("", "흡연 상태를 선택해주세요.")
+        ] + list(self.fields["smoking_status"].choices)
+
         for name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs["class"] = "form-check-input"
@@ -80,6 +84,31 @@ class HealthRecordForm(forms.ModelForm):
             else:
                 field.widget.attrs["class"] = "form-control"
 
+        # 예측 모델에 필요한 필수 변수
+        required_fields = [
+            "height",
+            "weight",
+            "sbp",
+            "dbp",
+            "glucose",
+            "hba1c",
+            "cholesterol",
+            "hdl",
+            "triglyceride",
+            "ast",
+            "alt",
+            "hemoglobin",
+            "wbc",
+            "rbc",
+            "asthma_history",
+            "rhinitis_history",
+        ]
+
+        for field_name in required_fields:
+            self.fields[field_name].required = True
+
+        # hsCRP는 결측 허용
+        self.fields["hscrp"].required = False
 
 
 class ClinicalDecisionForm(forms.ModelForm):
