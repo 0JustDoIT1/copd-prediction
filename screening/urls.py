@@ -35,5 +35,11 @@ urlpatterns = [
     "results/",
     views.result_list,
     name="result_list",
-),
+    ),
+
+    path(
+    "ocr/",
+    views.ocr_upload,
+    name="ocr_upload",
+    ),
 ]

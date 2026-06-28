@@ -1,11 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-from django.http import HttpResponse
+
 from .models import Questionnaire, HealthRecord, PredictionResult, ClinicalDecision
 from .forms import QuestionnaireForm, HealthRecordForm, ClinicalDecisionForm
 from .services.prediction_service import create_prediction_result, calculate_age
-
+from .forms import (
+    QuestionnaireForm,
+    HealthRecordForm,
+    ClinicalDecisionForm,
+    OCRUploadForm,
+)
+from .services.ocr_service import extract_health_data
 
 @login_required
 def screening_home(request): # 로그인한 사용자만 문진입력 가능
@@ -119,96 +125,8 @@ def health_record_create(request, questionnaire_id):
     )
 
 # 결과페이지 📋
-def result_detail(request, prediction_id): 
-
-    prediction = get_object_or_404(
-        PredictionResult,
-        id=prediction_id
-    )
-
-    return render(
-    request,
-    "screening/result_detail.html",
-    {
-        "prediction": prediction,
-        "active_menu": "result_list",
-        "active_group": "screening",
-    }
-)
-
-# 의사 대시보드 💻
-'''
-아직 의사가 판정하지 않은 PredictionResult만 가져옴
-권고 점수 높은 순으로 정렬
-의사 대시보드 템플릿으로 전달
-'''
-
 @login_required
-def doctor_dashboard(request):
-    pending_predictions = (
-        PredictionResult.objects
-        .filter(decision__isnull=True)
-        .select_related(
-            "questionnaire__patient__user"
-        )
-        .order_by("-risk_probability")
-    )
-
-    completed_predictions = (
-        PredictionResult.objects
-        .filter(decision__isnull=False)
-        .select_related(
-            "questionnaire__patient__user",
-            "decision"
-        )
-        .order_by("-decision__decided_at")
-    )
-
-    return render(
-        request,
-        "screening/doctor_dashboard.html",
-        {
-            "pending_predictions": pending_predictions,
-            "completed_predictions": completed_predictions,
-        }
-    )
-
-
-# 의사 판정 🔨
-@login_required
-def doctor_decision(request, prediction_id):
-    prediction = get_object_or_404(
-        PredictionResult,
-        id=prediction_id
-    )
-
-    if request.method == "POST":
-        form = ClinicalDecisionForm(request.POST)
-
-        if form.is_valid():
-            decision = form.save(commit=False)
-            decision.prediction = prediction
-            decision.doctor = request.user.doctorprofile
-            decision.save()
-
-            return redirect("screening:doctor_dashboard")
-
-    else:
-        form = ClinicalDecisionForm()
-
-    return render(
-        request,
-        "screening/doctor_decision.html",
-        {
-            "form": form,
-            "prediction": prediction,
-            "active_menu": "doctor_dashboard",
-        }
-    )
-
-# 결과페이지 📋
 def result_detail(request, prediction_id): 
-
     prediction = get_object_or_404(
         PredictionResult,
         id=prediction_id
@@ -219,12 +137,14 @@ def result_detail(request, prediction_id):
         "screening/result_detail.html",
         {
             "prediction": prediction,
+            "active_menu": "result_list",
+            "active_group": "screening",
         }
     )
 
 # 의사 대시보드 💻
 '''
-아직 의사가 판정하지 않은 PredictionResult만 가져옴
+아직 의사가 판정하지 않은 PredictionResult 가져옴 + 검토 완료도 추가
 권고 점수 높은 순으로 정렬
 의사 대시보드 템플릿으로 전달
 '''
@@ -256,6 +176,7 @@ def doctor_dashboard(request):
         {
             "pending_predictions": pending_predictions,
             "completed_predictions": completed_predictions,
+            "active_menu": "doctor_dashboard",
         }
     )
 
@@ -291,6 +212,8 @@ def doctor_decision(request, prediction_id):
             "active_menu": "doctor_dashboard",
         }
     )
+
+
 
 
 # 환자가 결과 확인페이지
@@ -306,11 +229,45 @@ def result_list(request):
     )
 
     return render(
-    request,
-    "screening/result_list.html",
-    {
-        "predictions": predictions,
-        "active_menu": "result_list",
-        "active_group": "screening",
-    }
-)
+        request,
+        "screening/result_list.html",
+        {
+            "predictions": predictions,
+            "active_menu": "result_list",
+            "active_group": "screening",
+        }
+    )
+
+# ocr 서비스
+@login_required
+def ocr_upload(request):
+    if request.method == "POST":
+        form = OCRUploadForm(
+            request.POST,
+            request.FILES
+        )
+
+        if form.is_valid():
+            image = request.FILES["image"]
+
+            extracted_data = extract_health_data(
+                image
+            )
+
+            request.session["ocr_data"] = extracted_data
+
+            return redirect(
+                "screening:questionnaire"
+            )
+
+    else:
+        form = OCRUploadForm()
+
+    return render(
+        request,
+        "screening/ocr_upload.html",
+        {
+            "form": form,
+            "active_group": "screening",
+        }
+    )
