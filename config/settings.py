@@ -12,6 +12,19 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+# .env 파일에 저장된 Google Vision API 인증키(JSON) 경로 읽기
+# 예:
+# GOOGLE_APPLICATION_CREDENTIALS=secrets/copd-ocr-xxxx.json
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+# 환경변수에 인증키 경로 등록
+# Google Vision API가 이 경로를 보고 서비스 계정 JSON을 사용하여 인증함
+if GOOGLE_APPLICATION_CREDENTIALS:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

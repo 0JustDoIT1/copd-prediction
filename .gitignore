@@ -41,3 +41,6 @@ Thumbs.db
 # 팀에서 마이그레이션을 매번 새로 생성하는 방식으로 간다면 아래 주석 해제
 # */migrations/*.py
 # !*/migrations/__init__.py
+
+# ocr_json키
+secrets/

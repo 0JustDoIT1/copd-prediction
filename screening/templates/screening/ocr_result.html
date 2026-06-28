@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}OCR 결과 | 미래의료병원{% endblock %}
+{% block page_title %}OCR 결과{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">OCR 추출 결과</h5>
+  </div>
+
+  <div class="card-body">
+    <pre style="white-space: pre-wrap;">{{ ocr_result.raw_text }}</pre>
+
+    <a href="{% url 'screening:ocr_upload' %}" class="btn btn-outline-secondary">
+      다시 업로드
+    </a>
+  </div>
+</div>
+{% endblock %}

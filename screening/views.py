@@ -242,22 +242,20 @@ def result_list(request):
 @login_required
 def ocr_upload(request):
     if request.method == "POST":
-        form = OCRUploadForm(
-            request.POST,
-            request.FILES
-        )
+        form = OCRUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
             image = request.FILES["image"]
 
-            extracted_data = extract_health_data(
-                image
-            )
+            ocr_result = extract_health_data(image)
 
-            request.session["ocr_data"] = extracted_data
-
-            return redirect(
-                "screening:questionnaire"
+            return render(
+                request,
+                "screening/ocr_result.html",
+                {
+                    "ocr_result": ocr_result,
+                    "active_group": "screening",
+                }
             )
 
     else:
