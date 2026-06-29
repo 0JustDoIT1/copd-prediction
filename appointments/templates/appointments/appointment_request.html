@@ -164,14 +164,17 @@ document.getElementById('selected-info-text').style.color = '#62756f';
   event.target.style.background = '#4a7c72';
   event.target.style.color = '#fff';
   event.target.style.fontWeight = '700';
-  document.getElementById('slot-label').textContent = `${year}년 ${month}월 ${day}일`;
+
   
-  // 시간 선택 초기화
+// 시간 선택 초기화
 selectedTime = '';
 document.getElementById('selected-info').style.display = 'block';
 document.getElementById('selected-info-text').style.color = '#1a2e2a';
-document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
-document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
+const days = ['일', '월', '화', '수', '목', '금', '토'];
+const dayOfWeek = new Date(year, month-1, day).getDay();
+const dateStr = `${year}년 ${month}월 ${day}일 (${days[dayOfWeek]})`;
+document.getElementById('slot-label').textContent = dateStr;
+document.getElementById('selected-info-text').textContent = dateStr;
 document.querySelectorAll('.slot-btn-item').forEach(b => {
   if (b.disabled) return;
   b.style.background = '#fff';

@@ -49,6 +49,20 @@ def appointment_confirm(request):
     selected_time = request.GET.get('time', '')
     request.session['selected_date'] = selected_date
     request.session['selected_time'] = selected_time
+    
+    DAYS_KO = ['월', '화', '수', '목', '금', '토', '일']
+    from datetime import datetime as dt
+    if selected_date:
+        try:
+            parsed = dt.strptime(selected_date, "%Y년 %m월 %d일")
+            day_of_week = DAYS_KO[parsed.weekday()]
+            selected_date_with_day = f"{selected_date} ({day_of_week})"
+        except:
+            selected_date_with_day = selected_date
+    else:
+        selected_date_with_day = selected_date
+        
+        
     try:
         # 주의: 'patientprofile'이 맞는 속성명 (accounts.PatientProfile의 OneToOneField 역참조).
         # 'patient_profile'(언더스코어 포함)은 존재하지 않는 속성이라 항상 예외가 나서
@@ -61,7 +75,7 @@ def appointment_confirm(request):
     ampm = '오전' if hour < 12 else '오후'
     
     return render(request, 'appointments/appointment_confirm.html', {
-        'selected_date': selected_date,
+        'selected_date': selected_date_with_day,
         'selected_time': selected_time,
         'patient': patient,
         'ampm': ampm,
@@ -123,6 +137,16 @@ def appointment_done(request):
     hour = int(time_str.split(':')[0]) if time_str else 0
     ampm = '오전' if hour < 12 else '오후'
     
+    DAYS_KO = ['월', '화', '수', '목', '금', '토', '일']
+    if date_str:
+        try:
+            from datetime import datetime as dt
+            parsed = dt.strptime(date_str, "%Y년 %m월 %d일")
+            day_of_week = DAYS_KO[parsed.weekday()]
+            date_str = f"{date_str} ({day_of_week})"
+        except:
+            pass
+        
     return render(request, 'appointments/appointment_done.html', {
         'date': date_str,
         'time': time_str,
@@ -148,18 +172,21 @@ def my_appointments(request):
         
         now = tz.now()
         
+        DAYS_KO = ['월', '화', '수', '목', '금', '토', '일']
+        
         def add_ampm(appointments):
             result = []
             for a in appointments:
                 local_dt = tz.localtime(a.slot_datetime)
+                day_of_week = DAYS_KO[local_dt.weekday()]
                 result.append({
                     'obj': a,
                     'local_dt': local_dt,
                     'ampm': '오전' if local_dt.hour < 12 else '오후',
-                    'date_str': local_dt.strftime('%Y-%m-%d'),    
+                    'date_str': f"{local_dt.year}년 {local_dt.month}월 {local_dt.day}일 ({day_of_week})",
                 })
             return result
-        
+                
         upcoming = add_ampm(all_appointments.filter(slot_datetime__gte=now, status='confirmed'))
         past = add_ampm(all_appointments.filter(models.Q(slot_datetime__lt=now) | models.Q(status='cancelled')))
         
