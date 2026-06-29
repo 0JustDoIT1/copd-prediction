@@ -26,7 +26,7 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
       <div>
         <div style="font-size:15px; font-weight:600; color:#2c4a44; margin-bottom:8px;">이름 <span style="font-size:11px; color:#62756f; font-weight:400;">자동 입력</span></div>
-        <div style="background:#f0f7f5; border:1px solid #d7e6e2; border-radius:10px; padding:10px 14px; font-size:14px;">{% if patient %}{{ patient.user.name|default:patient.user.username }}{% else %}정보 없음{% endif %}</div>
+        <div style="background:#f0f7f5; border:1px solid #d7e6e2; border-radius:10px; padding:10px 14px; font-size:14px;">{% if patient %}{{ patient.user.name|default:patient.user.name }}{% else %}정보 없음{% endif %}</div>
       </div>
       <div>
         <div style="font-size:15px; font-weight:600; color:#2c4a44; margin-bottom:8px;">생년월일 <span style="font-size:11px; color:#62756f; font-weight:400;">자동 입력</span></div>

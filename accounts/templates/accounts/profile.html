@@ -22,7 +22,7 @@
     <div class="profile-header-inner">
       <div class="profile-avatar">{{ user_obj.username|slice:":1"|upper }}</div>
       <div class="profile-header-text">
-        <div class="profile-email">{{ user_obj.username }}</div>
+        <div class="profile-email">{{ user_obj.name }}</div>
         <span class="profile-role-badge {% if user_obj.role == 'doctor' %}is-doctor{% endif %}">
           <i class="bi {% if user_obj.role == 'patient' %}bi-person-heart{% else %}bi-clipboard2-pulse{% endif %}"></i>
           {% if user_obj.role == 'patient' %}환자{% else %}의사{% endif %}

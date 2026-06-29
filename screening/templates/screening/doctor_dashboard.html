@@ -342,7 +342,7 @@
                   {% endif %}
                 >
                   <td class="fw-semibold">
-                    {{ prediction.questionnaire.patient.user.username }}
+                    {{ prediction.questionnaire.patient.user.name }}
                   </td>
 
                   <td>
@@ -456,7 +456,7 @@
               {% for prediction in completed_predictions %}
                 <tr>
                   <td class="fw-semibold">
-                    {{ prediction.questionnaire.patient.user.username }}
+                    {{ prediction.questionnaire.patient.user.name }}
                   </td>
 
                   <td>
