@@ -14,15 +14,15 @@
   </div>
 {% endif %}
     <!-- 예약 내용 확인 -->
-    <p style="font-size:20px; font-weight:700; margin-bottom:14px;">예약 내용 확인</p>
+    <p style="font-size:20px; font-weight:700; margin-bottom:14px;"><i class="bi bi-calendar-check"></i> 예약 내용 확인</p>
     <div style="border:1.5px solid #d7e6e2; border-radius:12px; padding:18px 20px; margin-bottom:24px;">
-      <p style="font-size:18px; font-weight:700; margin-bottom:8px;">COPD 폐기능검사</p>
+      <p style="font-size:18px; font-weight:700; margin-bottom:8px;">COPD 폐기능 검사</p>
       <p style="font-size:19px; font-weight:750; margin-bottom:6px; color:#2c4a44">예약 일시 &nbsp; {{ selected_date }} &nbsp;·&nbsp; {{ ampm }} {{ selected_time }}</p>    </div>
 
     <hr style="border:none; border-top:1px solid #d7e6e2; margin:20px 0;">
 
     <!-- 예약자 정보 -->
-    <p style="font-size:20px; font-weight:700; margin-bottom:16px;">예약자 정보</p>
+    <p style="font-size:20px; font-weight:700; margin-bottom:16px;"><i class="bi bi-person"></i> 예약자 정보</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
       <div>
         <div style="font-size:15px; font-weight:600; color:#2c4a44; margin-bottom:8px;">이름 <span style="font-size:11px; color:#62756f; font-weight:400;">자동 입력</span></div>
@@ -36,7 +36,7 @@
 
     <!-- 안내사항 -->
     <hr style="border:none; border-top:1px solid #d7e6e2; margin:20px 0;">
-    <p style="font-size:15px; font-weight:700; margin-bottom:12px;">검사 전 주의사항</p>
+    <p style="font-size:15px; font-weight:700; margin-bottom:12px;"><i class="bi bi-exclamation-circle"></i> 검사 전 주의사항</p>
     <div style="background:#fff8f0; border:1.5px solid #f6ad55; border-radius:12px; padding:16px 20px; margin-bottom:20px;">
         <ul style="margin:0; padding-left:18px; font-size:13px; color:#7a4f00; line-height:2;">
         <li>검사 전 음주, 흡연, 과식, 과격한 운동, 불편한 복장은 검사 결과에 영향을 줄 수 있으니 삼가 주세요.</li>
@@ -49,7 +49,7 @@
       <input type="hidden" name="date" value="{{ selected_date }}">
       <input type="hidden" name="time" value="{{ selected_time }}">
       
-      <p style="font-size:20px; font-weight:700; margin-bottom:8px;">요청사항 <span style="font-size:13px; color:#62756f; font-weight:400;">(선택)</span></p>
+      <p style="font-size:20px; font-weight:700; margin-bottom:8px;"><i class="bi bi-chat-left-text"></i> 요청사항 <span style="font-size:13px; color:#62756f; font-weight:400;">(선택)</span></p>
       <textarea name="note" style="border:1px solid #d7e6e2; border-radius:10px; padding:10px 14px; font-size:14px; width:100%; min-height:90px; font-family:inherit; resize:vertical;" placeholder="의료진에게 전달하고 싶은 내용을 입력해 주세요."></textarea>
   </div>
 

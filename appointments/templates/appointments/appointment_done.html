@@ -30,7 +30,7 @@
   </div>
   <div style="display:flex; padding:7px 0; font-size:18px;">
     <span style="color:#62756f; width:120px;">검사 종류</span>
-    <span style="flex:1; text-align:center; font-weight:600;">COPD 폐기능검사</span>
+    <span style="flex:1; text-align:center; font-weight:600;">COPD 폐기능 검사</span>
   </div>
 </div>
 <!-- 취소/변경 안내 + 준비물 -->
@@ -49,9 +49,11 @@
     <li>당일 취소 시 불이익이 있을 수 있습니다</li>
   </ul>
 </div>
-
-    <a href="/" style="display:block; width:100%; padding:13px; background:#4a7c72; color:#fff; border-radius:12px; font-size:15px; font-weight:600; text-decoration:none; margin-bottom:10px;">홈으로 돌아가기</a>
-
+    
+<div style="display:flex; gap:10px;">
+  <a href="{% url 'appointments:my_appointments' %}" style="flex:1; padding:13px; background:#4a7c72; color:#fff; border-radius:12px; font-size:15px; font-weight:600; text-decoration:none; text-align:center;">내 예약 확인</a>
+  <a href="/" style="flex:1; padding:13px; background:#fff; border:1.5px solid #4a7c72; color:#4a7c72; border-radius:12px; font-size:15px; font-weight:600; text-decoration:none; text-align:center;">홈으로 돌아가기</a>
+</div>
   </div>
 </div>
 {% endblock %}

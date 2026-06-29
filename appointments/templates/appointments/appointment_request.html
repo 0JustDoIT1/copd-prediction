@@ -59,7 +59,7 @@
 <!-- 선택 정보 + 다음 버튼 -->
 <p style="font-size:25px; font-weight:700; margin-bottom:16px; margin-top:32px;"><i class="bi bi-check-circle"></i> 선택한 예약 일시</p>
 <div id="selected-info" style=" padding:20px; background:#fff; border:1.5px solid #a8cdc3; border-radius:12px;box-shadow: 0 4px 12px rgba(74,124,114,0.15);display:flex; align-items:center;">
-  <p id="selected-info-text" style="font-size:18px; font-weight:700; margin-bottom:0px;"></p>
+  <p id="selected-info-text" style="font-size:18px; font-weight:700; margin-bottom:0px; color:#62756f;">날짜와 시간을 선택해주세요</p>
   </div>
   <button onclick="goToConfirm()" style="width:100%; padding:13px; background:#4a7c72; color:#fff; border:none; border-radius:12px; font-size:15px; fo nt-weight:600; cursor:pointer; margin-top:10px; box-shadow: 0 4px 12px rgba(74,124,114,0.15);">다음 →</button>
 
@@ -144,8 +144,16 @@ if (currentDate === clickedDate) {
   event.target.style.color = '';
   event.target.style.fontWeight = '';
   document.getElementById('slot-label').textContent = '날짜를 먼저 선택해주세요';
-  document.getElementById('selected-info-text').textContent = '';
+  document.getElementById('selected-info-text').textContent = '날짜와 시간을 선택해주세요.';
+document.getElementById('selected-info-text').style.color = '#62756f';
   selectedTime = '';
+  document.querySelectorAll('.slot-btn-item').forEach(btn => {
+    btn.disabled = false;
+    btn.style.background = '#fff';
+    btn.style.color = '#1a2e2a';
+    btn.style.borderColor = '#d7e6e2';
+    btn.style.cursor = 'pointer';
+  });
   return;
 }
   document.querySelectorAll('#calendar-grid div[onclick]').forEach(el => {
@@ -161,6 +169,8 @@ if (currentDate === clickedDate) {
   // 시간 선택 초기화
 selectedTime = '';
 document.getElementById('selected-info').style.display = 'block';
+document.getElementById('selected-info-text').style.color = '#1a2e2a';
+document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
 document.getElementById('selected-info-text').textContent = `${year}년 ${month}월 ${day}일`;
 document.querySelectorAll('.slot-btn-item').forEach(b => {
   if (b.disabled) return;
@@ -286,6 +296,7 @@ if (savedDate) {
           cell.style.fontWeight = '700';
         }
       });
+      document.getElementById('selected-info-text').style.color = '#1a2e2a';
       document.getElementById('slot-label').textContent = savedDate;
       document.getElementById('selected-info').style.display = 'block';
       if (savedTime) {
@@ -296,6 +307,26 @@ if (savedDate) {
         document.getElementById('selected-info-text').textContent = savedDate;
       }
       updateSlotAvailability(savedDate);
+
+      // 오늘 날짜면 지난 시간 비활성화
+      const now = new Date();
+      const isToday = year === now.getFullYear() && month === now.getMonth()+1 && day === now.getDate();
+      if (isToday) {
+        document.querySelectorAll('.slot-btn-item').forEach(btn => {
+          const btnHour = parseInt(btn.textContent.split(':')[0]);
+          const btnMin = parseInt(btn.textContent.split(':')[1]);
+          const btnTime = btnHour * 60 + btnMin;
+          const nowTime = now.getHours() * 60 + now.getMinutes();
+          if (btnTime <= nowTime) {
+            btn.disabled = true;
+            btn.style.background = '#f5f5f5';
+            btn.style.color = '#bbb';
+            btn.style.borderColor = '#e0e0e0';
+            btn.style.cursor = 'not-allowed';
+          }
+        });
+      }
+
     }, 100);
   }
 }
