@@ -233,7 +233,9 @@ function goToConfirm() {
     alert('시간을 선택해주세요!');
     return;
   }
-  window.location.href = `/appoint/confirm/?time=${selectedTime}&date=${selectedDate}`;
+  // 주의: 한글/공백/콜론(:)이 포함된 값을 그대로 쿼리스트링에 넣으면 일부 환경에서
+  // 깨지거나 잘릴 수 있음 - encodeURIComponent로 반드시 인코딩해서 전달.
+  window.location.href = `/appoint/confirm/?time=${encodeURIComponent(selectedTime)}&date=${encodeURIComponent(selectedDate)}`;
 }
 
 renderCalendar();

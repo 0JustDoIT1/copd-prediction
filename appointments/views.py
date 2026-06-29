@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import datetime
 from .models import AppointmentRequest
+from accounts.models import PatientProfile
 from django.db import transaction, IntegrityError
 from django.utils import timezone as tz
 
@@ -43,8 +44,11 @@ def appointment_confirm(request):
     request.session['selected_date'] = selected_date
     request.session['selected_time'] = selected_time
     try:
-        patient = request.user.patient_profile
-    except:
+        # 주의: 'patientprofile'이 맞는 속성명 (accounts.PatientProfile의 OneToOneField 역참조).
+        # 'patient_profile'(언더스코어 포함)은 존재하지 않는 속성이라 항상 예외가 나서
+        # patient가 None으로만 저장되던 버그가 있었음 - 수정됨.
+        patient = request.user.patientprofile
+    except PatientProfile.DoesNotExist:
         patient = None
         
     hour = int(selected_time.split(':')[0]) if selected_time else 0
@@ -57,7 +61,6 @@ def appointment_confirm(request):
         'ampm': ampm,
     })
 
-from django.db import transaction, IntegrityError
 
 def appointment_done(request):
     if request.method == 'POST':
@@ -66,8 +69,9 @@ def appointment_done(request):
         note = request.POST.get('note', '')
         
         try:
-            patient = request.user.patient_profile
-        except:
+            # 주의: 'patientprofile'이 맞는 속성명. 위 appointment_confirm과 동일 이슈.
+            patient = request.user.patientprofile
+        except PatientProfile.DoesNotExist:
             patient = None
         
         try:
@@ -115,6 +119,8 @@ def appointment_done(request):
         'time': time_str,
         'ampm': ampm,
     })
+
+
 def appointment_list(request):
     appointments = AppointmentRequest.objects.select_related(
         'patient__user'
@@ -122,4 +128,4 @@ def appointment_list(request):
     
     return render(request, 'appointments/appointment_list.html', {
         'appointments': appointments,
-    })    
+    })
