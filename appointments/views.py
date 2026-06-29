@@ -155,6 +155,7 @@ def my_appointments(request):
                     'obj': a,
                     'local_dt': local_dt,
                     'ampm': '오전' if local_dt.hour < 12 else '오후',
+                    'date_str': local_dt.strftime('%Y-%m-%d'),    
                 })
             return result
         
