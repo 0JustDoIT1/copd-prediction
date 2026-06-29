@@ -5,7 +5,12 @@
 body.auth-body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Pretendard", -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   background-color: #ffffff;
 }
 
@@ -71,7 +76,8 @@ body.auth-body {
 }
 
 @keyframes auth-dot-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
@@ -154,6 +160,49 @@ body.auth-body {
   overflow: hidden;
 }
 
+/* 우측 패널 배경 블롭/점 SVG — 좌측 브랜드 패널과 같은 "숨쉬기" 모션으로 톤을 통일 */
+.auth-form-blobs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-form-blob {
+  transform-origin: center;
+  animation: auth-form-breathe 6s ease-in-out infinite;
+}
+
+.auth-form-blob-1 {
+  fill: url(#authFormGlow1);
+}
+
+.auth-form-blob-2 {
+  fill: url(#authFormGlow2);
+  animation-delay: 3s;
+}
+
+@keyframes auth-form-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-form-blob,
+  .auth-brand-dot {
+    animation: none;
+  }
+}
+
 /* 우측 영역 포인트 — 참고 디자인처럼 모서리를 가로지르는 또렷한 색면 도형 */
 .auth-shape {
   position: absolute;
@@ -221,7 +270,8 @@ body.auth-body {
 }
 
 @keyframes auth-shape-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.7;
   }

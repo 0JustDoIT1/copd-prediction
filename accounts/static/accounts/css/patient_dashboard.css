@@ -45,9 +45,12 @@
   opacity: 0.6;
 }
 
+/* 배경 블롭 — 천천히 부풀고 가라앉는 "숨쉬기" 모션 */
 .dashboard-hero-blob {
   position: absolute;
   border-radius: 50%;
+  transform-origin: center;
+  animation: hero-breathe 6s ease-in-out infinite;
 }
 
 .dashboard-hero-blob-1 {
@@ -56,7 +59,6 @@
   width: 220px;
   height: 220px;
   background-color: #dcefe7;
-  opacity: 0.7;
 }
 
 .dashboard-hero-blob-2 {
@@ -65,7 +67,59 @@
   width: 240px;
   height: 240px;
   background-color: #e8f5ee;
-  opacity: 0.6;
+  animation-delay: 3s;
+}
+
+@keyframes hero-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.9;
+  }
+}
+
+/* 떠다니는 점들 — 위아래로 은은하게 움직이며 밝기도 함께 변화 */
+.dashboard-hero-dots circle {
+  animation: hero-dot-float 5s ease-in-out infinite;
+}
+
+.dashboard-hero-dots circle:nth-child(4n + 1) {
+  animation-delay: 0s;
+}
+
+.dashboard-hero-dots circle:nth-child(4n + 2) {
+  animation-delay: 1.2s;
+}
+
+.dashboard-hero-dots circle:nth-child(4n + 3) {
+  animation-delay: 2.4s;
+}
+
+.dashboard-hero-dots circle:nth-child(4n + 4) {
+  animation-delay: 3.6s;
+}
+
+@keyframes hero-dot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-hero-blob,
+  .dashboard-hero-dots circle {
+    animation: none;
+  }
 }
 
 .dashboard-hero-content {
