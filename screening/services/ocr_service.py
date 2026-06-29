@@ -93,16 +93,33 @@ def parse_health_data(full_text):
         ]),
     }
 
-    # 표 형태 보완: 175.0 cm / 72.0 kg / 23.5
-    match = re.search(
-        r"(\d+\.?\d*)\s*cm\s*/\s*(\d+\.?\d*)\s*kg\s*/\s*(\d+\.?\d*)",
-        full_text,
-        re.IGNORECASE
-    )
-    if match:
-        data["height"] = float(match.group(1))
-        data["weight"] = float(match.group(2))
+    # 표 형태 보완:
+    # OCR이 Height, Weight 항목명을 먼저 읽고
+    # 그 아래에 165.0, 58.0처럼 값을 따로 읽는 경우 처리
+    lines = [
+        line.strip()
+        for line in full_text.splitlines()
+        if line.strip()
+    ]
 
+    if any("Height" in line for line in lines) and any("Weight" in line for line in lines):
+        weight_index = next(
+            i for i, line in enumerate(lines)
+            if "Weight" in line
+        )
+
+        numbers_after_weight = []
+
+        for line in lines[weight_index + 1:]:
+            if re.fullmatch(r"\d+\.?\d*", line):
+                numbers_after_weight.append(float(line))
+
+            if len(numbers_after_weight) >= 2:
+                break
+
+        if len(numbers_after_weight) >= 2:
+            data["height"] = numbers_after_weight[0]
+            data["weight"] = numbers_after_weight[1]
     # 표 형태 보완: 120 / 80 mmHg
     match = re.search(
         r"(\d{2,3})\s*/\s*(\d{2,3})\s*mmHg",
