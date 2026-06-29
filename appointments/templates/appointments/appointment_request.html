@@ -15,6 +15,10 @@
         <button onclick="changeMonth(-1)" style="width:34px; height:34px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer; font-size:16px;">&lt;</button>
         <span id="cal-title" style="font-size:25px; font-weight:700;"></span>
         <button onclick="changeMonth(1)" style="width:34px; height:34px; border-radius:8px; border:1px solid #d7e6e2; background:#fff; cursor:pointer; font-size:16px;">&gt;</button>
+      </div>
+      <div style="display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:#62756f;">
+        <span><span style="display:inline-block; width:14px; height:14px; border-radius:4px; border:1.5px solid #4a7c72; vertical-align:middle; margin-right:4px;"></span>오늘 날짜</span>
+        <span><span style="display:inline-block; width:14px; height:14px; border-radius:4px; background:#4a7c72; vertical-align:middle; margin-right:4px;"></span>선택된 날짜</span>
       </div>      
       <div id="calendar-grid"></div>
     </div>
@@ -291,6 +295,7 @@ if (savedDate) {
       } else {
         document.getElementById('selected-info-text').textContent = savedDate;
       }
+      updateSlotAvailability(savedDate);
     }, 100);
   }
 }
