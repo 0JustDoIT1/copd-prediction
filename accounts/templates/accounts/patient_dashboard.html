@@ -103,14 +103,6 @@
       <input type="range" id="amountSlider" min="0" max="40" value="20" step="1" class="form-range">
     </div>
 
-    <div class="whatif-field">
-      <div class="whatif-label-row">
-        <label class="whatif-label">체중 변화</label>
-        <span class="whatif-value" id="weightOut">현재와 동일</span>
-      </div>
-      <input type="range" id="weightSlider" min="-20" max="20" value="0" step="1" class="form-range">
-    </div>
-
     <div class="whatif-result-grid">
       <div class="whatif-result-card whatif-result-current">
         <div class="whatif-result-label">현재 COPD 검사 권고 점수</div>
@@ -133,12 +125,6 @@
       <i class="bi bi-info-circle"></i>
       이 결과는 상관관계 기반의 참고용 시뮬레이션이며, 의학적으로 검증된 인과관계가 아닙니다.
     </div>
-    <p class="whatif-field-hint">
-      <i class="bi bi-info-circle"></i>
-      이 모델은 체중이 늘수록 권고 점수가 단순히 낮아지는 경향으로 학습되었습니다.
-      저체중·고체중을 모두 위험으로 보는 일반적인 체중-COPD 관계와는 다를 수 있어,
-      체중 변화 결과는 참고용으로만 봐주세요.
-    </p>
   </div>
 
   {% else %}
@@ -146,7 +132,7 @@
     <div class="whatif-empty-icon"><i class="bi bi-droplet-half"></i></div>
     <div class="whatif-empty-title">아직 시뮬레이션을 사용할 수 없어요</div>
     <div class="whatif-empty-desc">
-      검진정보를 입력하면 흡연, 체중 변화에 따른<br>COPD 검사 권고 점수 변화를 미리 살펴볼 수 있어요.
+      검진정보를 입력하면 흡연 변화에 따른<br>COPD 검사 권고 점수 변화를 미리 살펴볼 수 있어요.
     </div>
     <a href="{% url 'screening:home' %}" class="btn btn-primary mt-2">검진정보 입력하기</a>
   </div>

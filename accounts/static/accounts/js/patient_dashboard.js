@@ -3,8 +3,14 @@
  *
  * computeScore()는 더미 계산식이다. screening 팀이 /predict/what-if/ 를
  * 만들면 이 함수 내부만 fetch 호출로 교체하면 된다.
- * 입력: {smoking_status, smoking_amount, weight_delta}
+ * 입력: {smoking_status, smoking_amount}
  * 출력: {risk_probability}
+ *
+ * 주의: 체중(BMI) 슬라이더는 의도적으로 제거됨. 실제 모델에서 HE_BMI 계수가
+ * 단순 선형(체중상승 -> 권고점수 단순하락)으로 학습되어 있어, 저체중·고체중을
+ * 모두 위험으로 보는 일반적인 체중-COPD 관계와 어긋나 보이는 문제가 있었고,
+ * 환자가 슬라이더로 "바꿀 수 있는" 변수 중에서도 의학적으로 설명하기 까다로운
+ * 항목이라 What-if 시뮬레이션 대상에서 제외하기로 함.
  *
  * 사용하는 전역 값 두 개는 patient_dashboard.html에서 Django 템플릿 변수로
  * window에 미리 세팅해둔다: window.WHATIF_CURRENT_SMOKING, window.WHATIF_CURRENT_AMOUNT
@@ -21,35 +27,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var smokingVal = CURRENT_SMOKING;
   var amountVal = CURRENT_AMOUNT;
-  var weightVal = 0;
 
   var smokingButtons = document.querySelectorAll("#smokingToggle button");
   var amountSlider = document.getElementById("amountSlider");
   var amountOut = document.getElementById("amountOut");
   var amountRow = document.getElementById("amountRow");
-  var weightSlider = document.getElementById("weightSlider");
-  var weightOut = document.getElementById("weightOut");
   var currentScoreEl = document.getElementById("currentScore");
   var currentText = document.getElementById("currentText");
   var resultScoreEl = document.getElementById("resultScore");
   var resultText = document.getElementById("resultText");
   var resultBadge = document.getElementById("resultBadge");
 
-  // 슬라이더의 실제 핸들 위치/표시 텍스트를 현재 JS 값(amountVal, weightVal)에 맞춰 동기화.
-  // HTML의 value="20" 같은 하드코딩된 초기 속성을 덮어써서, 페이지 로드 시점부터
-  // "최근 검진값"이 슬라이더 위치에도 그대로 반영되도록 한다.
   function syncSlidersToCurrentValues() {
     amountSlider.value = amountVal;
     amountOut.textContent = amountVal + "개비";
-
-    weightSlider.value = weightVal;
-    if (weightVal === 0) {
-      weightOut.textContent = "현재와 동일";
-    } else if (weightVal > 0) {
-      weightOut.textContent = "+" + weightVal + "kg";
-    } else {
-      weightOut.textContent = weightVal + "kg";
-    }
   }
 
   function updateButtons() {
@@ -62,11 +53,10 @@ document.addEventListener("DOMContentLoaded", function () {
     amountSlider.disabled = isNonSmoker;
   }
 
-  function computeScore(smoking, amount, weight) {
+  function computeScore(smoking, amount) {
     var base = 0.5;
     base += smoking * 0.08;
     base += (smoking === 0 ? 0 : amount) * 0.003;
-    base += weight * -0.008;
     return Math.max(0.05, Math.min(0.95, base));
   }
 
@@ -77,8 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function render() {
-    var currentScore = computeScore(CURRENT_SMOKING, CURRENT_AMOUNT, 0);
-    var simScore = computeScore(smokingVal, amountVal, weightVal);
+    var currentScore = computeScore(CURRENT_SMOKING, CURRENT_AMOUNT);
+    var simScore = computeScore(smokingVal, amountVal);
     var diff = simScore - currentScore;
 
     currentScoreEl.textContent = (currentScore * 100).toFixed(1);
@@ -112,18 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
   amountSlider.addEventListener("input", function () {
     amountVal = parseInt(amountSlider.value, 10);
     amountOut.textContent = amountVal + "개비";
-    render();
-  });
-
-  weightSlider.addEventListener("input", function () {
-    weightVal = parseInt(weightSlider.value, 10);
-    if (weightVal === 0) {
-      weightOut.textContent = "현재와 동일";
-    } else if (weightVal > 0) {
-      weightOut.textContent = "+" + weightVal + "kg";
-    } else {
-      weightOut.textContent = weightVal + "kg";
-    }
     render();
   });
 
