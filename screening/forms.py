@@ -40,6 +40,7 @@ class QuestionnaireForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         smoking_status = cleaned_data.get("smoking_status")
+        smoking_amount = cleaned_data.get("smoking_amount")
 
         # 비흡연(0)·과거흡연(1)인 경우, 클라이언트에서 disabled로 막아도
         # 폼 데이터를 직접 조작해서 보낼 수 있고, disabled된 input은 값 자체가
@@ -47,8 +48,13 @@ class QuestionnaireForm(forms.ModelForm):
         # 최종 보정한다 (입력값을 신뢰하지 않고 서버가 마지막에 확정).
         if str(smoking_status) in ("0", "1"):
             cleaned_data["smoking_amount"] = 0
-        elif cleaned_data.get("smoking_amount") in (None, ""):
-            cleaned_data["smoking_amount"] = 0
+        elif str(smoking_status) == "2":
+            # 현재흡연(2)인데 흡연량이 비어있거나 0이면, 논리적으로 맞지 않으므로
+            # 명시적인 에러로 막는다. 0을 "값이 없다"는 의미로 그냥 채워버리지 않음.
+            if smoking_amount in (None, ""):
+                self.add_error("smoking_amount", "현재흡연을 선택한 경우 하루 흡연량을 입력해주세요.")
+            elif smoking_amount <= 0:
+                self.add_error("smoking_amount", "현재흡연을 선택한 경우 흡연량은 0보다 커야 합니다.")
 
         return cleaned_data
 
