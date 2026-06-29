@@ -165,7 +165,10 @@ def cancel_appointment(request, pk):
             appointment = AppointmentRequest.objects.get(pk=pk, patient=patient)
             
             # 하루 전까지만 취소 가능
-            if appointment.slot_datetime - tz.now() > timedelta(days=1):
+            # 예약 당일 자정(00:00) 이전까지 취소 가능
+            appointment_date = tz.localtime(appointment.slot_datetime).date()
+            today = tz.localtime(tz.now()).date()
+            if appointment_date > today:
                 appointment.status = 'cancelled'
                 appointment.save()
         except:
