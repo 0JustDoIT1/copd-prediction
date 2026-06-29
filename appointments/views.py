@@ -6,6 +6,7 @@ from accounts.models import PatientProfile
 from django.db import transaction, IntegrityError
 from django.utils import timezone as tz
 from datetime import timedelta
+from django.db import models
 
 SLOT_TIMES_AM = [
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -159,8 +160,8 @@ def my_appointments(request):
                 })
             return result
         
-        upcoming = add_ampm(all_appointments.filter(slot_datetime__gte=now))
-        past = add_ampm(all_appointments.filter(slot_datetime__lt=now))
+        upcoming = add_ampm(all_appointments.filter(slot_datetime__gte=now, status='confirmed'))
+        past = add_ampm(all_appointments.filter(models.Q(slot_datetime__lt=now) | models.Q(status='cancelled')))
         
     except:
         upcoming = []
