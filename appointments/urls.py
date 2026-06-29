@@ -8,4 +8,6 @@ urlpatterns = [
     path('confirm/', views.appointment_confirm, name='appointment_confirm'),
     path('done/', views.appointment_done, name='appointment_done'),
     path('list/', views.appointment_list, name='appointment_list'),  
+    path('my/', views.my_appointments, name='my_appointments'),
+    path('cancel/<int:pk>/', views.cancel_appointment, name='cancel_appointment'),
 ]

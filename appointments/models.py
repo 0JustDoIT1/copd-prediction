@@ -17,4 +17,10 @@ class AppointmentRequest(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = (('slot_datetime',),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['slot_datetime'],
+                condition=models.Q(status='confirmed'),
+                name='unique_confirmed_slot_datetime',
+            )
+        ]
