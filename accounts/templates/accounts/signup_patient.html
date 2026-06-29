@@ -2,7 +2,7 @@
 {% block title %}환자 회원가입 - 미래의료병원{% endblock %}
 
 {% block auth_content %}
-<a href="{% url 'accounts:signup' %}" class="text-decoration-none" style="font-size: 13px; color: var(--color-muted);">
+<a href="{% url 'accounts:signup' %}" class="signup-back-link">
   <i class="bi bi-arrow-left"></i> 가입 유형 다시 선택
 </a>
 
@@ -18,26 +18,40 @@
 
   <div class="mb-3">
     <label class="form-label">{{ form.name.label }}</label>
-    {{ form.name }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-person input-icon"></i>
+      {{ form.name }}
+    </div>
     {% if form.name.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_name" style="font-size:13px; padding:8px 12px;">{{ form.name.errors|first }}</div>{% endif %}
   </div>
 
   <div class="mb-3">
     <label class="form-label">{{ form.email.label }}</label>
-    {{ form.email }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-envelope input-icon"></i>
+      {{ form.email }}
+    </div>
     {% if form.email.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_email" style="font-size:13px; padding:8px 12px;">{{ form.email.errors|first }}</div>{% endif %}
   </div>
 
   <div class="mb-3">
     <label class="form-label">{{ form.password1.label }}</label>
-    {{ form.password1 }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-lock input-icon"></i>
+      {{ form.password1 }}
+      <i class="bi bi-eye-slash input-icon-toggle" data-toggle-target="id_password1"></i>
+    </div>
     <div class="text-muted" style="font-size:11.5px; margin-top:4px;">영문, 숫자, 특수문자를 포함한 8~16자</div>
     {% if form.password1.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_password1" style="font-size:13px; padding:8px 12px;">{{ form.password1.errors|first }}</div>{% endif %}
   </div>
 
   <div class="mb-3">
     <label class="form-label">{{ form.password2.label }}</label>
-    {{ form.password2 }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-lock input-icon"></i>
+      {{ form.password2 }}
+      <i class="bi bi-eye-slash input-icon-toggle" data-toggle-target="id_password2"></i>
+    </div>
     {% if form.password2.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_password2" style="font-size:13px; padding:8px 12px;">{{ form.password2.errors|first }}</div>{% endif %}
   </div>
 
@@ -45,19 +59,24 @@
 
   <div class="mb-3">
     <label class="form-label">{{ form.birth_date.label }}</label>
-    {{ form.birth_date }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-calendar3 input-icon"></i>
+      {{ form.birth_date }}
+    </div>
     {% if form.birth_date.errors %}<div class="alert-danger-soft mt-2 mb-0 js-server-error" data-watch="id_birth_date" style="font-size:13px; padding:8px 12px;">{{ form.birth_date.errors|first }}</div>{% endif %}
   </div>
 
   <div class="mb-3" data-parsley-required="true" data-parsley-multiple="sex"
        data-parsley-required-message="성별을 선택해주세요.">
     <label class="form-label d-block">{{ form.sex.label }}</label>
-    {% for radio in form.sex %}
-      <div class="form-check form-check-inline">
-        {{ radio.tag }}
-        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-      </div>
-    {% endfor %}
+    <div class="sex-radio-group">
+      {% for radio in form.sex %}
+        <label class="sex-radio-option" for="{{ radio.id_for_label }}">
+          {{ radio.tag }}
+          <span>{{ radio.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
     {% if form.sex.errors %}<div class="alert-danger-soft mt-2 mb-0" style="font-size:13px; padding:8px 12px;">{{ form.sex.errors|first }}</div>{% endif %}
   </div>
 
@@ -67,4 +86,109 @@
 <p class="text-center mt-4 mb-0" style="font-size: 13.5px;">
   이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a>
 </p>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .signup-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .signup-back-link:hover {
+    color: var(--color-main);
+  }
+
+  .input-icon-wrap {
+    position: relative;
+  }
+
+  .input-icon-wrap .form-control {
+    padding-left: 40px;
+  }
+
+  .input-icon-wrap .form-control#id_password1,
+  .input-icon-wrap .form-control#id_password2 {
+    padding-right: 40px;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--color-muted);
+    pointer-events: none;
+  }
+
+  .input-icon-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+
+  .input-icon-toggle:hover {
+    color: var(--color-main);
+  }
+
+  .sex-radio-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .sex-radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    padding: 9px 0;
+    font-size: 13.5px;
+    color: var(--color-darker);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .sex-radio-option:has(input:checked) {
+    border-color: var(--color-main);
+    background-color: var(--color-bg);
+    color: var(--color-main);
+    font-weight: 600;
+  }
+
+  .sex-radio-option input {
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.input-icon-toggle[data-toggle-target]').forEach(function (toggle) {
+      var input = document.getElementById(toggle.getAttribute('data-toggle-target'));
+      if (!input) return;
+
+      toggle.addEventListener('click', function () {
+        var isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        toggle.classList.toggle('bi-eye-slash', !isHidden);
+        toggle.classList.toggle('bi-eye', isHidden);
+      });
+    });
+  });
+</script>
 {% endblock %}
