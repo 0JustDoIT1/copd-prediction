@@ -204,7 +204,7 @@
         </svg>
         <div style="position: relative; z-index: 1;">
             <h5 class="fw-bold mb-1" style="color: white;">
-                {{ request.user.first_name|default:request.user.username|default:"환자" }}님, 안녕하세요 👋
+                {{ display_name }}님, 안녕하세요 👋
             </h5>
             <p class="mb-0" style="opacity: .9; font-size: 0.88rem;">
                 {% now "n월 j일" %} · 오늘도 건강 기록 잊지 마세요

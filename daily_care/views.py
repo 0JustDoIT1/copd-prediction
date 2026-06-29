@@ -22,6 +22,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         today = timezone.localdate()
 
+        # ── 표시 이름 (가입 시 입력한 실제 이름 우선) ──
+        if getattr(user, 'name', None):
+            display_name = user.name
+        elif user.first_name:
+            display_name = user.first_name
+        elif user.email:
+            display_name = user.email.split('@')[0]
+        else:
+            display_name = user.username
+        context['display_name'] = display_name
+
         today_log = DailyLog.objects.filter(user=user, log_date=today).first()
         context['checked_in_today'] = has_checked_in_today(user)
         context['today_log'] = today_log
@@ -50,17 +61,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['weekly'] = weekly
         context['weekly_rate'] = round(checked_count / 7 * 100)
 
-               # ── 월간(이번 달 1일 ~ 오늘) 체크인 달성률 ──
+        # ── 월간(이번 달 1일 ~ 오늘) 체크인 달성률 ──
         month_start = today.replace(day=1)
-        days_so_far = (today - month_start).days + 1        # 이번 달 1일부터 오늘까지 지난 일수
+        days_so_far = (today - month_start).days + 1
         month_logged = DailyLog.objects.filter(
             user=user, log_date__range=(month_start, today)
         ).values_list('log_date', flat=True).distinct().count()
         monthly_rate = round(month_logged / days_so_far * 100) if days_so_far else 0
         context['monthly_rate'] = monthly_rate
-                # 원형 게이지 채움 계산 (둘레 2πr = 2 × 3.1416 × 40 ≈ 251.2)
+        # 원형 게이지 채움 계산 (둘레 2πr = 2 × 3.1416 × 40 ≈ 251.2)
         context['monthly_dashoffset'] = round(251.2 * (1 - monthly_rate / 100), 1)
-
 
         return context
 
