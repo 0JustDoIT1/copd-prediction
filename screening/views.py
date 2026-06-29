@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 from .models import Questionnaire, PredictionResult
 from .forms import (
@@ -186,6 +187,12 @@ def doctor_dashboard(request):
         .order_by("-decision__decided_at")
     )
 
+    # 오늘(로컬 타임존 기준) 판정 완료된 건수 - decision__decided_at의 날짜 부분만 비교
+    today = timezone.localtime().date()
+    today_completed_count = completed_predictions.filter(
+        decision__decided_at__date=today
+    ).count()
+
     pending_paginator = Paginator(pending_predictions, 5)
     completed_paginator = Paginator(completed_predictions, 5)
 
@@ -206,6 +213,7 @@ def doctor_dashboard(request):
             "active_menu": "doctor_dashboard",
             "sort": sort,
             "priority_count": priority_count,
+            "today_completed_count": today_completed_count,
         }
     )
 
