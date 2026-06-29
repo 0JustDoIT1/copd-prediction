@@ -19,6 +19,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['active_menu'] = 'daily_log'
         user = self.request.user
         today = timezone.localdate()
 
@@ -84,6 +85,7 @@ class CheckinView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['active_menu'] = 'daily_log'
         context['checked_in_today'] = has_checked_in_today(self.request.user)
         return context
 
@@ -122,6 +124,7 @@ class HistoryView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['active_menu'] = 'daily_log'
 
         context['checked_in_today'] = has_checked_in_today(self.request.user)
 
@@ -196,6 +199,11 @@ class LogUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         # 본인 기록만 수정 가능 (URL의 pk를 바꿔 남의 기록 접근하는 것 차단)
         return DailyLog.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_menu'] = 'daily_log'
+        return context
 
     def form_valid(self, form):
         # log_date는 수정 시 변경하지 않음 — DB의 기존 날짜를 그대로 유지

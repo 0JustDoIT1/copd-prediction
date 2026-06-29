@@ -41,6 +41,8 @@ def appointment_request(request):
         'saved_date': saved_date,
         'saved_time': saved_time,
         'booked_times': booked_times,
+        'active_group': 'appointments',
+        'active_menu': 'appointment_request',
     })
 
 
@@ -79,6 +81,8 @@ def appointment_confirm(request):
         'selected_time': selected_time,
         'patient': patient,
         'ampm': ampm,
+        'active_group': 'appointments',
+        'active_menu': 'appointment_request',
     })
 
 
@@ -108,6 +112,8 @@ def appointment_done(request):
                         'selected_time': time_str,
                         'patient': patient,
                         'error': '이미 예약된 시간입니다. 다른 시간을 선택해주세요.',
+                        'active_group': 'appointments',
+                        'active_menu': 'appointment_request',
                     })
                 
                 AppointmentRequest.objects.create(
@@ -122,6 +128,8 @@ def appointment_done(request):
                 'selected_time': time_str,
                 'patient': patient,
                 'error': '이미 예약된 시간입니다. 다른 시간을 선택해주세요.',
+                'active_group': 'appointments',
+                'active_menu': 'appointment_request',
             })
         except Exception as e:
             print(f"예약 저장 오류: {e}")
@@ -151,6 +159,8 @@ def appointment_done(request):
         'date': date_str,
         'time': time_str,
         'ampm': ampm,
+        'active_group': 'appointments',
+        'active_menu': 'appointment_request',
     })
 
 
@@ -161,6 +171,7 @@ def appointment_list(request):
     
     return render(request, 'appointments/appointment_list.html', {
         'appointments': appointments,
+        'active_menu': 'appointment_list',
     })
     
 def my_appointments(request):
@@ -197,6 +208,8 @@ def my_appointments(request):
     return render(request, 'appointments/appointment_my.html', {
         'upcoming': upcoming,
         'past': past,
+        'active_group': 'appointments',
+        'active_menu': 'my_appointments',
     })
 
 def cancel_appointment(request, pk):

@@ -29,7 +29,7 @@ def screening_home(request):
         "screening/screening_home.html",
         {
             "active_group": "screening",
-            "active_menu": "screening_home",
+            "active_menu": "questionnaire",
         }
     )
 
@@ -56,7 +56,9 @@ def questionnaire_create(request):
         request,
         "screening/questionnaire_form.html",
         {
-            "form": form
+            "form": form,
+            "active_group": "screening",
+            "active_menu": "questionnaire",
         }
     )
 
@@ -110,6 +112,8 @@ def health_record_create(request, questionnaire_id):
                 "screening/submit_complete.html",
                 {
                     "prediction_id": prediction.id,
+                    "active_group": "screening",
+                    "active_menu": "questionnaire",
                 }
             )
 
@@ -130,6 +134,8 @@ def health_record_create(request, questionnaire_id):
             "patient": patient,
             "age": calculate_age(patient.birth_date),
             "ocr_success": ocr_success,
+            "active_group": "screening",
+            "active_menu": "questionnaire",
         }
     )
 
@@ -335,7 +341,7 @@ def ocr_upload(request, questionnaire_id):
         {
             "form": form,
             "active_group": "screening",
-            "active_menu": "ocr_upload",
+            "active_menu": "questionnaire",
         }
     )
 
