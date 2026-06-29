@@ -17,18 +17,83 @@
 
 <form method="post" novalidate data-parsley-validate>
   {% csrf_token %}
+
   <div class="mb-3">
     <label class="form-label">{{ form.username.label }}</label>
-    {{ form.username }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-envelope input-icon"></i>
+      {{ form.username }}
+    </div>
   </div>
+
   <div class="mb-3">
     <label class="form-label">{{ form.password.label }}</label>
-    {{ form.password }}
+    <div class="input-icon-wrap">
+      <i class="bi bi-lock input-icon"></i>
+      {{ form.password }}
+      <i class="bi bi-eye-slash input-icon-toggle" id="togglePassword"></i>
+    </div>
   </div>
+
   <button type="submit" class="btn btn-primary w-100 mt-2">로그인</button>
 </form>
 
 <p class="text-center mt-4 mb-0" style="font-size: 13.5px;">
   계정이 없으신가요? <a href="{% url 'accounts:signup' %}">회원가입</a>
 </p>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .input-icon-wrap {
+    position: relative;
+  }
+
+  .input-icon-wrap .form-control {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--color-muted);
+    pointer-events: none;
+  }
+
+  .input-icon-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+
+  .input-icon-toggle:hover {
+    color: var(--color-main);
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.getElementById('togglePassword');
+    var passwordInput = document.getElementById('id_password');
+
+    if (toggle && passwordInput) {
+      toggle.addEventListener('click', function () {
+        var isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        toggle.classList.toggle('bi-eye-slash', !isHidden);
+        toggle.classList.toggle('bi-eye', isHidden);
+      });
+    }
+  });
+</script>
 {% endblock %}

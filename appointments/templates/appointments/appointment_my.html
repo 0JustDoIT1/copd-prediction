@@ -17,12 +17,16 @@
         <div>
           <p style="font-size:16px; font-weight:700; margin-bottom:4px;">COPD 폐기능검사</p>
           <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ item.local_dt|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {{ item.ampm }} {{ item.local_dt|date:"H:i" }}</p>
-          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ item.obj.get_status_display }}</span>
+          {% if item.obj.status == 'confirmed' %}
+          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">확정</span>
+          {% else %}
+          <span style="background:#fff3e0; color:#f97316; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">취소</span>
+          {% endif %}
         </div>
         {% if item.obj.status == 'confirmed' %}
         <form method="post" action="{% url 'appointments:cancel_appointment' item.obj.pk %}">
           {% csrf_token %}
-          <button type="submit" onclick="return confirm('예약을 취소하시겠습니까?')" style="padding:8px 16px; background:#fff; border:1.5px solid #fc8181; color:#c53030; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;">취소</button>
+          <button type="submit" onclick="return confirmCancel('{{ item.date_str }}')" style="padding:8px 16px; background:#fff; border:1.5px solid #fc8181; color:#c53030; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;">취소</button>
         </form>
         {% endif %}
       </div>
@@ -51,4 +55,16 @@
   {% endif %}
 
 </div>
+{% block extra_js %}
+<script>
+function confirmCancel(appointmentDate) {
+  const today = new Date().toISOString().split('T')[0];
+  if (appointmentDate <= today) {
+    alert('당일 예약은 취소가 불가합니다.');
+    return false;
+  }
+  return confirm('예약을 취소하시겠습니까?');
+}
+</script>
+{% endblock %}
 {% endblock %}
