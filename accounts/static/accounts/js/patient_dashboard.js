@@ -14,17 +14,19 @@
  *     전까지 점수/문구 자리에는 샤이머(shimmer) 스켈레톤을 보여줘 빈 "0%"가
  *     순간적으로 노출되는 것을 막는다.
  *   - 값이 바뀌었는데 아직 재계산하지 않은 상태는 버튼에 절제된 섀도 링 +
- *     짧은 문구 변경으로 알려준다(과한 애니메이션은 피함).
+ *     약한 흔들림 + 짧은 문구 변경으로 알려준다.
  *
  * 사용하는 전역 값은 patient_dashboard.html에서 Django 템플릿 변수로
  * window에 미리 세팅해둔다:
  *   window.WHATIF_CURRENT_SMOKING, window.WHATIF_CURRENT_AMOUNT, window.WHATIF_COMPUTE_URL
  *
- * 주의: 체중(BMI) 슬라이더는 의도적으로 제거됨. 실제 모델에서 HE_BMI 계수가
- * 단순 선형(체중상승 -> 권고점수 단순하락)으로 학습되어 있어, 저체중·고체중을
+ * 주의: 체중(BMI) 슬라이더는 제거된 상태. 실제 모델에서 HE_BMI 계수가 단순
+ * 선형(체중상승 -> 권고점수 단순하락)으로 학습되어 있어, 저체중·고체중을
  * 모두 위험으로 보는 일반적인 체중-COPD 관계와 어긋나 보이는 문제가 있었고,
  * 환자가 슬라이더로 "바꿀 수 있는" 변수 중에서도 의학적으로 설명하기 까다로운
- * 항목이라 What-if 시뮬레이션 대상에서 제외하기로 함.
+ * 항목이라 What-if 시뮬레이션 대상에서 제외함. 이 파일에는 weight 관련
+ * 코드가 전혀 없어야 한다 - HTML에도 weightSlider/weightOut 요소가 없으므로,
+ * 혹시 이 파일에 weight 관련 코드가 남아있으면 null 참조 에러가 난다.
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -46,15 +48,28 @@ document.addEventListener("DOMContentLoaded", function () {
   var amountOut = document.getElementById("amountOut");
   var amountRow = document.getElementById("amountRow");
   var calcBtn = document.getElementById("whatifCalcBtn");
-  var calcBtnDefaultHtml = calcBtn.innerHTML;
   var resultGrid = document.getElementById("whatifResultGrid");
-  var currentCard = resultGrid.querySelector(".whatif-result-current");
-  var simCard = resultGrid.querySelector(".whatif-result-sim");
   var currentScoreEl = document.getElementById("currentScore");
   var currentText = document.getElementById("currentText");
   var resultScoreEl = document.getElementById("resultScore");
   var resultText = document.getElementById("resultText");
   var resultBadge = document.getElementById("resultBadge");
+
+  // 필수 요소 중 하나라도 없으면(HTML 구조가 어긋났으면) 조용히 종료.
+  // null.addEventListener 같은 에러로 스크립트 전체가 죽는 것을 방지한다.
+  var requiredElements = [
+    smokingButtons.length > 0 ? true : null,
+    amountSlider, amountOut, amountRow, calcBtn, resultGrid,
+    currentScoreEl, currentText, resultScoreEl, resultText, resultBadge,
+  ];
+  if (requiredElements.indexOf(null) !== -1) {
+    console.error("What-if 시뮬레이션: 필요한 화면 요소를 찾지 못해 초기화를 중단합니다.");
+    return;
+  }
+
+  var calcBtnDefaultHtml = calcBtn.innerHTML;
+  var currentCard = resultGrid.querySelector(".whatif-result-current");
+  var simCard = resultGrid.querySelector(".whatif-result-sim");
 
   function getCsrfToken() {
     var input = document.querySelector('input[name="csrfmiddlewaretoken"]');
@@ -66,8 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
     amountOut.textContent = amountVal + "개비";
   }
 
-  // 슬라이더/토글 조작 시에는 라벨만 갱신하고 서버 요청은 보내지 않는다.
-  // 버튼에 "다시 계산이 필요하다"는 신호를 절제된 수준으로 표시한다.
   function markStale() {
     if (!hasLoadedOnce) {
       return;
@@ -176,6 +189,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("What-if 시뮬레이션 계산 중 오류가 발생했습니다:", error);
         if (hasLoadedOnce) {
           resultBadge.textContent = "계산 실패";
+        } else {
+          // 최초 계산이 아예 실패한 경우, 무한 스켈레톤으로 방치되지 않도록
+          // 명시적으로 실패 문구를 보여준다.
+          currentText.textContent = "계산에 실패했습니다";
+          resultText.textContent = "버튼을 다시 눌러주세요";
+          resultBadge.textContent = "계산 실패";
+          hasLoadedOnce = true;
+          currentCard.classList.add("is-loaded");
+          simCard.classList.add("is-loaded");
+          resultBadge.classList.add("is-loaded");
         }
       })
       .finally(function () {
