@@ -41,5 +41,13 @@ urlpatterns = [
     "ocr/<int:questionnaire_id>/",
     views.ocr_upload,
     name="ocr_upload",
-),
+    ),
+
+    # What-if 시뮬레이션 - accounts.views.patient_dashboard_view가
+    # reverse('screening:predict_whatif')로 이 경로를 가져다 쓴다.
+    path(
+    "predict/what-if/",
+    views.predict_whatif,
+    name="predict_whatif",
+    ),
 ]

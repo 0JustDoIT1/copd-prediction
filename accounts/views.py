@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.db import transaction
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from daily_care.utils import has_checked_in_today
@@ -155,9 +156,14 @@ def patient_dashboard_view(request):
     현재 흡연 상태/흡연량을 가져와 슬라이더 초기값으로 채운다. 검사 기록이 한
     건도 없으면 시뮬레이션 자체를 빈 상태(has_health_record=False)로 보여준다.
 
-    whatif_compute_url: screening 팀이 /predict/what-if/ 를 만들면 그 경로로 교체.
-    입력: {smoking_status, smoking_amount, weight_delta}, 출력: {risk_probability}
-    (아직 미구현이라 이 부분은 TODO로 남겨둠)
+    whatif_compute_url: screening 앱의 실제 추론 엔드포인트(/predict/what-if/)를
+    가리킨다(screening.views.predict_whatif). patient_dashboard.js가 슬라이더
+    조작 시 이 URL로 POST 요청을 보내 실제 LR 모델(.pkl) 기반 권고 점수를
+    받아온다.
+    요청: {smoking_status, smoking_amount}
+    응답: {risk_probability}
+    (체중(BMI) 변수는 모델 계수가 단순 선형이라 의학적으로 비직관적이라는
+    이유로 What-if 시뮬레이션 대상에서 제외됨 — weight_delta 없음)
     """
     from content.models import FAQ
     from screening.models import PredictionResult
@@ -187,6 +193,11 @@ def patient_dashboard_view(request):
 
     show_checkin_toast = not has_checked_in_today(request.user)
 
+    # screening 앱의 What-if 추론 엔드포인트 경로.
+    # reverse()로 가져와서, 나중에 screening/urls.py에서 경로명이 바뀌어도
+    # 이 템플릿/JS 쪽 하드코딩을 손댈 필요가 없게 한다.
+    whatif_compute_url = reverse('screening:predict_whatif')
+
     context = {
         'active_menu': 'home',
 
@@ -195,6 +206,7 @@ def patient_dashboard_view(request):
         'has_health_record': has_health_record,
         'whatif_current_smoking': whatif_current_smoking,
         'whatif_current_amount': whatif_current_amount,
+        'whatif_compute_url': whatif_compute_url,
 
         'show_checkin_toast': show_checkin_toast,
     }

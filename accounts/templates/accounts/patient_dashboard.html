@@ -5,6 +5,150 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'accounts/css/patient_dashboard.css' %}">
+<style>
+  /* ===================== What-if: 계산 버튼 ===================== */
+  .whatif-calc-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--color-main);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 6px 0 22px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .whatif-calc-btn:hover {
+    background-color: var(--color-dark);
+  }
+
+  .whatif-calc-btn:active {
+    transform: scale(0.98);
+  }
+
+  .whatif-calc-btn:disabled {
+    background-color: var(--color-border);
+    color: var(--color-muted);
+    cursor: not-allowed;
+  }
+
+  .whatif-calc-btn.is-loading i {
+    animation: whatif-spin 0.8s linear infinite;
+  }
+
+  @keyframes whatif-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* 슬라이더/토글을 조작했지만 아직 다시 계산하지 않은 상태임을 알려주는
+     절제된 강조 효과 - 메인 컬러 계열의 섀도 링 + 아주 약한 흔들림 */
+  .whatif-calc-btn-pulse {
+    animation:
+      whatif-btn-pulse 1.4s ease-in-out infinite,
+      whatif-btn-shake 1.4s ease-in-out infinite;
+  }
+
+  @keyframes whatif-btn-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74, 124, 114, 0.5); }
+    50% { box-shadow: 0 0 0 7px rgba(74, 124, 114, 0); }
+  }
+
+  @keyframes whatif-btn-shake {
+    0%, 85%, 100% { transform: translateX(0); }
+    88% { transform: translateX(-2px); }
+    91% { transform: translateX(2px); }
+    94% { transform: translateX(-1px); }
+  }
+
+  /* ===================== What-if: 스켈레톤 로딩 ===================== */
+  /* 기본 상태: 스켈레톤 보임 + 실제 값 텍스트는 숨김.
+     .is-loaded 클래스가 붙으면(최초 계산 완료 시) 스켈레톤이 사라지고 실제 값이 드러남. */
+  .whatif-skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(74, 124, 114, 0.12) 25%,
+      rgba(74, 124, 114, 0.22) 37%,
+      rgba(74, 124, 114, 0.12) 63%
+    );
+    background-size: 400% 100%;
+    animation: whatif-shimmer 1.4s ease infinite;
+    border-radius: 8px;
+    color: transparent !important;
+  }
+
+  .whatif-skeleton-dark {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.12) 25%,
+      rgba(255, 255, 255, 0.25) 37%,
+      rgba(255, 255, 255, 0.12) 63%
+    );
+    background-size: 400% 100%;
+  }
+
+  .whatif-skeleton-score {
+    display: inline-block;
+    width: 64px;
+    height: 30px;
+    vertical-align: middle;
+  }
+
+  .whatif-skeleton-text {
+    display: block;
+    width: 80%;
+    height: 14px;
+    margin-top: 2px;
+  }
+
+  .whatif-skeleton-badge {
+    display: inline-block;
+    width: 90px;
+    height: 22px;
+  }
+
+  @keyframes whatif-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .whatif-result-value-hidden {
+    display: none;
+  }
+
+  /* 계산이 완료되면 JS가 카드에 is-loaded를 붙인다 */
+  .whatif-result-card.is-loaded .whatif-skeleton,
+  .whatif-badge.is-loaded {
+    display: none !important;
+    animation: none;
+  }
+
+  .whatif-result-card.is-loaded .whatif-result-value-hidden {
+    display: inline;
+  }
+
+  .whatif-result-card.is-loaded .whatif-result-text {
+    color: inherit;
+  }
+
+  .whatif-result-card.is-loaded .whatif-result-unit {
+    display: inline !important;
+  }
+
+  /* 재계산 중(버튼 누른 후 응답 대기)일 때도 살짝 옅게 표시해 "갱신 중"임을 알림 */
+  .whatif-result-grid.is-recalculating {
+    opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -103,22 +247,32 @@
       <input type="range" id="amountSlider" min="0" max="40" value="20" step="1" class="form-range">
     </div>
 
-    <div class="whatif-result-grid">
+    <button type="button" class="whatif-calc-btn" id="whatifCalcBtn">
+      <i class="bi bi-calculator"></i> 변화 계산하기
+    </button>
+
+    <div class="whatif-result-grid" id="whatifResultGrid">
       <div class="whatif-result-card whatif-result-current">
         <div class="whatif-result-label">현재 COPD 검사 권고 점수</div>
-        <div class="whatif-result-score"><span id="currentScore">0</span><span class="whatif-result-unit">%</span></div>
-        <div class="whatif-result-text" id="currentText"></div>
+        <div class="whatif-result-score">
+          <span class="whatif-skeleton whatif-skeleton-score" id="currentScoreSkeleton"></span>
+          <span id="currentScore" class="whatif-result-value-hidden">0</span><span class="whatif-result-unit" id="currentScoreUnit" style="display:none;">%</span>
+        </div>
+        <div class="whatif-result-text whatif-skeleton whatif-skeleton-text" id="currentText"></div>
       </div>
       <div class="whatif-result-arrow"><i class="bi bi-arrow-right"></i></div>
       <div class="whatif-result-card whatif-result-sim">
         <div class="whatif-result-label">시뮬레이션 COPD 검사 권고 점수</div>
-        <div class="whatif-result-score"><span id="resultScore">0</span><span class="whatif-result-unit">%</span></div>
-        <div class="whatif-result-text" id="resultText"></div>
+        <div class="whatif-result-score">
+          <span class="whatif-skeleton whatif-skeleton-score whatif-skeleton-dark" id="resultScoreSkeleton"></span>
+          <span id="resultScore" class="whatif-result-value-hidden">0</span><span class="whatif-result-unit" id="resultScoreUnit" style="display:none;">%</span>
+        </div>
+        <div class="whatif-result-text whatif-skeleton whatif-skeleton-text whatif-skeleton-dark" id="resultText"></div>
       </div>
     </div>
 
     <div class="whatif-badge-row">
-      <span class="whatif-badge" id="resultBadge">변화 없음</span>
+      <span class="whatif-badge whatif-skeleton whatif-skeleton-badge" id="resultBadge"></span>
     </div>
 
     <div class="whatif-notice">
@@ -194,6 +348,7 @@
 <script>
   window.WHATIF_CURRENT_SMOKING = {{ whatif_current_smoking }};
   window.WHATIF_CURRENT_AMOUNT = {{ whatif_current_amount }};
+  window.WHATIF_COMPUTE_URL = "{{ whatif_compute_url }}";
 </script>
 <script src="{% static 'accounts/js/patient_dashboard.js' %}"></script>
 <script src="{% static 'js/checkin_toast.js' %}"></script>

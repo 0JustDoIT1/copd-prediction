@@ -1,6 +1,9 @@
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 
@@ -11,11 +14,16 @@ from .forms import (
     ClinicalDecisionForm,
     OCRUploadForm,
 )
-from .services.prediction_service import create_prediction_result, calculate_age
+from .services.prediction_service import (
+    create_prediction_result,
+    calculate_age,
+    build_feature_dict,
+)
 from .services.ocr_service import extract_health_data
+from .ml_model import predict_risk_probability
 
 @login_required
-def screening_home(request): # 로그인한 사용자만 문진입력 가능
+def screening_home(request):
     return render(
         request,
         "screening/screening_home.html",
@@ -26,14 +34,13 @@ def screening_home(request): # 로그인한 사용자만 문진입력 가능
     )
 
 
-# 문진 입력 ✏️
 @login_required 
 def questionnaire_create(request): 
     if request.method == "POST":
-        form = QuestionnaireForm(request.POST) # 환자가 제출한 문진 데이터 받음
+        form = QuestionnaireForm(request.POST)
 
         if form.is_valid():
-            questionnaire = form.save(commit=False) # DB에 바로 저장하지 않고 잠깐 멈춤
+            questionnaire = form.save(commit=False)
             questionnaire.patient = request.user.patientprofile
             questionnaire.save()
 
@@ -54,7 +61,6 @@ def questionnaire_create(request):
     )
 
 
-# 건강검진 입력 💉
 @login_required
 def health_record_create(request, questionnaire_id): 
     questionnaire = get_object_or_404(
@@ -70,14 +76,12 @@ def health_record_create(request, questionnaire_id):
             health_record = form.save(commit=False)
             health_record.patient = request.user.patientprofile
 
-            # BMI 자동 계산
             height_m = health_record.height / 100
             health_record.bmi = round(
                 health_record.weight / (height_m ** 2),
                 2
             )
 
-            # 고혈압 단계 자동 계산
             if health_record.bp_medication:
                 health_record.hp_stage = 4
             else:
@@ -95,7 +99,7 @@ def health_record_create(request, questionnaire_id):
                         health_record.hp_stage = 4
 
             health_record.save()
-           
+
             prediction = create_prediction_result(
                 questionnaire,
                 health_record
@@ -129,7 +133,7 @@ def health_record_create(request, questionnaire_id):
         }
     )
 
-# 결과페이지 📋
+
 @login_required
 def result_detail(request, prediction_id): 
     prediction = get_object_or_404(
@@ -147,12 +151,6 @@ def result_detail(request, prediction_id):
         }
     )
 
-# 의사 대시보드 💻
-'''
-아직 의사가 판정하지 않은 PredictionResult 가져옴 + 검토 완료도 추가
-권고 점수 높은 순으로 정렬
-의사 대시보드 템플릿으로 전달
-'''
 
 @login_required
 def doctor_dashboard(request):
@@ -169,9 +167,6 @@ def doctor_dashboard(request):
         )
     )
 
-    # 우선순위 필터 (전체 / 우선 검토만 / 일반 검토만)
-    # priority_count(통계 카드)는 이 필터와 무관하게 항상 "대기 전체" 기준으로
-    # 따로 계산하므로, 여기서 필터링해도 통계 카드 숫자는 흔들리지 않는다.
     if pending_filter == "priority":
         pending_predictions = pending_predictions.filter(risk_probability__gte=0.4)
     elif pending_filter == "normal":
@@ -182,16 +177,11 @@ def doctor_dashboard(request):
     else:
         pending_predictions = pending_predictions.order_by("-risk_probability")
 
-    # 통계 카드용 우선 검토 건수 - 필터(pending_filter)와 무관하게 항상 대기 전체 기준
     priority_count = PredictionResult.objects.filter(
         decision__isnull=True,
         risk_probability__gte=0.4,
     ).count()
 
-    # 필터를 적용하기 전, "대기 목록 자체가 원래 비어있는지"를 판단하기 위한
-    # 전체 건수. 0이면 필터/정렬 컨트롤 자체가 무의미하므로 템플릿에서 숨긴다.
-    # (필터링 때문에 0건이 된 경우는 컨트롤을 계속 보여줘야 하므로, 이 값과
-    # 화면에 표시되는 필터링된 결과 건수를 서로 다른 용도로 구분해서 쓴다.)
     pending_total_count = PredictionResult.objects.filter(
         decision__isnull=True
     ).count()
@@ -202,14 +192,11 @@ def doctor_dashboard(request):
         .select_related("questionnaire__patient__user", "decision")
     )
 
-    # 판정 결과 필터 (전체 / 권고 / 정상)
-    # decision_filter는 ClinicalDecision.DECISION_CHOICES의 값('recommend', 'normal')과 동일하게 받음
     if decision_filter in ("recommend", "normal"):
         completed_predictions = completed_predictions.filter(
             decision__decision=decision_filter
         )
 
-    # 완료 목록 정렬 (최신순 / 오래된순 / 권고점수 높은순 / 권고점수 낮은순)
     completed_sort_map = {
         "latest": "-decision__decided_at",
         "oldest": "decision__decided_at",
@@ -220,17 +207,10 @@ def doctor_dashboard(request):
         completed_sort_map.get(completed_sort, "-decision__decided_at")
     )
 
-    # 완료 목록도 동일한 이유로, 필터 적용 전 전체 건수를 따로 계산해둔다.
     completed_total_count = PredictionResult.objects.filter(
         decision__isnull=False
     ).count()
 
-    # 오늘(로컬 타임존 기준) 판정 완료된 건수.
-    # 주의 1: decided_at__date=today 형태의 date lookup은 DB에 UTC로 저장된 값을
-    # 그대로 자르는 경우가 있어 타임존 어긋남으로 0건이 나올 수 있음.
-    # 로컬 타임존 기준 "오늘 0시 ~ 내일 0시" 범위로 명시적으로 비교해야 안전함.
-    # 주의 2: 이 통계 카드는 필터(decision_filter)와 무관하게 항상 "오늘 전체"를
-    # 보여줘야 하므로, 필터 적용 전의 별도 쿼리셋으로 계산한다.
     now_local = timezone.localtime()
     today_start = now_local.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
@@ -271,7 +251,6 @@ def doctor_dashboard(request):
     )
 
 
-# 의사 판정 🔨
 @login_required
 def doctor_decision(request, prediction_id):
     prediction = get_object_or_404(
@@ -304,9 +283,6 @@ def doctor_decision(request, prediction_id):
     )
 
 
-
-
-# 환자가 결과 확인페이지
 @login_required
 def result_list(request):
     predictions = (
@@ -328,7 +304,7 @@ def result_list(request):
         }
     )
 
-# ocr 서비스
+
 @login_required
 def ocr_upload(request, questionnaire_id):
     if request.method == "POST":
@@ -342,7 +318,6 @@ def ocr_upload(request, questionnaire_id):
             print(ocr_result["raw_text"])
             print(ocr_result["extracted"])
 
-            # OCR 원문과 추출값을 세션에 저장
             request.session["ocr_raw_text"] = ocr_result["raw_text"]
             request.session["ocr_extracted"] = ocr_result["extracted"]
 
@@ -363,3 +338,68 @@ def ocr_upload(request, questionnaire_id):
             "active_menu": "ocr_upload",
         }
     )
+
+
+@login_required
+def predict_whatif(request):
+    """
+    환자 대시보드의 What-if 시뮬레이션이 호출하는 엔드포인트.
+
+    환자의 가장 최근 Questionnaire/HealthRecord로 feature_dict를 그대로
+    만들고(build_feature_dict 재사용), 그중 smoking_status/smoking_amount만
+    요청으로 받은 값으로 덮어써서 동일한 predict_risk_probability()를
+    재호출한다. 모델 로딩이나 다른 변수 처리 로직을 새로 만들지 않고,
+    health_record_create()가 실제 제출 때 쓰는 것과 완전히 같은 경로를 탄다.
+
+    요청(POST, JSON): {"smoking_status": 0|1|2, "smoking_amount": number}
+    응답(JSON): {"risk_probability": float}  (0~1 사이, 권고 점수)
+
+    체중(BMI)은 모델 계수가 단순 선형이라 의학적으로 비직관적이라는 이유로
+    시뮬레이션 대상에서 제외됨 - 요청에 weight_delta 없음, HE_BMI는 항상
+    환자의 최근 실측값을 그대로 사용한다.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({"error": "요청 본문이 올바른 JSON이 아닙니다."}, status=400)
+
+    smoking_status = body.get("smoking_status")
+    smoking_amount = body.get("smoking_amount")
+
+    if smoking_status not in (0, 1, 2):
+        return JsonResponse({"error": "smoking_status는 0, 1, 2 중 하나여야 합니다."}, status=400)
+
+    try:
+        smoking_amount = float(smoking_amount)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "smoking_amount가 올바르지 않습니다."}, status=400)
+
+    patient = request.user.patientprofile
+
+    latest_result = (
+        PredictionResult.objects
+        .filter(questionnaire__patient=patient)
+        .select_related("questionnaire", "health_record")
+        .order_by("-created_at")
+        .first()
+    )
+
+    if latest_result is None:
+        return JsonResponse(
+            {"error": "검진정보가 없어 시뮬레이션을 실행할 수 없습니다."},
+            status=404,
+        )
+
+    features = build_feature_dict(
+        latest_result.questionnaire,
+        latest_result.health_record,
+    )
+    features["smoking_status"] = smoking_status
+    features["smoking_amount"] = smoking_amount
+
+    risk_probability, _top_factors = predict_risk_probability(features)
+
+    return JsonResponse({"risk_probability": risk_probability})
