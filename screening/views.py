@@ -157,46 +157,86 @@ def result_detail(request, prediction_id):
 @login_required
 def doctor_dashboard(request):
     sort = request.GET.get("sort", "priority")
+    pending_filter = request.GET.get("pending_filter", "all")
+    completed_sort = request.GET.get("completed_sort", "latest")
+    decision_filter = request.GET.get("decision_filter", "all")
+
+    pending_predictions = (
+        PredictionResult.objects
+        .filter(decision__isnull=True)
+        .select_related(
+            "questionnaire__patient__user"
+        )
+    )
+
+    # 우선순위 필터 (전체 / 우선 검토만 / 일반 검토만)
+    # priority_count(통계 카드)는 이 필터와 무관하게 항상 "대기 전체" 기준으로
+    # 따로 계산하므로, 여기서 필터링해도 통계 카드 숫자는 흔들리지 않는다.
+    if pending_filter == "priority":
+        pending_predictions = pending_predictions.filter(risk_probability__gte=0.4)
+    elif pending_filter == "normal":
+        pending_predictions = pending_predictions.filter(risk_probability__lt=0.4)
 
     if sort == "latest":
-        pending_predictions = (
-            PredictionResult.objects
-            .filter(decision__isnull=True)
-            .select_related(
-                "questionnaire__patient__user"
-            )
-            .order_by("-created_at")
-        )
+        pending_predictions = pending_predictions.order_by("-created_at")
     else:
-        pending_predictions = (
-            PredictionResult.objects
-            .filter(decision__isnull=True)
-            .select_related(
-                "questionnaire__patient__user"
-            )
-            .order_by("-risk_probability")
-        )
+        pending_predictions = pending_predictions.order_by("-risk_probability")
 
-    priority_count = pending_predictions.filter(
-        risk_probability__gte=0.4
+    # 통계 카드용 우선 검토 건수 - 필터(pending_filter)와 무관하게 항상 대기 전체 기준
+    priority_count = PredictionResult.objects.filter(
+        decision__isnull=True,
+        risk_probability__gte=0.4,
+    ).count()
+
+    # 필터를 적용하기 전, "대기 목록 자체가 원래 비어있는지"를 판단하기 위한
+    # 전체 건수. 0이면 필터/정렬 컨트롤 자체가 무의미하므로 템플릿에서 숨긴다.
+    # (필터링 때문에 0건이 된 경우는 컨트롤을 계속 보여줘야 하므로, 이 값과
+    # 화면에 표시되는 필터링된 결과 건수를 서로 다른 용도로 구분해서 쓴다.)
+    pending_total_count = PredictionResult.objects.filter(
+        decision__isnull=True
     ).count()
 
     completed_predictions = (
         PredictionResult.objects
         .filter(decision__isnull=False)
         .select_related("questionnaire__patient__user", "decision")
-        .order_by("-decision__decided_at")
     )
 
+    # 판정 결과 필터 (전체 / 권고 / 정상)
+    # decision_filter는 ClinicalDecision.DECISION_CHOICES의 값('recommend', 'normal')과 동일하게 받음
+    if decision_filter in ("recommend", "normal"):
+        completed_predictions = completed_predictions.filter(
+            decision__decision=decision_filter
+        )
+
+    # 완료 목록 정렬 (최신순 / 오래된순 / 권고점수 높은순 / 권고점수 낮은순)
+    completed_sort_map = {
+        "latest": "-decision__decided_at",
+        "oldest": "decision__decided_at",
+        "score_high": "-risk_probability",
+        "score_low": "risk_probability",
+    }
+    completed_predictions = completed_predictions.order_by(
+        completed_sort_map.get(completed_sort, "-decision__decided_at")
+    )
+
+    # 완료 목록도 동일한 이유로, 필터 적용 전 전체 건수를 따로 계산해둔다.
+    completed_total_count = PredictionResult.objects.filter(
+        decision__isnull=False
+    ).count()
+
     # 오늘(로컬 타임존 기준) 판정 완료된 건수.
-    # 주의: decided_at__date=today 형태의 date lookup은 DB에 UTC로 저장된 값을
+    # 주의 1: decided_at__date=today 형태의 date lookup은 DB에 UTC로 저장된 값을
     # 그대로 자르는 경우가 있어 타임존 어긋남으로 0건이 나올 수 있음.
     # 로컬 타임존 기준 "오늘 0시 ~ 내일 0시" 범위로 명시적으로 비교해야 안전함.
+    # 주의 2: 이 통계 카드는 필터(decision_filter)와 무관하게 항상 "오늘 전체"를
+    # 보여줘야 하므로, 필터 적용 전의 별도 쿼리셋으로 계산한다.
     now_local = timezone.localtime()
     today_start = now_local.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
 
-    today_completed_count = completed_predictions.filter(
+    today_completed_count = PredictionResult.objects.filter(
+        decision__isnull=False,
         decision__decided_at__gte=today_start,
         decision__decided_at__lt=today_end,
     ).count()
@@ -220,6 +260,11 @@ def doctor_dashboard(request):
             "completed_page_obj": completed_page_obj,
             "active_menu": "doctor_dashboard",
             "sort": sort,
+            "pending_filter": pending_filter,
+            "pending_total_count": pending_total_count,
+            "completed_sort": completed_sort,
+            "decision_filter": decision_filter,
+            "completed_total_count": completed_total_count,
             "priority_count": priority_count,
             "today_completed_count": today_completed_count,
         }

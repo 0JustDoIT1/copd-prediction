@@ -15,15 +15,42 @@ class QuestionnaireForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # ModelChoiceField/TypedChoiceField가 기본으로 만드는 빈 옵션("---------")을
+        # 끄고, 대신 원하는 안내 문구 하나만 빈 값으로 넣는다.
+        # (둘 다 살려두면 "흡연 상태를 선택해주세요."와 "---------"가 같이
+        # 떠서 빈 옵션이 중복으로 보이는 문제가 있었음)
         self.fields["smoking_status"].choices = [
             ("", "흡연 상태를 선택해주세요.")
-        ] + list(self.fields["smoking_status"].choices)
+        ] + [
+            choice for choice in self.fields["smoking_status"].choices
+            if choice[0] != ""
+        ]
 
         for name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs["class"] = "form-check-input"
             else:
                 field.widget.attrs["class"] = "form-control"
+
+        # disabled 처리된 input은 폼 제출 시 값 자체가 전송되지 않으므로,
+        # smoking_amount를 required=False로 둬서 "이 필드는 필수입니다" 에러가
+        # clean() 도달 전에 먼저 발생하지 않게 한다. 실제 값 보정은 clean()에서.
+        self.fields["smoking_amount"].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        smoking_status = cleaned_data.get("smoking_status")
+
+        # 비흡연(0)·과거흡연(1)인 경우, 클라이언트에서 disabled로 막아도
+        # 폼 데이터를 직접 조작해서 보낼 수 있고, disabled된 input은 값 자체가
+        # 전송되지 않아 None으로 들어올 수도 있으므로 서버에서 항상 0으로
+        # 최종 보정한다 (입력값을 신뢰하지 않고 서버가 마지막에 확정).
+        if str(smoking_status) in ("0", "1"):
+            cleaned_data["smoking_amount"] = 0
+        elif cleaned_data.get("smoking_amount") in (None, ""):
+            cleaned_data["smoking_amount"] = 0
+
+        return cleaned_data
 
 
 class HealthRecordForm(forms.ModelForm):
@@ -125,9 +152,13 @@ class ClinicalDecisionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # smoking_status와 동일한 이유로, 자동 생성되는 빈 옵션과 중복되지 않게 처리
         self.fields["decision"].choices = [
             ("", "판정을 선택해주세요.")
-        ] + list(self.fields["decision"].choices)
+        ] + [
+            choice for choice in self.fields["decision"].choices
+            if choice[0] != ""
+        ]
 
 
 class OCRUploadForm(forms.Form):
