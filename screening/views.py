@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.utils import timezone
+from datetime import timedelta
 
 from .models import Questionnaire, PredictionResult
 from .forms import (
@@ -187,10 +188,17 @@ def doctor_dashboard(request):
         .order_by("-decision__decided_at")
     )
 
-    # 오늘(로컬 타임존 기준) 판정 완료된 건수 - decision__decided_at의 날짜 부분만 비교
-    today = timezone.localtime().date()
+    # 오늘(로컬 타임존 기준) 판정 완료된 건수.
+    # 주의: decided_at__date=today 형태의 date lookup은 DB에 UTC로 저장된 값을
+    # 그대로 자르는 경우가 있어 타임존 어긋남으로 0건이 나올 수 있음.
+    # 로컬 타임존 기준 "오늘 0시 ~ 내일 0시" 범위로 명시적으로 비교해야 안전함.
+    now_local = timezone.localtime()
+    today_start = now_local.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+
     today_completed_count = completed_predictions.filter(
-        decision__decided_at__date=today
+        decision__decided_at__gte=today_start,
+        decision__decided_at__lt=today_end,
     ).count()
 
     pending_paginator = Paginator(pending_predictions, 5)
