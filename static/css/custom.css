@@ -351,7 +351,13 @@ body {
   margin-top: 4px;
 }
 
-@media (max-width: 900px) {
+/* 사이드바 숨김/햄버거 전환 기준점.
+   base.html의 햄버거 버튼이 Bootstrap d-md-none(768px)을 쓰고 있으므로,
+   여기도 반드시 동일한 768px로 맞춰야 한다. 예전엔 900px였는데, 그러면
+   768px~900px 구간에서 사이드바도 숨고 햄버거 버튼도 아직 안 보이는
+   사각지대가 생긴다 (양쪽 모두 안 보이는 버그) — 이 값은 base.html의
+   d-md-none과 항상 같은 breakpoint로 유지해야 한다. */
+@media (max-width: 768px) {
   .sidebar {
     position: fixed;
     transform: translateX(-100%);
@@ -451,7 +457,8 @@ body {
   z-index: 40;
 }
 
-@media (max-width: 900px) {
+/* 위 .sidebar 미디어쿼리와 동일한 768px로 통일 (이유는 위 주석 참고) */
+@media (max-width: 768px) {
   .sidebar-overlay.show {
     display: block;
   }
