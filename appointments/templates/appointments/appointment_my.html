@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}내 예약{% endblock %}
 
@@ -10,16 +11,16 @@
   <!-- 예정된 예약 -->
   <p style="font-size:20px; font-weight:700; margin-bottom:16px;">예정된 예약</p>
   {% if upcoming %}
-    {% for appointment in upcoming %}
+    {% for item in upcoming %}
     <div class="card" style="padding:20px; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <p style="font-size:16px; font-weight:700; margin-bottom:4px;">COPD 폐기능검사</p>
-          <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ appointment.slot_datetime|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {% if appointment.slot_datetime.hour < 12 %}오전{% else %}오후{% endif %} {{ appointment.slot_datetime|date:"H:i" }}</p>
-          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ appointment.get_status_display }}</span>
+          <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ item.local_dt|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {{ item.ampm }} {{ item.local_dt|date:"H:i" }}</p>
+          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ item.obj.get_status_display }}</span>
         </div>
-        {% if appointment.status == 'confirmed' %}
-        <form method="post" action="{% url 'appointments:cancel_appointment' appointment.pk %}">
+        {% if item.obj.status == 'confirmed' %}
+        <form method="post" action="{% url 'appointments:cancel_appointment' item.obj.pk %}">
           {% csrf_token %}
           <button type="submit" onclick="return confirm('예약을 취소하시겠습니까?')" style="padding:8px 16px; background:#fff; border:1.5px solid #fc8181; color:#c53030; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;">취소</button>
         </form>
@@ -36,10 +37,10 @@
   <!-- 지난 예약 -->
   <p style="font-size:20px; font-weight:700; margin-bottom:16px; margin-top:32px;">지난 예약</p>
   {% if past %}
-    {% for appointment in past %}
+    {% for item in past %}
     <div class="card" style="padding:20px; margin-bottom:12px; opacity:0.7;">
       <p style="font-size:16px; font-weight:700; margin-bottom:4px;">COPD 폐기능검사</p>
-      <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ appointment.slot_datetime|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {% if appointment.slot_datetime.hour < 12 %}오전{% else %}오후{% endif %} {{ appointment.slot_datetime|date:"H:i" }}</p>
+      <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ item.local_dt|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {{ item.ampm }} {{ item.local_dt|date:"H:i" }}</p>
       <span style="background:#f5f5f5; color:#888; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">완료</span>
     </div>
     {% endfor %}

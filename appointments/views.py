@@ -146,8 +146,20 @@ def my_appointments(request):
         ).order_by('slot_datetime')
         
         now = tz.now()
-        upcoming = all_appointments.filter(slot_datetime__gte=now)
-        past = all_appointments.filter(slot_datetime__lt=now)
+        
+        def add_ampm(appointments):
+            result = []
+            for a in appointments:
+                local_dt = tz.localtime(a.slot_datetime)
+                result.append({
+                    'obj': a,
+                    'local_dt': local_dt,
+                    'ampm': '오전' if local_dt.hour < 12 else '오후',
+                })
+            return result
+        
+        upcoming = add_ampm(all_appointments.filter(slot_datetime__gte=now))
+        past = add_ampm(all_appointments.filter(slot_datetime__lt=now))
         
     except:
         upcoming = []
