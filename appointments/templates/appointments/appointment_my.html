@@ -17,7 +17,11 @@
         <div>
           <p style="font-size:16px; font-weight:700; margin-bottom:4px;">COPD 폐기능검사</p>
           <p style="font-size:14px; color:#62756f; margin-bottom:4px;">{{ item.local_dt|date:"Y년 n월 j일" }} &nbsp;·&nbsp; {{ item.ampm }} {{ item.local_dt|date:"H:i" }}</p>
-          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">{{ item.obj.get_status_display }}</span>
+          {% if item.obj.status == 'confirmed' %}
+          <span style="background:#e8f5f1; color:#4a7c72; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">확정</span>
+          {% else %}
+          <span style="background:#fff3e0; color:#f97316; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;">취소</span>
+          {% endif %}
         </div>
         {% if item.obj.status == 'confirmed' %}
         <form method="post" action="{% url 'appointments:cancel_appointment' item.obj.pk %}">
