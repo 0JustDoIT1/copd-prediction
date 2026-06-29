@@ -64,6 +64,11 @@
 
 {% block extra_js %}
 <script>
+// back 파라미터 있으면 URL에서 제거
+if (window.location.search.includes('back=true')) {
+  history.replaceState(null, '', window.location.pathname);
+}
+
 const DAYS = ['일','월','화','수','목','금','토'];
 let current = new Date();
 
@@ -102,8 +107,9 @@ function renderCalendar() {
     
     if (isPast || isSunday) {
       style += "color:#ccc; cursor:not-allowed;";
+      if (isToday) style += "border:1.5px solid #4a7c72;";
     } else if (isToday) {
-      style += "border:1.5px solid #4a7c72; font-weight:700; cursor:pointer;";
+      style += "border:1.5px solid #4a7c72; font-weight:700; cursor:pointer;";    
     } else {
       style += "cursor:pointer;";
     }
@@ -126,6 +132,18 @@ function changeMonth(dir) {
 }
 
 function selectDay(year, month, day, isSat) {
+  // 이미 선택된 날짜 다시 클릭하면 취소
+const currentDate = document.getElementById('slot-label').textContent;
+const clickedDate = `${year}년 ${month}월 ${day}일`;
+if (currentDate === clickedDate) {
+  event.target.style.background = '';
+  event.target.style.color = '';
+  event.target.style.fontWeight = '';
+  document.getElementById('slot-label').textContent = '날짜를 먼저 선택해주세요';
+  document.getElementById('selected-info-text').textContent = '';
+  selectedTime = '';
+  return;
+}
   document.querySelectorAll('#calendar-grid div[onclick]').forEach(el => {
     el.style.background = '';
     el.style.color = '';

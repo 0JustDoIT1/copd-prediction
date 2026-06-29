@@ -5,6 +5,7 @@ from .models import AppointmentRequest
 from accounts.models import PatientProfile
 from django.db import transaction, IntegrityError
 from django.utils import timezone as tz
+from datetime import timedelta
 
 SLOT_TIMES_AM = [
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -20,12 +21,16 @@ SLOT_TIMES_SAT = [
 ]
 
 def appointment_request(request):
-    saved_date = request.session.get('selected_date', '')
-    saved_time = request.session.get('selected_time', '')
+    if request.GET.get('back'):
+        saved_date = request.session.get('selected_date', '')
+        saved_time = request.session.get('selected_time', '')
+    else:
+        saved_date = ''
+        saved_time = ''
+        request.session.pop('selected_date', None)
+        request.session.pop('selected_time', None)
     
-    # 예약된 시간 목록 가져오기
-
-    booked_slots = list(AppointmentRequest.objects.values_list('slot_datetime', flat=True))
+    booked_slots = list(AppointmentRequest.objects.filter(status='confirmed').values_list('slot_datetime', flat=True))
     booked_times = [f"{tz.localtime(slot).year}년 {tz.localtime(slot).month}월 {tz.localtime(slot).day}일|{tz.localtime(slot).strftime('%H:%M')}" for slot in booked_slots]
 
     return render(request, 'appointments/appointment_request.html', {
@@ -80,7 +85,8 @@ def appointment_done(request):
             
             with transaction.atomic():
                 if AppointmentRequest.objects.select_for_update().filter(
-                    slot_datetime=slot_datetime
+                    slot_datetime=slot_datetime,
+                    status = 'confirmed'
                 ).exists():
                     return render(request, 'appointments/appointment_confirm.html', {
                         'selected_date': date_str,
@@ -105,6 +111,8 @@ def appointment_done(request):
         except Exception as e:
             print(f"예약 저장 오류: {e}")
         
+        request.session.pop('selected_date', None)
+        request.session.pop('selected_time', None)
         request.session['appointment_date'] = date_str
         request.session['appointment_time'] = time_str
         return redirect('appointments:appointment_done')
@@ -129,3 +137,38 @@ def appointment_list(request):
     return render(request, 'appointments/appointment_list.html', {
         'appointments': appointments,
     })
+    
+def my_appointments(request):
+    try:
+        patient = request.user.patientprofile
+        all_appointments = AppointmentRequest.objects.filter(
+            patient=patient
+        ).order_by('slot_datetime')
+        
+        now = tz.now()
+        upcoming = all_appointments.filter(slot_datetime__gte=now)
+        past = all_appointments.filter(slot_datetime__lt=now)
+        
+    except:
+        upcoming = []
+        past = []
+    
+    return render(request, 'appointments/appointment_my.html', {
+        'upcoming': upcoming,
+        'past': past,
+    })
+
+def cancel_appointment(request, pk):
+    if request.method == 'POST':
+        try:
+            patient = request.user.patientprofile
+            appointment = AppointmentRequest.objects.get(pk=pk, patient=patient)
+            
+            # 하루 전까지만 취소 가능
+            if appointment.slot_datetime - tz.now() > timedelta(days=1):
+                appointment.status = 'cancelled'
+                appointment.save()
+        except:
+            pass
+    
+    return redirect('appointments:my_appointments')
