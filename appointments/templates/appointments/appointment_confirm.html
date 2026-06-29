@@ -46,7 +46,12 @@
     <!-- 요청사항 -->
     <form method="post" action="{% url 'appointments:appointment_done' %}">
       {% csrf_token %}
-      <input type="hidden" name="date" value="{{ selected_date }}">
+      <!-- 주의: date에는 요일 없는 원본(selected_date_raw)을 넣어야 한다.
+           화면 표시용 selected_date(예: '2026년 6월 30일 (화)')를 그대로
+           넣으면, appointment_done()의 strptime 포맷("%Y년 %m월 %d일")과
+           안 맞아 파싱이 실패한다 - 이 버그로 예약이 화면상 성공한 것처럼
+           보이는데 실제로는 DB에 저장이 안 됐었음. -->
+      <input type="hidden" name="date" value="{{ selected_date_raw }}">
       <input type="hidden" name="time" value="{{ selected_time }}">
       
       <p style="font-size:20px; font-weight:700; margin-bottom:8px;"><i class="bi bi-chat-left-text"></i> 요청사항 <span style="font-size:13px; color:#62756f; font-weight:400;">(선택)</span></p>
