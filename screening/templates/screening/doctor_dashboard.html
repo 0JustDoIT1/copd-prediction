@@ -116,29 +116,6 @@
     border-color: #26765e;
   }
 
-  .btn-outline-primary {
-    color: #2f8f72;
-    border-color: #2f8f72;
-  }
-
-  .btn-outline-primary:hover {
-    background-color: #2f8f72;
-    border-color: #2f8f72;
-  }
-
-  .pagination .page-link {
-    color: #2f8f72;
-    border-radius: 10px;
-    margin: 0 3px;
-    border-color: #dbe9e4;
-  }
-
-  .pagination .active .page-link {
-    background-color: #2f8f72;
-    border-color: #2f8f72;
-    color: #ffffff;
-  }
-
   .alert-warning-soft {
     background-color: #fff9e8;
     color: #8a6d1d;
@@ -146,6 +123,127 @@
     border-radius: 14px;
     padding: 16px 18px;
     font-size: 14px;
+  }
+
+  /* ===================== 카드 헤더 컨트롤 영역 정리 ===================== */
+  /* 대기 목록/완료 목록 둘 다 "필터 드롭다운 1개 + 정렬 드롭다운 1개"로
+     구조를 동일하게 맞춤 (이전엔 한쪽만 세그먼트 버튼이 여러 개 늘어서
+     있어서 두 카드의 톤이 서로 달라 보였음) */
+  .review-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .review-toolbar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .review-toolbar-count {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #2f8f72;
+    background-color: #e7f5ef;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  .review-toolbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filter-select-wrap {
+    position: relative;
+  }
+
+  .filter-select {
+    appearance: none;
+    border: 1px solid #dbe9e4;
+    background-color: #ffffff;
+    color: #3f4d49;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 30px 7px 32px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .filter-select:hover,
+  .filter-select:focus {
+    border-color: #2f8f72;
+    outline: none;
+  }
+
+  .filter-select-wrap::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid #6c7d77;
+    border-bottom: 1.5px solid #6c7d77;
+    transform: translateY(-65%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .filter-select-wrap .select-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #6c7d77;
+    pointer-events: none;
+  }
+
+  /* ===================== 페이지네이션 정리 ===================== */
+  .review-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #e1ebe6;
+    background-color: #ffffff;
+    color: #4f5f5a;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .page-btn:hover {
+    border-color: #2f8f72;
+    color: #2f8f72;
+  }
+
+  .page-btn-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .page-info {
+    font-size: 12.5px;
+    color: #8a8f94;
+    margin: 0 6px;
   }
 </style>
 
@@ -192,23 +290,33 @@
   </div>
 
   <div class="card review-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold">검토 대기 목록</h5>
+    <div class="card-header">
+      <div class="review-toolbar">
+        <div class="review-toolbar-title">
+          <h5 class="mb-0 fw-bold">검토 대기 목록</h5>
+          <span class="review-toolbar-count">{{ pending_page_obj.paginator.count }}건</span>
+        </div>
 
-      <div class="btn-group btn-group-sm">
-        <a
-          href="?sort=priority"
-          class="btn {% if sort == 'priority' %}btn-primary{% else %}btn-outline-primary{% endif %}"
-        >
-          우선순위순
-        </a>
+        <div class="review-toolbar-controls">
+          {% if pending_total_count > 0 %}
+          <div class="filter-select-wrap">
+            <i class="bi bi-funnel select-icon"></i>
+            <select class="filter-select" onchange="location.href=this.value">
+              <option value="?sort={{ sort }}&pending_filter=all" {% if pending_filter == 'all' %}selected{% endif %}>전체</option>
+              <option value="?sort={{ sort }}&pending_filter=priority" {% if pending_filter == 'priority' %}selected{% endif %}>우선 검토만</option>
+              <option value="?sort={{ sort }}&pending_filter=normal" {% if pending_filter == 'normal' %}selected{% endif %}>일반 검토만</option>
+            </select>
+          </div>
 
-        <a
-          href="?sort=latest"
-          class="btn {% if sort == 'latest' %}btn-primary{% else %}btn-outline-primary{% endif %}"
-        >
-          최신순
-        </a>
+          <div class="filter-select-wrap">
+            <i class="bi bi-arrow-down-up select-icon"></i>
+            <select class="filter-select" onchange="location.href=this.value">
+              <option value="?pending_filter={{ pending_filter }}&sort=priority" {% if sort == 'priority' %}selected{% endif %}>우선순위순</option>
+              <option value="?pending_filter={{ pending_filter }}&sort=latest" {% if sort == 'latest' %}selected{% endif %}>최신순</option>
+            </select>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
 
@@ -267,41 +375,27 @@
           </table>
         </div>
 
-        <nav class="mt-3">
-          <ul class="pagination justify-content-center">
+        {% if pending_page_obj.paginator.num_pages > 1 %}
+        <nav class="review-pagination">
+          {% if pending_page_obj.has_previous %}
+            <a class="page-btn" href="?sort={{ sort }}&pending_filter={{ pending_filter }}&pending_page={{ pending_page_obj.previous_page_number }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          {% else %}
+            <span class="page-btn page-btn-disabled"><i class="bi bi-chevron-left"></i></span>
+          {% endif %}
 
-            {% if pending_page_obj.has_previous %}
-              <li class="page-item">
-                <a
-                  class="page-link"
-                  href="?pending_page={{ pending_page_obj.previous_page_number }}"
-                >
-                  이전
-                </a>
-              </li>
-            {% endif %}
+          <span class="page-info">{{ pending_page_obj.number }} / {{ pending_page_obj.paginator.num_pages }}</span>
 
-            <li class="page-item active">
-              <span class="page-link">
-                {{ pending_page_obj.number }}
-                /
-                {{ pending_page_obj.paginator.num_pages }}
-              </span>
-            </li>
-
-            {% if pending_page_obj.has_next %}
-              <li class="page-item">
-                <a
-                  class="page-link"
-                  href="?pending_page={{ pending_page_obj.next_page_number }}"
-                >
-                  다음
-                </a>
-              </li>
-            {% endif %}
-
-          </ul>
+          {% if pending_page_obj.has_next %}
+            <a class="page-btn" href="?sort={{ sort }}&pending_filter={{ pending_filter }}&pending_page={{ pending_page_obj.next_page_number }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          {% else %}
+            <span class="page-btn page-btn-disabled"><i class="bi bi-chevron-right"></i></span>
+          {% endif %}
         </nav>
+        {% endif %}
 
       {% else %}
         <div class="alert-warning-soft">
@@ -313,7 +407,35 @@
 
   <div class="card review-card mt-4">
     <div class="card-header">
-      <h5 class="mb-0 fw-bold">검토 완료 목록</h5>
+      <div class="review-toolbar">
+        <div class="review-toolbar-title">
+          <h5 class="mb-0 fw-bold">검토 완료 목록</h5>
+          <span class="review-toolbar-count">{{ completed_page_obj.paginator.count }}건</span>
+        </div>
+
+        <div class="review-toolbar-controls">
+          {% if completed_total_count > 0 %}
+          <div class="filter-select-wrap">
+            <i class="bi bi-funnel select-icon"></i>
+            <select class="filter-select" onchange="location.href=this.value">
+              <option value="?completed_sort={{ completed_sort }}&decision_filter=all" {% if decision_filter == 'all' %}selected{% endif %}>전체 결과</option>
+              <option value="?completed_sort={{ completed_sort }}&decision_filter=recommend" {% if decision_filter == 'recommend' %}selected{% endif %}>폐활량검사 권고</option>
+              <option value="?completed_sort={{ completed_sort }}&decision_filter=normal" {% if decision_filter == 'normal' %}selected{% endif %}>정상</option>
+            </select>
+          </div>
+
+          <div class="filter-select-wrap">
+            <i class="bi bi-arrow-down-up select-icon"></i>
+            <select class="filter-select" onchange="location.href=this.value">
+              <option value="?decision_filter={{ decision_filter }}&completed_sort=latest" {% if completed_sort == 'latest' %}selected{% endif %}>최신순</option>
+              <option value="?decision_filter={{ decision_filter }}&completed_sort=oldest" {% if completed_sort == 'oldest' %}selected{% endif %}>오래된순</option>
+              <option value="?decision_filter={{ decision_filter }}&completed_sort=score_high" {% if completed_sort == 'score_high' %}selected{% endif %}>점수 높은순</option>
+              <option value="?decision_filter={{ decision_filter }}&completed_sort=score_low" {% if completed_sort == 'score_low' %}selected{% endif %}>점수 낮은순</option>
+            </select>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
     <div class="card-body">
@@ -362,41 +484,27 @@
           </table>
         </div>
 
-        <nav class="mt-3">
-          <ul class="pagination justify-content-center">
+        {% if completed_page_obj.paginator.num_pages > 1 %}
+        <nav class="review-pagination">
+          {% if completed_page_obj.has_previous %}
+            <a class="page-btn" href="?completed_sort={{ completed_sort }}&decision_filter={{ decision_filter }}&completed_page={{ completed_page_obj.previous_page_number }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          {% else %}
+            <span class="page-btn page-btn-disabled"><i class="bi bi-chevron-left"></i></span>
+          {% endif %}
 
-            {% if completed_page_obj.has_previous %}
-              <li class="page-item">
-                <a
-                  class="page-link"
-                  href="?completed_page={{ completed_page_obj.previous_page_number }}"
-                >
-                  이전
-                </a>
-              </li>
-            {% endif %}
+          <span class="page-info">{{ completed_page_obj.number }} / {{ completed_page_obj.paginator.num_pages }}</span>
 
-            <li class="page-item active">
-              <span class="page-link">
-                {{ completed_page_obj.number }}
-                /
-                {{ completed_page_obj.paginator.num_pages }}
-              </span>
-            </li>
-
-            {% if completed_page_obj.has_next %}
-              <li class="page-item">
-                <a
-                  class="page-link"
-                  href="?completed_page={{ completed_page_obj.next_page_number }}"
-                >
-                  다음
-                </a>
-              </li>
-            {% endif %}
-
-          </ul>
+          {% if completed_page_obj.has_next %}
+            <a class="page-btn" href="?completed_sort={{ completed_sort }}&decision_filter={{ decision_filter }}&completed_page={{ completed_page_obj.next_page_number }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          {% else %}
+            <span class="page-btn page-btn-disabled"><i class="bi bi-chevron-right"></i></span>
+          {% endif %}
         </nav>
+        {% endif %}
 
       {% else %}
         <div class="alert-warning-soft">

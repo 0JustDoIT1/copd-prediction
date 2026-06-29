@@ -1,4 +1,3 @@
-```html
 {% extends "base.html" %}
 
 {% block title %}COPD 선별 문진 | 미래의료병원{% endblock %}
@@ -85,6 +84,12 @@
     box-shadow: 0 0 0 3px rgba(74,124,114,0.12) !important;
   }
 
+  form input[type="number"]:disabled {
+    background-color: #f0f2f1 !important;
+    color: var(--color-muted) !important;
+    cursor: not-allowed;
+  }
+
   .form-check {
     background: #f8fbfa;
     border: 1px solid var(--color-border);
@@ -156,9 +161,9 @@
 
             {{ form.smoking_amount }}
 
-            <div class="form-text">
+            <div class="form-text" id="smokingAmountHint">
               현재 흡연 중인 경우 하루 평균 흡연 개비 수를 입력해주세요.<br>
-              비흡연자와 과거흡연자는 0을 입력합니다.
+              비흡연자와 과거흡연자는 0으로 자동 고정됩니다.
             </div>
           </div>
         </div>
@@ -222,4 +227,34 @@
 </div>
 
 {% endblock %}
-```
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var smokingStatus = document.getElementById('id_smoking_status');
+    var smokingAmount = document.getElementById('id_smoking_amount');
+
+    if (!smokingStatus || !smokingAmount) {
+      return;
+    }
+
+    // 비흡연(0), 과거흡연(1)일 때는 흡연량을 0으로 고정하고 수정 못 하게 함.
+    // 서버(forms.py의 clean())에서도 동일하게 강제하므로, 여기서 disabled를
+    // 풀고 값을 조작해서 보내도 최종적으로는 0으로 처리된다 - 이 JS는
+    // 사용자 경험을 위한 보조 장치일 뿐, 검증의 최종 책임은 서버에 있음.
+    function syncSmokingAmount() {
+      var isNonOrPastSmoker = smokingStatus.value === '0' || smokingStatus.value === '1';
+
+      if (isNonOrPastSmoker) {
+        smokingAmount.value = 0;
+        smokingAmount.setAttribute('disabled', 'disabled');
+      } else {
+        smokingAmount.removeAttribute('disabled');
+      }
+    }
+
+    smokingStatus.addEventListener('change', syncSmokingAmount);
+    syncSmokingAmount();
+  });
+</script>
+{% endblock %}
