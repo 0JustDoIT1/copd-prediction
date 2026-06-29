@@ -269,7 +269,7 @@ def result_list(request):
 
 # ocr 서비스
 @login_required
-def ocr_upload(request):
+def ocr_upload(request, questionnaire_id):
     if request.method == "POST":
         form = OCRUploadForm(request.POST, request.FILES)
 
@@ -285,7 +285,10 @@ def ocr_upload(request):
             request.session["ocr_raw_text"] = ocr_result["raw_text"]
             request.session["ocr_extracted"] = ocr_result["extracted"]
 
-            return redirect("screening:questionnaire")
+            return redirect(
+                "screening:health_record",
+                questionnaire_id=questionnaire_id
+            )
 
     else:
         form = OCRUploadForm()

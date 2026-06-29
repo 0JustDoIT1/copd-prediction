@@ -38,8 +38,8 @@ urlpatterns = [
     ),
 
     path(
-    "ocr/",
+    "ocr/<int:questionnaire_id>/",
     views.ocr_upload,
     name="ocr_upload",
-    ),
+),
 ]

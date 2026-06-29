@@ -259,9 +259,12 @@
               </small>
             </div>
 
-            <a href="{% url 'screening:ocr_upload' %}" class="btn btn-primary">
-              OCR 업로드
-            </a>
+            <a
+                href="{% url 'screening:ocr_upload' questionnaire.id %}"
+                class="btn btn-primary"
+                >
+                OCR 업로드
+                </a>
           </div>
         </div>
       </div>
