@@ -99,9 +99,20 @@ document.addEventListener("DOMContentLoaded", function () {
       var active = parseInt(btn.dataset.val, 10) === smokingVal;
       btn.classList.toggle("active", active);
     });
-    var isNonSmoker = smokingVal === 0;
-    amountRow.style.opacity = isNonSmoker ? "0.35" : "1";
-    amountSlider.disabled = isNonSmoker;
+
+    // 현재흡연(2)만 흡연량 조절 가능
+    var canChangeAmount = smokingVal === 2;
+
+    amountRow.style.opacity = canChangeAmount ? "1" : "0.35";
+    amountSlider.disabled = !canChangeAmount;
+
+    if (!canChangeAmount) {
+      amountSlider.value = 0;
+      amountOut.textContent = "0개비";
+    } else {
+      amountSlider.value = amountVal;
+      amountOut.textContent = amountVal + "개비";
+    }
   }
 
   function labelFor(score) {
@@ -152,7 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     Promise.all([
       fetchScore(CURRENT_SMOKING, CURRENT_AMOUNT),
-      fetchScore(smokingVal, amountVal),
+      fetchScore(
+        smokingVal,
+        smokingVal === 2 ? amountVal : 0
+      ),
     ])
       .then(function (scores) {
         var currentScore = scores[0];
